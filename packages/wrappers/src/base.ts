@@ -7,7 +7,6 @@ import {
 } from '@aiostreams/types';
 import { parseFilename } from '@aiostreams/parser';
 import { getTextHash, serviceDetails, Settings } from '@aiostreams/utils';
-import { fetch as uFetch, ProxyAgent } from 'undici';
 import { emojiToLanguage, codeToLanguage } from '@aiostreams/formatters';
 
 export class BaseWrapper {
@@ -122,8 +121,7 @@ export class BaseWrapper {
     );
 
     let response = useProxy
-      ? uFetch(url, {
-          dispatcher: new ProxyAgent(Settings.ADDON_PROXY),
+      ? fetch(url, {
           method: 'GET',
           headers: headers,
           signal: AbortSignal.timeout(this.indexerTimeout),
