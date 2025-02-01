@@ -4,6 +4,8 @@ import {
   StreamRequest,
   ParsedNameData,
   Config,
+  ErrorStream,
+  ParseResult,
 } from '@aiostreams/types';
 import { parseFilename } from '@aiostreams/parser';
 import { getTextHash, serviceDetails, Settings } from '@aiostreams/utils';
@@ -38,14 +40,27 @@ export class BaseWrapper {
       : `${manifestUrl}/manifest.json`;
   }
 
-  public async getParsedStreams(
-    streamRequest: StreamRequest
-  ): Promise<ParsedStream[]> {
+  public async getParsedStreams(streamRequest: StreamRequest): Promise<{
+    addonStreams: ParsedStream[];
+    addonErrors: string[];
+  }> {
     const streams: Stream[] = await this.getStreams(streamRequest);
-    const parsedStreams: ParsedStream[] = streams
-      .map((stream) => this.parseStream(stream))
+    const errors: string[] = [];
+    const finalStreams = streams
+      .map((stream) => {
+        const { type, result } = this.parseStream(stream);
+        if (type === 'error') {
+          errors.push(result);
+          return undefined;
+        } else if (type === 'stream') {
+          return result;
+        } else {
+          return undefined;
+        }
+      })
       .filter((parsedStream) => parsedStream !== undefined);
-    return parsedStreams;
+
+    return { addonStreams: finalStreams, addonErrors: errors };
   }
 
   private getStreamUrl(streamRequest: StreamRequest) {
@@ -70,27 +85,38 @@ export class BaseWrapper {
       useProxy = false;
     } else if (Settings.ADDON_PROXY_CONFIG || Settings.ADDON_PROXY) {
       useProxy = true;
-      for (const rule of Settings.ADDON_PROXY_CONFIG?.split(',')) {
-        const [ruleHost, enabled] = rule.split(':');
-        if (['true', 'false'].includes(enabled) === false) {
-          console.error(
-            `|ERR| utils > shouldProxyRequest > Invalid rule: ${rule}`
-          );
-          continue;
-        }
-        if (ruleHost === '*') {
-          useProxy = !(enabled === 'false');
-        } else if (ruleHost.startsWith('*')) {
-          if (hostname.endsWith(ruleHost.slice(1))) {
+      if (Settings.ADDON_PROXY_CONFIG) {
+        for (const rule of Settings.ADDON_PROXY_CONFIG.split(',')) {
+          const [ruleHost, enabled] = rule.split(':');
+          if (['true', 'false'].includes(enabled) === false) {
+            console.error(
+              `|ERR| utils > shouldProxyRequest > Invalid rule: ${rule}`
+            );
+            continue;
+          }
+          if (ruleHost === '*') {
+            useProxy = !(enabled === 'false');
+          } else if (ruleHost.startsWith('*')) {
+            if (hostname.endsWith(ruleHost.slice(1))) {
+              useProxy = !(enabled === 'false');
+            }
+          }
+          if (hostname === ruleHost) {
             useProxy = !(enabled === 'false');
           }
-        }
-        if (hostname === ruleHost) {
-          useProxy = !(enabled === 'false');
         }
       }
     }
     return useProxy;
+  }
+
+  private getLoggableUrl(url: string): string {
+    let urlObj = new URL(url);
+    return `${urlObj.protocol}//${urlObj.hostname}/${urlObj.pathname
+      .split('/')
+      .slice(1, -3)
+      .map((part) => (Settings.LOG_SENSITIVE_INFO ? part : '<redacted>'))
+      .join('/')}/${urlObj.pathname.split('/').slice(-3).join('/')}`;
   }
 
   protected makeRequest(url: string): Promise<any> {
@@ -102,12 +128,7 @@ export class BaseWrapper {
       headers.set('X-Real-IP', userIp);
     }
 
-    let urlObj = new URL(url);
-    let sanitisedUrl = `${urlObj.protocol}//${urlObj.hostname}/${urlObj.pathname
-      .split('/')
-      .slice(1, -3)
-      .map((part) => (Settings.LOG_SENSITIVE_INFO ? part : '<redacted>'))
-      .join('/')}/${urlObj.pathname.split('/').slice(-3).join('/')}`;
+    let sanitisedUrl = this.getLoggableUrl(url);
     let useProxy = this.shouldProxyRequest(url);
 
     console.log(
@@ -141,16 +162,19 @@ export class BaseWrapper {
     const cachedStreams = cache ? cache.get(requestCacheKey) : undefined;
     if (cachedStreams) {
       console.debug(
-        `|DBG| wrappers > base > ${this.addonName}: Returning cached streams for`
+        `|DBG| wrappers > base > ${this.addonName}: Returning cached streams for ${this.getLoggableUrl(url)}`
       );
       return cachedStreams;
     }
     try {
       const response = await this.makeRequest(url);
       if (!response.ok) {
-        throw new Error(
-          `${this.addonName} failed to respond with status ${response.status}`
-        );
+        const text = await response.text();
+        let error = `${response.status} - ${response.statusText}`;
+        try {
+          error += ` with response: ${JSON.stringify(JSON.parse(text))}`;
+        } catch {}
+        throw new Error(error);
       }
 
       const results = (await response.json()) as { streams: Stream[] };
@@ -168,7 +192,7 @@ export class BaseWrapper {
     } catch (error: any) {
       let message = error.message;
       if (error.name === 'TimeoutError') {
-        message = `The request to ${this.addonName} was aborted after ${this.indexerTimeout}ms`;
+        message = `The request to ${this.addonName} timed out after ${this.indexerTimeout}ms`;
       }
       return Promise.reject(new Error(message));
     }
@@ -186,56 +210,73 @@ export class BaseWrapper {
     duration?: number,
     personal?: boolean,
     infoHash?: string
-  ): ParsedStream {
+  ): ParseResult {
     return {
-      ...parsedInfo,
-      addon: { name: this.addonName, id: this.addonId },
-      filename: filename,
-      size: size,
-      url: stream.url,
-      externalUrl: stream.externalUrl,
-      _infoHash: infoHash,
-      torrent: {
-        infoHash: stream.infoHash,
-        fileIdx: stream.fileIdx,
-        sources: stream.sources,
-        seeders: seeders,
-      },
-      provider: provider,
-      usenet: {
-        age: usenetAge,
-      },
-      indexers: indexer,
-      duration: duration,
-      personal: personal,
-      type: stream.infoHash
-        ? 'p2p'
-        : usenetAge
-          ? 'usenet'
-          : provider
-            ? 'debrid'
-            : stream.url?.endsWith('.m3u8')
-              ? 'live'
-              : 'unknown',
-      stream: {
-        subtitles: stream.subtitles,
-        behaviorHints: {
-          countryWhitelist: stream.behaviorHints?.countryWhitelist,
-          notWebReady: stream.behaviorHints?.notWebReady,
-          proxyHeaders:
-            stream.behaviorHints?.proxyHeaders?.request ||
-            stream.behaviorHints?.proxyHeaders?.response
-              ? {
-                  request: stream.behaviorHints?.proxyHeaders?.request,
-                  response: stream.behaviorHints?.proxyHeaders?.response,
-                }
-              : undefined,
-          videoHash: stream.behaviorHints?.videoHash,
+      type: 'stream',
+      result: {
+        ...parsedInfo,
+        addon: { name: this.addonName, id: this.addonId },
+        filename: filename,
+        size: size,
+        url: stream.url,
+        externalUrl: stream.externalUrl,
+        _infoHash: infoHash,
+        torrent: {
+          infoHash: stream.infoHash,
+          fileIdx: stream.fileIdx,
+          sources: stream.sources,
+          seeders: seeders,
+        },
+        provider: provider,
+        usenet: {
+          age: usenetAge,
+        },
+        indexers: indexer,
+        duration: duration,
+        personal: personal,
+        type: stream.infoHash
+          ? 'p2p'
+          : usenetAge
+            ? 'usenet'
+            : provider
+              ? 'debrid'
+              : stream.url?.endsWith('.m3u8')
+                ? 'live'
+                : 'unknown',
+        stream: {
+          subtitles: stream.subtitles,
+          behaviorHints: {
+            countryWhitelist: stream.behaviorHints?.countryWhitelist,
+            notWebReady: stream.behaviorHints?.notWebReady,
+            proxyHeaders:
+              stream.behaviorHints?.proxyHeaders?.request ||
+              stream.behaviorHints?.proxyHeaders?.response
+                ? {
+                    request: stream.behaviorHints?.proxyHeaders?.request,
+                    response: stream.behaviorHints?.proxyHeaders?.response,
+                  }
+                : undefined,
+            videoHash: stream.behaviorHints?.videoHash,
+          },
         },
       },
     };
   }
-  protected parseStream(stream: { [key: string]: any }): ParsedStream {
+  protected parseStream(stream: { [key: string]: any }): ParseResult {
+    // see if the stream is an error
+    const errorRegex = /invalid\s+\w+\s+(account|apikey|token)/i;
+    if (
+      errorRegex.test(stream.title || '') ||
+      errorRegex.test(stream.description || '')
+    ) {
+      console.log(
+        `|ERR| wrappers > base > ${this.addonName}: ${stream.title || stream.description} was detected as an error`
+      );
+      return {
+        type: 'error',
+        result: stream.title || stream.description,
+      };
+    }
     // attempt to look for filename in behaviorHints.filename
     let filename =
       stream?.behaviorHints?.filename || stream.torrentTitle || stream.filename;
@@ -385,30 +426,34 @@ export class BaseWrapper {
   }
 
   protected extractResolution(string: string): string | undefined {
-    const resolutionPattern = /(?:\d{3,4}p|SD|HD|FHD|UHD|4K|8K)/i;
+    const resolutionPattern = /(?:\d{3,4}(?:p)?|SD|HD|FHD|UHD|4K|8K)/gi;
     const match = string.match(resolutionPattern);
 
     if (!match) return undefined;
-
-    const resolution = match[0].toUpperCase();
-    switch (resolution) {
-      case '480P':
-      case 'SD':
-        return '480p';
-      case '720P':
-      case 'HD':
-        return '720p';
-      case '1080P':
-      case '960P':
-      case 'FHD':
-        return '1080p';
-      case 'UHD':
-      case '4K':
-      case '2160P':
-        return '2160p';
-      default:
-        return resolution;
-    }
+    return (
+      match
+        .map((resolution) => {
+          switch (resolution) {
+            case '480':
+            case 'SD':
+              return '480p';
+            case '720':
+            case 'HD':
+              return '720p';
+            case '1080':
+            case '960':
+            case 'FHD':
+              return '1080p';
+            case 'UHD':
+            case '4K':
+            case '2160':
+              return '2160p';
+            default:
+              return 'Unknown';
+          }
+        })
+        .find((res) => res !== 'Unknown') || 'Unknown'
+    );
   }
 
   protected extractSizeInBytes(string: string, k: number): number {
@@ -436,15 +481,16 @@ export class BaseWrapper {
   protected extractDurationInMs(input: string): number {
     // Regular expression to match different formats of time durations
     const regex =
-      /(\d+)h[:\s]?(\d+)m[:\s]?(\d+)s|(\d+)h[:\s]?(\d+)m|(\d+)h|(\d+)m|(\d+)s/gi;
+      /(?<![^\s\[(_\-,.])(?:(\d+)h[:\s]?(\d+)m[:\s]?(\d+)s|(\d+)h[:\s]?(\d+)m|(\d+)h|(\d+)m|(\d+)s)(?=[\s\)\]_.\-,]|$)/gi;
+
     const match = regex.exec(input);
     if (!match) {
       return 0;
     }
 
-    const hours = parseInt(match[1] || match[4] || match[5] || '0', 10);
-    const minutes = parseInt(match[2] || match[5] || match[6] || '0', 10);
-    const seconds = parseInt(match[3] || match[6] || match[7] || '0', 10);
+    const hours = parseInt(match[1] || match[4] || match[6] || '0', 10);
+    const minutes = parseInt(match[2] || match[5] || match[7] || '0', 10);
+    const seconds = parseInt(match[3] || match[8] || '0', 10);
 
     // Convert to milliseconds
     const totalMilliseconds = (hours * 3600 + minutes * 60 + seconds) * 1000;
