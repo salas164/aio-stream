@@ -85,23 +85,25 @@ export class BaseWrapper {
       useProxy = false;
     } else if (Settings.ADDON_PROXY_CONFIG || Settings.ADDON_PROXY) {
       useProxy = true;
-      for (const rule of Settings.ADDON_PROXY_CONFIG?.split(',')) {
-        const [ruleHost, enabled] = rule.split(':');
-        if (['true', 'false'].includes(enabled) === false) {
-          console.error(
-            `|ERR| utils > shouldProxyRequest > Invalid rule: ${rule}`
-          );
-          continue;
-        }
-        if (ruleHost === '*') {
-          useProxy = !(enabled === 'false');
-        } else if (ruleHost.startsWith('*')) {
-          if (hostname.endsWith(ruleHost.slice(1))) {
+      if (Settings.ADDON_PROXY_CONFIG) {
+        for (const rule of Settings.ADDON_PROXY_CONFIG.split(',')) {
+          const [ruleHost, enabled] = rule.split(':');
+          if (['true', 'false'].includes(enabled) === false) {
+            console.error(
+              `|ERR| utils > shouldProxyRequest > Invalid rule: ${rule}`
+            );
+            continue;
+          }
+          if (ruleHost === '*') {
+            useProxy = !(enabled === 'false');
+          } else if (ruleHost.startsWith('*')) {
+            if (hostname.endsWith(ruleHost.slice(1))) {
+              useProxy = !(enabled === 'false');
+            }
+          }
+          if (hostname === ruleHost) {
             useProxy = !(enabled === 'false');
           }
-        }
-        if (hostname === ruleHost) {
-          useProxy = !(enabled === 'false');
         }
       }
     }
@@ -479,15 +481,16 @@ export class BaseWrapper {
   protected extractDurationInMs(input: string): number {
     // Regular expression to match different formats of time durations
     const regex =
-      /(\d+)h[:\s]?(\d+)m[:\s]?(\d+)s|(\d+)h[:\s]?(\d+)m|(\d+)h|(\d+)m|(\d+)s/gi;
+      /(?<![^\s\[(_\-,.])(?:(\d+)h[:\s]?(\d+)m[:\s]?(\d+)s|(\d+)h[:\s]?(\d+)m|(\d+)h|(\d+)m|(\d+)s)(?=[\s\)\]_.\-,]|$)/gi;
+
     const match = regex.exec(input);
     if (!match) {
       return 0;
     }
 
-    const hours = parseInt(match[1] || match[4] || match[5] || '0', 10);
-    const minutes = parseInt(match[2] || match[5] || match[6] || '0', 10);
-    const seconds = parseInt(match[3] || match[6] || match[7] || '0', 10);
+    const hours = parseInt(match[1] || match[4] || match[6] || '0', 10);
+    const minutes = parseInt(match[2] || match[5] || match[7] || '0', 10);
+    const seconds = parseInt(match[3] || match[8] || '0', 10);
 
     // Convert to milliseconds
     const totalMilliseconds = (hours * 3600 + minutes * 60 + seconds) * 1000;
