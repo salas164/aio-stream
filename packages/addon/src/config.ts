@@ -1,5 +1,10 @@
 import { AddonDetail, Config } from '@aiostreams/types';
-import { addonDetails, serviceDetails, Settings } from '@aiostreams/utils';
+import {
+  addonDetails,
+  serviceDetails,
+  Settings,
+  unminifyConfig,
+} from '@aiostreams/utils';
 
 export const allowedFormatters = [
   'gdrive',
@@ -68,6 +73,7 @@ export function validateConfig(config: Config): {
   errorCode: string | null;
   errorMessage: string | null;
 } {
+  config = unminifyConfig(config);
   const createResponse = (
     valid: boolean,
     errorCode: string | null,
@@ -203,7 +209,8 @@ export function validateConfig(config: Config): {
           } else if (
             addon.options[option.id]?.match(
               /^E-[0-9a-fA-F]{32}-[0-9a-fA-F]+$/
-            ) === null
+            ) === null &&
+            addon.options[option.id]?.match(/^E2-[^-]+-[^-]+$/) === null
           ) {
             try {
               new URL(addon.options[option.id] as string);

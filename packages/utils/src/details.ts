@@ -146,6 +146,8 @@ export const addonDetails: AddonDetail[] = [
           { value: 'torbox', label: 'Torbox' },
           { value: 'offcloud', label: 'Offcloud' },
           { value: 'easydebrid', label: 'EasyDebrid' },
+          { value: 'pikpak', label: 'PikPak' },
+          { value: 'seedr', label: 'Seedr' },
         ],
       },
       {
@@ -178,6 +180,14 @@ export const addonDetails: AddonDetail[] = [
         },
       },
       {
+        id: 'liveSearchStreams',
+        required: false,
+        label: 'Search streams on-demand',
+        description:
+          'Enable this option to live search movies & TV streams. By default, results will only be based on cached data. Enable this option to show live search streams as well.',
+        type: 'checkbox',
+      },
+      {
         id: 'filterCertificationLevels',
         required: false,
         label: 'Filter Certification Levels',
@@ -207,6 +217,75 @@ export const addonDetails: AddonDetail[] = [
           { value: 'Moderate', label: 'Moderate' },
           { value: 'Severe', label: 'Severe' },
         ],
+      },
+    ],
+  },
+  {
+    name: 'Stremio-Jackett',
+    id: 'stremio-jackett',
+    requiresService: false,
+    supportedServices: ['realdebrid', 'alldebrid', 'premiumize', 'torbox'],
+    options: [
+      {
+        id: 'prioritiseDebrid',
+        required: false,
+        label: 'Prioritise Debrid Service',
+        description:
+          'Prioritise a specific debrid service when fetching streams. This option is useful when you want to use a specific debrid service for fetching streams. By default, the addon will make a separate request for each debrid service. I highly recommend provding a value for this option as it will speed up the fetching process and remove redundant results.',
+        type: 'select',
+        options: [
+          { value: 'realdebrid', label: 'Real Debrid' },
+          { value: 'alldebrid', label: 'All Debrid' },
+          { value: 'premiumize', label: 'Premiumize' },
+          { value: 'torbox', label: 'Torbox' },
+        ],
+      },
+      {
+        id: 'torrenting',
+        required: false,
+        label: 'Show Torrents',
+        description:
+          'If you have not provided any debrid services, this option does not apply to you, it will show torrent streams regardless.\
+          Show torrents along with debrid streams. By default, the addon will only show debrid streams. Enable this option to show torrents as well.',
+        type: 'checkbox',
+      },
+      {
+        id: 'tmdbApiKey',
+        secret: true,
+        required: false,
+        label: 'TMDB API Key',
+        description:
+          'Stremio-Jackett will use Cinemeta by default. Optionally provide a TMDB API key to fetch metadata from TMDB instead. You can get a free API key from https://www.themoviedb.org/settings/api',
+        type: 'text',
+      },
+      {
+        id: 'overrideName',
+        required: false,
+        label: 'Override Addon Name',
+        description:
+          'Override the name of the Stremio Jackett addon that shows up in the results',
+        type: 'text',
+      },
+      {
+        id: 'overrideUrl',
+        secret: true,
+        required: false,
+        label: 'Override URL',
+        description:
+          'Override the URL used to fetch streams from the Stremio Jackett addon. This option is incompatible with the prioritiseDebrid option. By default, the URL is generated based on the selected services and their credentials. Use this option to override the URL with a custom URL.',
+        type: 'text',
+      },
+      {
+        id: 'indexerTimeout',
+        required: false,
+        label: 'Override Indexer Timeout',
+        description:
+          'The timeout for fetching streams from the Stremio Jackett addon. This is the time in milliseconds that the addon will wait for a response before timing out. Leave it empty to use the recommended timeout.',
+        type: 'number',
+        constraints: {
+          min: Settings.MIN_TIMEOUT,
+          max: Settings.MAX_TIMEOUT,
+        },
       },
     ],
   },
@@ -842,3 +921,129 @@ export const serviceDetails = [
     ],
   },
 ];
+export const compressedConfigMap: Record<string, string> = {
+  streamTypes: 'a',
+  usenet: 'b',
+  debrid: 'c',
+  unknown: 'd',
+  p2p: 'e',
+  live: 'f',
+  resolutions: 'g',
+  '2160p': 'h',
+  '1440p': 'i',
+  '1080p': 'j',
+  '720p': 'k',
+  '480p': 'l',
+  Unknown: 'm',
+  qualities: 'n',
+  'BluRay REMUX': 'o',
+  BluRay: 'p',
+  'WEB-DL': 'q',
+  WEBRip: 'r',
+  HDRip: 's',
+  DVDRip: 't',
+  HDTV: 'u',
+  'HC HD-Rip': 'v',
+  CAM: 'x',
+  SCR: 'A',
+  visualTags: 'B',
+  'HDR+DV': 'C',
+  'HDR10+': 'D',
+  HDR10: 'F',
+  HDR: 'G',
+  '10bit': 'H',
+  IMAX: 'J',
+  audioTags: 'L',
+  Atmos: 'M',
+  'DD+': 'N',
+  'DTS-HD MA': 'P',
+  'DTS-HD': 'Q',
+  DTS: 'R',
+  TrueHD: 'S',
+  '5.1': 'T',
+  '7.1': 'U',
+  FLAC: 'V',
+  AAC: 'W',
+  encodes: 'X',
+  AV1: 'Y',
+  HEVC: 'Z',
+  AVC: 'E',
+  Xvid: 'I',
+  DivX: 'K',
+  'H-OU': 'O',
+  'H-SBS': 'aa',
+  sortBy: 'ab',
+  cached: 'ac',
+  direction: 'ad',
+  resolution: 'ae',
+  language: 'af',
+  size: 'ag',
+  streamType: 'ah',
+  visualTag: 'ai',
+  service: 'aj',
+  audioTag: '!',
+  encode: '@',
+  quality: '#',
+  seeders: '$',
+  addon: '%',
+  onlyShowCachedStreams: '^',
+  prioritisedLanguages: '&',
+  excludedLanguages: '*',
+  maxMovieSize: '(',
+  minMovieSize: ')',
+  maxEpisodeSize: '-',
+  minEpisodeSize: '=',
+  addonNameInDescription: '_',
+  cleanResults: '+',
+  maxResultsPerResolution: '{',
+  strictIncludeFilters: '}',
+  excludeFilters: '|',
+  formatter: '[',
+  mediaFlowConfig: ']',
+  mediaFlowEnabled: ';',
+  proxyUrl: ':',
+  apiPassword: '"',
+  publicIp: "'",
+  proxiedAddons: '<',
+  proxiedServices: '>',
+  addons: '?',
+  options: '/',
+  services: '.',
+  credentials: ',',
+  name: '~',
+  enabled: '`',
+  gdrive: '\\',
+  'minimalistic-gdrive': '..',
+  premiumize: '!!',
+  true: '@;',
+  false: '#;',
+  null: '00',
+  desc: 'dd',
+  asc: 'ak',
+  useMultipleInstances: '--',
+  prioritiseDebrid: '++',
+  indexerTimeout: 'tt',
+  overrideName: 'nn',
+  overrideUrl: 'uu',
+};
+
+// validate unique keys and values
+
+const compressedConfigMapValues = Object.values(compressedConfigMap);
+const compressedConfigMapKeys = Object.keys(compressedConfigMap);
+
+if (
+  new Set(compressedConfigMapValues).size !== compressedConfigMapValues.length
+) {
+  throw new Error(`found duplicate values in compressedConfigMap: Duplicate values were: ${compressedConfigMapValues.filter(
+    (value, index, self) => self.indexOf(value) !== index
+  )}
+  `);
+}
+
+if (new Set(compressedConfigMapKeys).size !== compressedConfigMapKeys.length) {
+  throw new Error(`found duplicate keys in compressedConfigMap: Duplicate keys were: ${compressedConfigMapKeys.filter(
+    (key, index, self) => self.indexOf(key) !== index
+  )}
+  `);
+}
