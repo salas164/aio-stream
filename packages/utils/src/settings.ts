@@ -16,13 +16,13 @@ export class Settings {
     process.env.BRANDING ?? process.env.NEXT_PUBLIC_ELFHOSTED_BRANDING;
   public static readonly SECRET_KEY = process.env.SECRET_KEY ?? '';
   public static readonly CUSTOM_CONFIGS = process.env.CUSTOM_CONFIGS || '';
-
   public static readonly DISABLE_CUSTOM_CONFIG_GENERATOR_ROUTE =
     process.env.DISABLE_CUSTOM_CONFIG_GENERATOR_ROUTE === 'true';
   public static readonly DETERMINISTIC_ADDON_ID = process.env
     .DETERMINISTIC_ADDON_ID
     ? process.env.DETERMINISTIC_ADDON_ID === 'true'
     : false;
+  public static readonly API_KEY = process.env.API_KEY ?? '';
   public static readonly TMDB_API_KEY = process.env.TMDB_API_KEY || '';
   public static readonly SHOW_DIE = process.env.SHOW_DIE
     ? process.env.SHOW_DIE === 'true'

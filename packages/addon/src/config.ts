@@ -97,7 +97,20 @@ export function validateConfig(config: Config): {
       `You can only select a maximum of ${Settings.MAX_ADDONS} addons`
     );
   }
-
+  // check for apiKey if Settings.API_KEY is set
+  if (Settings.API_KEY && !config.apiKey) {
+    return createResponse(
+      false,
+      'missingApiKey',
+      'The AIOStreams API key is required'
+    );
+  } else if (Settings.API_KEY && config.apiKey !== Settings.API_KEY) {
+    return createResponse(
+      false,
+      'invalidApiKey',
+      'Invalid AIOStreams API key. Please use the one defined in your environment variables'
+    );
+  }
   // check for any duplicate addons where both the ID and options are the same
   const duplicateAddons = config.addons.filter(
     (addon, index) =>

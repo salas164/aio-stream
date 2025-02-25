@@ -195,6 +195,7 @@ export default function Configure() {
     string[] | null
   >(null);
   const [overrideName, setOverrideName] = useState<string>('');
+  const [apiKey, setApiKey] = useState<string>('');
 
   const [disableButtons, setDisableButtons] = useState<boolean>(false);
   const [maxMovieSizeSlider, setMaxMovieSizeSlider] = useState<number>(
@@ -206,6 +207,7 @@ export default function Configure() {
   const [choosableAddons, setChoosableAddons] = useState<string[]>(
     addonDetails.map((addon) => addon.id)
   );
+  const [showApiKeyInput, setShowApiKeyInput] = useState<boolean>(false);
   const [manifestUrl, setManifestUrl] = useState<string | null>(null);
 
   useEffect(() => {
@@ -216,6 +218,7 @@ export default function Configure() {
         if (data.success) {
           setMaxMovieSizeSlider(data.maxMovieSize);
           setMaxEpisodeSizeSlider(data.maxEpisodeSize);
+          setShowApiKeyInput(data.apiKeyRequired);
           // filter out 'torrentio' from choosableAddons if torrentioDisabled is true
           if (data.torrentioDisabled) {
             setChoosableAddons(
@@ -230,6 +233,7 @@ export default function Configure() {
 
   const createConfig = (): Config => {
     const config = {
+      apiKey: apiKey,
       overrideName,
       streamTypes,
       resolutions,
@@ -1318,6 +1322,30 @@ export default function Configure() {
             </div>
           }
         </div>
+
+        {showApiKeyInput && (
+          <div className={styles.section}>
+            <div className={styles.setting}>
+              <div className={styles.settingDescription}>
+                <h2 style={{ padding: '5px' }}>API Key</h2>
+                <p style={{ padding: '5px' }}>
+                  Enter your AIOStreams API Key to install and use this addon.
+                  You need to enter the one that is set in the{' '}
+                  <code>API_KEY</code> environment variable.
+                </p>
+              </div>
+              <div className={styles.settingInput}>
+                <CredentialInput
+                  credential={apiKey}
+                  setCredential={setApiKey}
+                  inputProps={{
+                    placeholder: 'Enter your API key',
+                  }}
+                />
+              </div>
+            </div>
+          </div>
+        )}
 
         <div className={styles.installButtons}>
           <button
