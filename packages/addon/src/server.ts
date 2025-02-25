@@ -341,7 +341,7 @@ app.get('/get-addon-config', (req, res) => {
     maxMovieSize: Settings.MAX_MOVIE_SIZE,
     maxEpisodeSize: Settings.MAX_EPISODE_SIZE,
     torrentioDisabled: Settings.DISABLE_TORRENTIO,
-    apiKeyRequired: Settings.API_KEY ? true : false,
+    apiKeyRequired: !!Settings.API_KEY,
   });
 });
 
