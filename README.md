@@ -9,7 +9,7 @@
 - [Usage](#usage)
   - [Public Instace](#public-instance)
   - [Cloudflare Workers](#cloudflare-workers)
-  - [ElfHosted](#elfhosted-paid)
+  - [ElfHosted](#elfhosted-paid) SS
   - [Heroku](#heroku-paid)
   - [VPS](#vps)
   - [Docker](#docker)
