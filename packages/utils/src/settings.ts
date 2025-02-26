@@ -8,7 +8,7 @@ try {
 }
 
 export class Settings {
-  public static readonly ADDON_NAME = process.env.ADDON_NAME ?? 'AIOStreams';
+  public static readonly ADDON_NAME = process.env.ADDON_NAME ?? 'MP4S AND MKVS';
   public static readonly ADDON_ID =
     process.env.ADDON_ID || 'aiostreams.viren070.com';
   public static readonly PORT = process.env.PORT || 3000;
