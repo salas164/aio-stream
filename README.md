@@ -19,7 +19,7 @@
   - [Cloudflare Workers](#cloudflare-workers-1)
   - [Local](#local)
 - [Development](#development)
-- [Credits](#credits)
+- [Creditss](#credits)
 
 ## Description
 
