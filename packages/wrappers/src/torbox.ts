@@ -75,13 +75,21 @@ export class Torbox extends BaseWrapper {
           // the last line can either contain only the type or the type and the seeders/age
           // we will always return the age or seeders and assign the type to the variable declared outside the map
           const parts = field.split('|');
-          type = ['torrent', 'usenet', 'web'].includes(type || '')
-            ? type
-            : parts[0].split(':')[1].trim().toLowerCase();
-          if (parts.length > 1) {
-            return parts[1].split(':')[1].trim();
+          // Extract type from the first part (e.g., "Type: usenet")
+          const typePart = parts[0].split(':');
+          if (typePart.length > 1) {
+            const extractedType = typePart[1].trim().toLowerCase();
+            // Only update type if it's a valid type and we don't already have a valid type
+            if (['torrent', 'usenet', 'web'].includes(extractedType)) {
+              type = extractedType;
+            }
           }
-          // since the last line only contains the type, we will return undefined
+          
+          // Return the seeders/age from the second part if it exists
+          if (parts.length > 1) {
+            const valuePart = parts[1].split(':');
+            return valuePart.length > 1 ? valuePart[1].trim() : undefined;
+          }
           return undefined;
         }
         // Handle case where field might not contain ':'
@@ -166,18 +174,21 @@ export class Torbox extends BaseWrapper {
       cached: stream.is_cached,
     };
 
-    const seeders =
-      type === 'torrent'
-        ? stream.seeders ||
-          (dAgeOrSeeders ? parseInt(dAgeOrSeeders) : undefined)
-        : undefined;
-    // For usenet type, ensure age is a string value
-    const age = type === 'usenet' ? dAgeOrSeeders || undefined : undefined;
-    let infoHash = stream.hash || this.extractInfoHash(stream.url);
-    if (age && infoHash) {
-      // we only need the infoHash for torrents
-      infoHash = undefined;
+    // If seeders is undefined and we have a source indexer, it's likely a Usenet stream
+    if (sourceIndexer && !stream.seeders && type !== 'torrent') {
+      type = 'usenet';
     }
+
+    // Set seeders only for torrent type
+    const seeders = type === 'torrent' ?
+      stream.seeders || (dAgeOrSeeders ? parseInt(dAgeOrSeeders) : undefined) :
+      undefined;
+
+    // Set age only for usenet type
+    const age = type === 'usenet' ? dAgeOrSeeders || undefined : undefined;
+
+    // Handle infoHash - only for torrent type
+    let infoHash = type === 'torrent' ? (stream.hash || this.extractInfoHash(stream.url)) : undefined;
 
     // Add the sourceIndexer to the indexers field if available
     const indexers = sourceIndexer ? sourceIndexer : undefined;

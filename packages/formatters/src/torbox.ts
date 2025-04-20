@@ -36,13 +36,15 @@ Size: ${formatSize(stream.size || 0)}`;
   description += `
 Language: ${stream.languages.length > 0 ? stream.languages.join(', ') : 'Unknown'}`;
 
-  let streamType = stream.torrent
-    ? 'Torrent'
-    : stream.usenet
-      ? 'Usenet'
-      : stream.url
-        ? 'Direct'
-        : 'Unknown';
+  // Determine stream type based on multiple indicators
+  let streamType = 'Unknown';
+  if (stream.usenet?.age || stream.type === 'usenet') {
+    streamType = 'Usenet';
+  } else if (stream.torrent?.infoHash || stream.torrent?.seeders || stream.type === 'p2p') {
+    streamType = 'Torrent';
+  } else if (stream.url) {
+    streamType = 'Direct';
+  }
   description += `
 Type: ${streamType}`;
 
