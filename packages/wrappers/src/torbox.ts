@@ -27,6 +27,7 @@ interface TorboxStream extends Stream {
   resolution?: string;
   language?: string;
   type?: string;
+  source?: string; // Indexer source (e.g., NZBGeek)
   adult?: boolean;
 }
 
@@ -50,13 +51,16 @@ export class Torbox extends BaseWrapper {
   protected parseStream(stream: TorboxStream): ParseResult {
     let type = stream.type;
     let personal = false;
+    let sourceIndexer: string | undefined;
+    
     if (stream.name.includes('Your Media')) {
       logger.debug(`${stream.name} was detected as a personal stream.`, {
         func: 'torbox',
       });
       personal = true;
     }
-    const [dQuality, dFilename, dSize, dLanguage, dAgeOrSeeders] =
+    
+    const [dQuality, dFilename, dSize, dSourceAndLanguage, dAgeOrSeeders] =
       stream.description.split('\n').map((field: string) => {
         if (field.startsWith('Type')) {
           // the last line can either contain only the type or the type and the seeders/age
@@ -71,8 +75,27 @@ export class Torbox extends BaseWrapper {
           // since the last line only contains the type, we will return undefined
           return undefined;
         }
-        const [_, value] = field.split(':');
-        return value.trim();
+        const [fieldName, value] = field.split(':');
+        const trimmedValue = value.trim();
+        
+        // Extract Source/Indexer from the size or language field
+        if (fieldName.trim() === 'Size' && trimmedValue.includes('Source')) {
+          // Format: "643MB | Source: NZBGeek"
+          const parts = trimmedValue.split('|');
+          if (parts.length > 1 && parts[1].includes('Source')) {
+            sourceIndexer = parts[1].split(':')[1].trim();
+            return parts[0].trim(); // Return just the size part
+          }
+        } else if (fieldName.trim() === 'Language' && trimmedValue.includes('Source')) {
+          // Format: "Unknown | Source: NZBGeek"
+          const parts = trimmedValue.split('|');
+          if (parts.length > 1 && parts[1].includes('Source')) {
+            sourceIndexer = parts[1].split(':')[1].trim();
+            return parts[0].trim(); // Return just the language part
+          }
+        }
+        
+        return trimmedValue;
       });
     const filename = stream.behaviorHints?.filename || dFilename;
     const parsedFilename: ParsedNameData = parseFilename(
@@ -87,7 +110,7 @@ export class Torbox extends BaseWrapper {
     }
     */
 
-    const language = stream.language || dLanguage;
+    const language = stream.language || dSourceAndLanguage;
     const normaliseLanguage = (lang: string) => {
       if (lang.toLowerCase() === 'multi audio') {
         return 'Multi';
@@ -127,6 +150,7 @@ export class Torbox extends BaseWrapper {
         ? stream.seeders ||
           (dAgeOrSeeders ? parseInt(dAgeOrSeeders) : undefined)
         : undefined;
+    // For usenet type, ensure age is a string value
     const age = type === 'usenet' ? dAgeOrSeeders || undefined : undefined;
     let infoHash = stream.hash || this.extractInfoHash(stream.url);
     if (age && infoHash) {
@@ -134,6 +158,9 @@ export class Torbox extends BaseWrapper {
       infoHash = undefined;
     }
 
+    // Add the sourceIndexer to the indexers field if available
+    const indexers = sourceIndexer ? sourceIndexer : undefined;
+    
     const parsedStream: ParseResult = this.createParsedResult(
       parsedFilename,
       stream,
@@ -142,8 +169,8 @@ export class Torbox extends BaseWrapper {
       provider,
       seeders,
       age,
-      undefined,
-      undefined,
+      indexers, // The indexers parameter is in the 8th position
+      undefined, // This is the duration parameter in the 9th position
       personal,
       infoHash
     );
