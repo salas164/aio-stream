@@ -531,11 +531,11 @@ export class AIOStreams {
     return streams;
   }
 
-  private createMediaFlowStream(
+  private async createMediaFlowStream(
     parsedStream: ParsedStream,
     name: string,
     description: string
-  ): Stream {
+  ): Promise<Stream> {
     if (!parsedStream.url) {
       logger.error(
         `Stream URL is missing, cannot proxy a stream without a URL`,
@@ -545,7 +545,7 @@ export class AIOStreams {
     }
 
     const mediaFlowConfig = getMediaFlowConfig(this.config);
-    const proxiedUrl = createProxiedMediaFlowUrl(
+    const proxiedUrl = await createProxiedMediaFlowUrl(
       parsedStream.url,
       mediaFlowConfig,
       parsedStream.stream?.behaviorHints?.proxyHeaders
@@ -673,7 +673,7 @@ export class AIOStreams {
     const shouldProxy = this.shouldProxyStream(parsedStream);
     if (shouldProxy) {
       try {
-        const mediaFlowStream = this.createMediaFlowStream(
+        const mediaFlowStream = await this.createMediaFlowStream(
           parsedStream,
           name,
           description
