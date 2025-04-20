@@ -60,8 +60,17 @@ export class Torbox extends BaseWrapper {
       personal = true;
     }
     
-    const [dQuality, dFilename, dSize, dSourceAndLanguage, dAgeOrSeeders] =
-      stream.description.split('\n').map((field: string) => {
+    // Initialize default values
+    let dQuality: string | undefined;
+    let dFilename: string | undefined;
+    let dSize: string | undefined;
+    let dSourceAndLanguage: string | undefined;
+    let dAgeOrSeeders: string | undefined;
+
+    // Only try to parse if description exists
+    if (stream.description) {
+      try {
+        const fields = stream.description.split('\n').map((field: string) => {
         if (field.startsWith('Type')) {
           // the last line can either contain only the type or the type and the seeders/age
           // we will always return the age or seeders and assign the type to the variable declared outside the map
@@ -75,18 +84,23 @@ export class Torbox extends BaseWrapper {
           // since the last line only contains the type, we will return undefined
           return undefined;
         }
-        const [fieldName, value] = field.split(':');
+        // Handle case where field might not contain ':'
+        const parts = field.split(':');
+        if (parts.length < 2) return undefined;
+
+        const [fieldName, ...valueParts] = parts;
+        const value = valueParts.join(':'); // Rejoin in case there were more colons
         const trimmedValue = value.trim();
         
         // Extract Source/Indexer from the size or language field
-        if (fieldName.trim() === 'Size' && trimmedValue.includes('Source')) {
+        if (fieldName && fieldName.trim() === 'Size' && trimmedValue.includes('Source')) {
           // Format: "643MB | Source: NZBGeek"
           const parts = trimmedValue.split('|');
           if (parts.length > 1 && parts[1].includes('Source')) {
             sourceIndexer = parts[1].split(':')[1].trim();
             return parts[0].trim(); // Return just the size part
           }
-        } else if (fieldName.trim() === 'Language' && trimmedValue.includes('Source')) {
+        } else if (fieldName && fieldName.trim() === 'Language' && trimmedValue.includes('Source')) {
           // Format: "Unknown | Source: NZBGeek"
           const parts = trimmedValue.split('|');
           if (parts.length > 1 && parts[1].includes('Source')) {
@@ -97,6 +111,13 @@ export class Torbox extends BaseWrapper {
         
         return trimmedValue;
       });
+
+      // Safely assign values from the parsed fields
+      [dQuality, dFilename, dSize, dSourceAndLanguage, dAgeOrSeeders] = fields;
+      } catch (error) {
+        logger.error(`Error parsing stream description: ${error}`, { func: 'torbox' });
+      }
+    }
     const filename = stream.behaviorHints?.filename || dFilename;
     const parsedFilename: ParsedNameData = parseFilename(
       filename || stream.description
