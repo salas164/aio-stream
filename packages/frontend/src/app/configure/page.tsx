@@ -40,6 +40,7 @@ import CredentialInput from '@/components/CredentialInput';
 import CreateableSelect from '@/components/CreateableSelect';
 import MultiSelect from '@/components/MutliSelect';
 import InstallWindow from '@/components/InstallWindow';
+import FormatterPreview from '@/components/FormatterPreview';
 
 const version = addonPackage.version;
 
@@ -283,7 +284,7 @@ export default function Configure() {
   const fetchWithTimeout = async (
     url: string,
     options: RequestInit | undefined,
-    timeoutMs = 30000
+    timeoutMs = 5000
   ) => {
     const controller = new AbortController();
     const timeout = setTimeout(() => controller.abort(), timeoutMs);
@@ -1081,7 +1082,7 @@ export default function Configure() {
             <div className={styles.settingDescription}>
               <h2 style={{ padding: '5px' }}>Formatter</h2>
               <p style={{ padding: '5px' }}>
-                Change how your stream results are f
+                Change how your stream results are formatted.
                 <span
                   onClick={() => {
                     if (formatterOptions.includes('imposter')) {
@@ -1097,7 +1098,6 @@ export default function Configure() {
                 >
                   ◌
                 </span>
-                rmatted.
               </p>
             </div>
             <div className={styles.settingInput}>
@@ -1113,6 +1113,7 @@ export default function Configure() {
               </select>
             </div>
           </div>
+          <FormatterPreview formatter={formatter || 'gdrive'} />
         </div>
 
         <div className={styles.section}>
