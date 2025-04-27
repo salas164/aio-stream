@@ -1082,7 +1082,7 @@ export default function Configure() {
             <div className={styles.settingDescription}>
               <h2 style={{ padding: '5px' }}>Formatter</h2>
               <p style={{ padding: '5px' }}>
-                Change how your stream results are f.
+                Change how your stream results are f
                 <span
                   onClick={() => {
                     if (formatterOptions.includes('imposter')) {
