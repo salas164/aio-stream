@@ -284,7 +284,7 @@ export default function Configure() {
   const fetchWithTimeout = async (
     url: string,
     options: RequestInit | undefined,
-    timeoutMs = 5000
+    timeoutMs = 3000
   ) => {
     const controller = new AbortController();
     const timeout = setTimeout(() => controller.abort(), timeoutMs);
