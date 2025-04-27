@@ -26,11 +26,10 @@ const FormatterPreview: React.FC<FormatterPreviewProps> = ({
     size: 62500000000, // 58.2 GB
     duration: 9120, // 2h 32m
     provider: {
-      id: 'rd',
+      id: 'realdebrid',
       cached: true
     },
     torrent: {
-      infoHash: 'abc123',
       seeders: 125
     },
     indexers: 'RARBG',
