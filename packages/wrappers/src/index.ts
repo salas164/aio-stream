@@ -5,6 +5,7 @@ export * from './comet';
 export * from './mediafusion';
 export * from './easynews';
 export * from './easynewsPlus';
+export * from './easynewsPlusPlus';
 export * from './debridio';
 export * from './jackettio';
 export * from './orion';

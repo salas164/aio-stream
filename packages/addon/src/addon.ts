@@ -3,6 +3,7 @@ import {
   getCometStreams,
   getDebridioStreams,
   getDMMCastStreams,
+  getEasynewsPlusPlusStreams,
   getEasynewsPlusStreams,
   getEasynewsStreams,
   getJackettioStreams,
@@ -28,12 +29,12 @@ import {
 } from '@aiostreams/formatters';
 import {
   addonDetails,
-  createProxiedMediaFlowUrl,
   getMediaFlowConfig,
   getMediaFlowPublicIp,
   getTimeTakenSincePoint,
   Settings,
   createLogger,
+  generateMediaFlowStreams,
 } from '@aiostreams/utils';
 import { errorStream } from './responses';
 
@@ -53,10 +54,18 @@ export class AIOStreams {
     }
     const mediaFlowConfig = getMediaFlowConfig(this.config);
     if (mediaFlowConfig.mediaFlowEnabled) {
-      const mediaFlowIp = await getMediaFlowPublicIp(
-        mediaFlowConfig,
-        this.config.instanceCache
-      );
+      let mediaFlowIp: string | null = null;
+      // if mediaflow is enabled, we MUST use its IP and throw an error if we can't get it
+      for (let attempt = 1; attempt <= 3; attempt++) {
+        mediaFlowIp = await getMediaFlowPublicIp(
+          mediaFlowConfig,
+          this.config.instanceCache
+        );
+        if (mediaFlowIp) break;
+      }
+      if (!mediaFlowIp) {
+        throw new Error('Failed to get MediaFlow IP after 3 attempts');
+      }
       if (mediaFlowIp) {
         userIp = mediaFlowIp;
       }
@@ -68,33 +77,13 @@ export class AIOStreams {
     const streams: Stream[] = [];
     const startTime = new Date().getTime();
 
-    let ipRequestCount = 0;
-    while (ipRequestCount < 3) {
-      try {
-        const ip = await this.getRequestingIp();
-        if (!ip && getMediaFlowConfig(this.config).mediaFlowEnabled) {
-          throw new Error('No IP was found with MediaFlow enabled');
-        }
-        this.config.requestingIp = ip;
-        break;
-      } catch (error: any) {
-        logger.error(error, {
-          func: 'getRequestingIp',
-        });
-        ipRequestCount++;
-        if (ipRequestCount < 3) {
-          logger.info(`Retrying ${ipRequestCount}/3...`);
-        }
-      }
+    try {
+      this.config.requestingIp = await this.getRequestingIp();
+    } catch (error) {
+      logger.error(error);
+      return [errorStream(`Failed to get MediaFlow IP`)];
     }
-    if (ipRequestCount === 3) {
-      logger.error('Failed to get requesting IP after 3 attempts');
-      if (this.config.mediaFlowConfig?.mediaFlowEnabled) {
-        return [
-          errorStream('Aborted request after failing to get requesting IP'),
-        ];
-      }
-    }
+
     const { parsedStreams, errorStreams } =
       await this.getParsedStreams(streamRequest);
 
@@ -520,9 +509,7 @@ export class AIOStreams {
 
     // Create stream objects
     const streamsStartTime = new Date().getTime();
-    const streamObjects = await Promise.all(
-      filteredResults.map(this.createStreamObject.bind(this))
-    );
+    const streamObjects = await this.createStreamObjects(filteredResults);
     streams.push(...streamObjects.filter((s) => s !== null));
 
     // Add error streams to the end
@@ -537,56 +524,6 @@ export class AIOStreams {
       `Total time taken to get streams: ${getTimeTakenSincePoint(startTime)}`
     );
     return streams;
-  }
-
-  private async createMediaFlowStream(
-    parsedStream: ParsedStream,
-    name: string,
-    description: string
-  ): Promise<Stream> {
-    if (!parsedStream.url) {
-      logger.error(
-        `Stream URL is missing, cannot proxy a stream without a URL`,
-        { func: 'createMediaFlowStream' }
-      );
-      throw new Error('Stream URL is missing');
-    }
-
-    const mediaFlowConfig = getMediaFlowConfig(this.config);
-    const proxiedUrl = await createProxiedMediaFlowUrl(
-      parsedStream.url,
-      mediaFlowConfig,
-      parsedStream.stream?.behaviorHints?.proxyHeaders
-    );
-    if (!proxiedUrl) {
-      throw new Error('Could not create MediaFlow proxied URL');
-    }
-    const combinedTags = [
-      parsedStream.resolution,
-      parsedStream.quality,
-      parsedStream.encode,
-      ...parsedStream.visualTags,
-      ...parsedStream.audioTags,
-      ...parsedStream.languages,
-    ];
-
-    return {
-      url: proxiedUrl,
-      name: this.config.addonNameInDescription
-        ? Settings.ADDON_NAME
-        : `🕵️ ${name}`,
-      description: this.config.addonNameInDescription
-        ? `🕵️ ${name.split('\n').join(' ')}\n${description}`
-        : description,
-      subtitles: parsedStream.stream?.subtitles,
-      behaviorHints: {
-        notWebReady: parsedStream.stream?.behaviorHints?.notWebReady,
-        filename: parsedStream.filename,
-        videoSize: Math.floor(parsedStream.size || 0) || undefined,
-        videoHash: parsedStream.stream?.behaviorHints?.videoHash,
-        bingeGroup: `mfp.${Settings.ADDON_ID}|${parsedStream.addon.name}|${combinedTags.join('|')}`,
-      },
-    };
   }
 
   private shouldProxyStream(stream: ParsedStream): boolean {
@@ -620,107 +557,133 @@ export class AIOStreams {
     return true;
   }
 
-  private async createStreamObject(
-    parsedStream: ParsedStream
-  ): Promise<Stream | null> {
-    let name: string = '';
-    let description: string = '';
+  private getFormattedText(parsedStream: ParsedStream): {
+    name: string;
+    description: string;
+  } {
     switch (this.config.formatter) {
       case 'gdrive': {
-        const { name: _name, description: _description } =
-          gdriveFormat(parsedStream);
-        name = _name;
-        description = _description;
-        break;
+        return gdriveFormat(parsedStream, false);
       }
       case 'minimalistic-gdrive': {
-        const { name: _name, description: _description } = gdriveFormat(
-          parsedStream,
-          true
-        );
-        name = _name;
-        description = _description;
-        break;
+        return gdriveFormat(parsedStream, true);
       }
       case 'imposter': {
-        const { name: _name, description: _description } =
-          imposterFormat(parsedStream);
-        name = _name;
-        description = _description;
-        break;
+        return imposterFormat(parsedStream);
       }
       case 'torrentio': {
-        const { name: _name, description: _description } =
-          torrentioFormat(parsedStream);
-        name = _name;
-        description = _description;
-        break;
+        return torrentioFormat(parsedStream);
       }
       case 'torbox': {
-        const { name: _name, description: _description } =
-          torboxFormat(parsedStream);
-        name = _name;
-        description = _description;
-        break;
+        return torboxFormat(parsedStream);
       }
       default: {
         throw new Error('Unsupported formatter');
       }
     }
+  }
 
-    const combinedTags = [
-      parsedStream.resolution,
-      parsedStream.quality,
-      parsedStream.encode,
-      ...parsedStream.visualTags,
-      ...parsedStream.audioTags,
-      ...parsedStream.languages,
-    ];
+  private async createStreamObjects(
+    parsedStreams: ParsedStream[]
+  ): Promise<Stream[]> {
+    // Step 1: Format all stream metadata
+    let streamObjects: Stream[] = await Promise.all(
+      parsedStreams.map(async (parsedStream) => {
+        const { name, description } = this.getFormattedText(parsedStream);
 
-    let stream: Stream;
-    const shouldProxy = this.shouldProxyStream(parsedStream);
-    if (shouldProxy) {
-      try {
-        const mediaFlowStream = await this.createMediaFlowStream(
-          parsedStream,
-          name,
-          description
-        );
-        if (!mediaFlowStream) {
-          throw new Error('Unknown error creating MediaFlow stream');
-        }
-        return mediaFlowStream;
-      } catch (error) {
-        logger.error(`Failed to create MediaFlow stream URL: ${error}`);
-        return null;
-      }
+        const combinedTags = [
+          parsedStream.resolution,
+          parsedStream.quality,
+          parsedStream.encode,
+          ...parsedStream.visualTags,
+          ...parsedStream.audioTags,
+          ...parsedStream.languages,
+        ];
+
+        return {
+          url: parsedStream.url,
+          externalUrl: parsedStream.externalUrl,
+          infoHash: parsedStream.torrent?.infoHash,
+          fileIdx: parsedStream.torrent?.fileIdx,
+          name: this.config.addonNameInDescription
+            ? Settings.ADDON_NAME
+            : Settings.SHOW_DIE
+              ? `🎲 ${name}`
+              : name,
+          description: this.config.addonNameInDescription
+            ? `🎲 ${name.split('\n').join(' ')}\n${description}`
+            : description,
+          subtitles: parsedStream.stream?.subtitles,
+          sources: parsedStream.torrent?.sources,
+          behaviorHints: {
+            videoSize: parsedStream.size
+              ? Math.floor(parsedStream.size)
+              : undefined,
+            filename: parsedStream.filename,
+            bingeGroup: `${Settings.ADDON_ID}|${parsedStream.addon.name}|${combinedTags.join('|')}`,
+            proxyHeaders: parsedStream.stream?.behaviorHints?.proxyHeaders,
+            notWebReady: parsedStream.stream?.behaviorHints?.notWebReady,
+          },
+        };
+      })
+    );
+
+    // Determine which streams need proxying and remember their indexes
+    const streamsToProxy = parsedStreams
+      .map((stream, index) => ({ stream, index }))
+      .filter(({ stream }) => stream.url !== undefined) // cannot proxy a stream without a URL
+      .filter(({ stream }) => this.shouldProxyStream(stream));
+
+    // Generate proxied URLs
+    const proxiedUrls =
+      streamsToProxy.length > 0
+        ? await generateMediaFlowStreams(
+            getMediaFlowConfig(this.config),
+            streamsToProxy.map(({ stream }) => ({
+              url: stream.url!,
+              filename: stream.filename,
+              headers: stream.stream?.behaviorHints?.proxyHeaders,
+            }))
+          )
+        : null;
+
+    if (
+      streamsToProxy &&
+      proxiedUrls &&
+      proxiedUrls.length !== streamsToProxy.length
+    ) {
+      logger.error(
+        `Proxied URLs length (${proxiedUrls.length}) does not match streamsToProxy length (${streamsToProxy.length})`
+      );
+      return streamObjects;
+    } else if (streamsToProxy.length > 0 && !proxiedUrls) {
+      logger.error(
+        `Proxied URLs is null, but streamsToProxy length is ${streamsToProxy.length}, filtering out streams that needed proxying`
+      );
+      streamObjects = streamObjects.filter(
+        (_, index) => !streamsToProxy.some((s) => s.index === index)
+      );
+    } else if (proxiedUrls) {
+      // inject proxied URLs back into their original positions
+      streamsToProxy.forEach(({ index }, i) => {
+        streamObjects[index].url = proxiedUrls[i] || streamObjects[index].url;
+
+        streamObjects[index].name = this.config.addonNameInDescription
+          ? Settings.ADDON_NAME
+          : `🕵️ ${streamObjects[index].name}`;
+
+        streamObjects[index].description = this.config.addonNameInDescription
+          ? `🕵️ ${streamObjects[index].name.split('\n').join(' ')}\n${streamObjects[index].description}`
+          : streamObjects[index].description;
+
+        streamObjects[index].behaviorHints = {
+          ...streamObjects[index].behaviorHints,
+          bingeGroup: `mfp.${streamObjects[index].behaviorHints?.bingeGroup}`,
+        };
+      });
     }
 
-    stream = {
-      url: parsedStream.url,
-      externalUrl: parsedStream.externalUrl,
-      infoHash: parsedStream.torrent?.infoHash,
-      fileIdx: parsedStream.torrent?.fileIdx,
-      name: this.config.addonNameInDescription
-        ? Settings.ADDON_NAME
-        : Settings.SHOW_DIE
-          ? `🎲 ${name}`
-          : name,
-      description: this.config.addonNameInDescription
-        ? `🎲 ${name.split('\n').join(' ')}\n${description}`
-        : description,
-      subtitles: parsedStream.stream?.subtitles,
-      sources: parsedStream.torrent?.sources,
-      behaviorHints: {
-        videoSize: Math.floor(parsedStream.size || 0) || undefined,
-        filename: parsedStream.filename,
-        bingeGroup: `${Settings.ADDON_ID}|${parsedStream.addon.name}|${combinedTags.join('|')}`,
-        proxyHeaders: parsedStream.stream?.behaviorHints?.proxyHeaders,
-        notWebReady: parsedStream.stream?.behaviorHints?.notWebReady,
-      },
-    };
-
-    return stream;
+    return streamObjects;
   }
 
   private compareLanguages(a: ParsedStream, b: ParsedStream) {
@@ -1084,6 +1047,14 @@ export class AIOStreams {
       }
       case 'easynews-plus': {
         return await getEasynewsPlusStreams(
+          this.config,
+          addon.options,
+          streamRequest,
+          addonId
+        );
+      }
+      case 'easynews-plus-plus': {
+        return await getEasynewsPlusPlusStreams(
           this.config,
           addon.options,
           streamRequest,

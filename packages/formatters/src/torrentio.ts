@@ -17,11 +17,11 @@ export function torrentioFormat(stream: ParsedStream): {
     const serviceShortName =
       serviceDetails.find((service) => service.id === stream.provider!.id)
         ?.shortName || stream.provider.id;
-    name += `[${serviceShortName}${cacheStatus}]\n`;
+    name += `[${serviceShortName}${cacheStatus}] `;
   }
 
   if (stream.torrent?.infoHash) {
-    name += '[P2P]\n';
+    name += '[P2P] ';
   }
 
   name += `${stream.addon.name} ${stream.personal ? '(Your Media) ' : ''}${stream.resolution} `;

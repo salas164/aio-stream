@@ -13,6 +13,7 @@ import {
   serviceDetails,
   Settings,
   createLogger,
+  maskSensitiveInfo,
 } from '@aiostreams/utils';
 import { emojiToLanguage, codeToLanguage } from '@aiostreams/formatters';
 
@@ -127,7 +128,7 @@ export class BaseWrapper {
     const pathParts = urlObj.pathname.split('/');
     const redactedParts = pathParts.length > 3 ? pathParts.slice(1, -3) : [];
     return `${urlObj.protocol}//${urlObj.hostname}/${redactedParts
-      .map((part) => (Settings.LOG_SENSITIVE_INFO ? part : '<redacted>'))
+      .map(maskSensitiveInfo)
       .join(
         '/'
       )}${redactedParts.length ? '/' : ''}${pathParts.slice(-3).join('/')}`;
@@ -147,11 +148,7 @@ export class BaseWrapper {
 
     logger.info(
       `Making a ${useProxy ? 'proxied' : 'direct'} request to ${this.addonName} (${sanitisedUrl}) with user IP ${
-        userIp
-          ? Settings.LOG_SENSITIVE_INFO
-            ? userIp
-            : '<redacted>'
-          : 'not set'
+        userIp ? maskSensitiveInfo(userIp) : 'not set'
       }`
     );
 

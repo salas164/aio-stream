@@ -33,15 +33,22 @@ export class Comet extends BaseWrapper {
     if (stream.url && parsedStream.type === 'stream') {
       parsedStream.result.filename = stream.description?.split('\n')[0];
       if (
-        Settings.FORCE_COMET_HOSTNAME ||
-        Settings.FORCE_COMET_PORT ||
-        Settings.FORCE_COMET_PROTOCOL
+        Settings.FORCE_COMET_HOSTNAME !== null ||
+        Settings.FORCE_COMET_PORT !== null ||
+        Settings.FORCE_COMET_PROTOCOL !== null
       ) {
         // modify the URL according to settings, needed when using a local URL for requests but a public stream URL is needed.
         const url = new URL(stream.url);
-        url.protocol = Settings.FORCE_COMET_PROTOCOL || url.protocol;
-        url.hostname = Settings.FORCE_COMET_HOSTNAME || url.hostname;
-        url.port = Settings.FORCE_COMET_PORT || url.port;
+
+        if (Settings.FORCE_COMET_PROTOCOL !== null) {
+          url.protocol = Settings.FORCE_COMET_PROTOCOL;
+        }
+        if (Settings.FORCE_COMET_PORT !== null) {
+          url.port = Settings.FORCE_COMET_PORT;
+        }
+        if (Settings.FORCE_COMET_HOSTNAME !== null) {
+          url.hostname = Settings.FORCE_COMET_HOSTNAME;
+        }
         parsedStream.result.url = url.toString();
       }
     }

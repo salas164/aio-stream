@@ -23,6 +23,7 @@ import {
   createLogger,
   getTimeTakenSincePoint,
   isValueEncrypted,
+  maskSensitiveInfo,
 } from '@aiostreams/utils';
 
 const logger = createLogger('server');
@@ -98,7 +99,7 @@ app.use((req, res, next) => {
         .replace(
           /\/(E2?|B)?-[\w-\%]+/g,
           '/*******'
-        )} - ${Settings.LOG_SENSITIVE_INFO ? getIp(req) : '<redactedIp>'} - ${res.statusCode} - ${getTimeTakenSincePoint(start)}`
+        )} - ${getIp(req) ? maskSensitiveInfo(getIp(req)!) : 'Unknown IP'} - ${res.statusCode} - ${getTimeTakenSincePoint(start)}`
     );
   });
   next();

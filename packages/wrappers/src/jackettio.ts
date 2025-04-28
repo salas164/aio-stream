@@ -40,6 +40,7 @@ const getJackettioConfigString = (
       priotizePackTorrents: 2,
       excludeKeywords: [],
       debridId: debridService,
+      debridApiKey: debridApiKey,
       hideUncached: false,
       sortCached: [
         ['quality', true],
@@ -54,9 +55,10 @@ const getJackettioConfigString = (
       mediaflowProxyUrl: '',
       mediaflowApiPassword: '',
       mediaflowPublicIp: '',
+      useStremThru: true,
+      stremthruUrl: Settings.DEFAULT_JACKETTIO_STREMTHRU_URL,
       qualities: [0, 360, 480, 720, 1080, 2160],
-      indexers: Settings.JACKETT_INDEXERS,
-      debridApiKey: debridApiKey,
+      indexers: Settings.DEFAULT_JACKETTIO_INDEXERS,
     })
   ).toString('base64');
 };

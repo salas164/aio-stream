@@ -1,0 +1,28 @@
+.previewContainer {
+  background-color: #121212;
+  border-radius: 6px;
+  padding: 15px;
+  margin-top: 15px;
+  border: 1px solid #333333;
+  transition: all 0.3s ease;
+}
+
+
+
+.streamPreview {
+  font-family: monospace;
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+
+.streamName {
+  font-size: 16px;
+  font-weight: bold;
+  margin-bottom: 10px;
+  color: #ffffff;
+}
+
+.streamDescription {
+  font-size: 14px;
+  color: #dddddd;
+}

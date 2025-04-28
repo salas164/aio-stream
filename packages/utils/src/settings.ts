@@ -23,7 +23,6 @@ export class Settings {
     ? process.env.DETERMINISTIC_ADDON_ID === 'true'
     : false;
   public static readonly API_KEY = process.env.API_KEY ?? '';
-  public static readonly TMDB_API_KEY = process.env.TMDB_API_KEY || '';
   public static readonly SHOW_DIE = process.env.SHOW_DIE
     ? process.env.SHOW_DIE === 'true'
     : false;
@@ -111,15 +110,12 @@ export class Settings {
   public static readonly COMET_INDEXERS = process.env.COMET_INDEXERS
     ? JSON.parse(process.env.COMET_INDEXERS)
     : ['dmm_public_hash_shares_only'];
-  public static readonly FORCE_COMET_HOSTNAME = process.env.FORCE_COMET_HOSTNAME
-    ? process.env.FORCE_COMET_HOSTNAME
-    : null;
-  public static readonly FORCE_COMET_PORT = process.env.FORCE_COMET_PORT
-    ? process.env.FORCE_COMET_PORT
-    : null;
-  public static readonly FORCE_COMET_PROTOCOL = process.env.FORCE_COMET_PROTOCOL
-    ? process.env.FORCE_COMET_PROTOCOL
-    : null;
+  public static readonly FORCE_COMET_HOSTNAME =
+    process.env.FORCE_COMET_HOSTNAME ?? null;
+  public static readonly FORCE_COMET_PORT =
+    process.env.FORCE_COMET_PORT ?? null;
+  public static readonly FORCE_COMET_PROTOCOL =
+    process.env.FORCE_COMET_PROTOCOL ?? null;
   public static readonly DEFAULT_COMET_TIMEOUT = process.env
     .DEFAULT_COMET_TIMEOUT
     ? parseInt(process.env.DEFAULT_COMET_TIMEOUT)
@@ -142,9 +138,16 @@ export class Settings {
   // Jackettio settings
   public static readonly JACKETTIO_URL =
     process.env.JACKETTIO_URL || 'https://jackettio.elfhosted.com/';
-  public static readonly JACKETT_INDEXERS = process.env.JACKETT_INDEXERS
-    ? JSON.parse(process.env.JACKETT_INDEXERS)
-    : ['bitsearch', 'eztv', 'thepiratebay', 'therarbg', 'yts'];
+  public static readonly DEFAULT_JACKETTIO_INDEXERS =
+    process.env.DEFAULT_JACKETTIO_INDEXERS || process.env.JACKETT_INDEXERS
+      ? JSON.parse(
+          process.env.DEFAULT_JACKETTIO_INDEXERS ||
+            process.env.JACKETT_INDEXERS!
+        )
+      : ['eztv', 'thepiratebay', 'therarbg', 'yts'];
+  public static readonly DEFAULT_JACKETTIO_STREMTHRU_URL =
+    process.env.DEFAULT_JACKETTIO_STREMTHRU_URL ||
+    'https://stremthru.13377001.xyz';
   public static readonly DEFAULT_JACKETTIO_TIMEOUT = process.env
     .DEFAULT_JACKETTIO_TIMEOUT
     ? parseInt(process.env.DEFAULT_JACKETTIO_TIMEOUT)
@@ -153,12 +156,12 @@ export class Settings {
   // Stremio Jackett settings
   public static readonly STREMIO_JACKETT_URL =
     process.env.STREMIO_JACKETT_URL || 'https://stremio-jackett.elfhosted.com/';
-  public static readonly JACKETT_URL = process.env.JACKETT_URL || null;
-  public static readonly JACKETT_API_KEY = process.env.JACKETT_API_KEY || null;
-  public static readonly STREMIO_JACKETT_CACHE_ENABLED = process.env
-    .STREMIO_JACKETT_CACHE_ENABLED
-    ? process.env.STREMIO_JACKETT_CACHE_ENABLED !== 'false'
-    : true;
+  public static readonly DEFAULT_STREMIO_JACKETT_JACKETT_URL =
+    process.env.DEFAULT_STREMIO_JACKETT_JACKETT_URL || null;
+  public static readonly DEFAULT_STREMIO_JACKETT_JACKETT_API_KEY =
+    process.env.DEFAULT_STREMIO_JACKETT_JACKETT_API_KEY || null;
+  public static readonly DEFAULT_STREMIO_JACKETT_TMDB_API_KEY =
+    process.env.DEFAULT_STREMIO_JACKETT_TMDB_API_KEY || null;
   public static readonly DEFAULT_STREMIO_JACKETT_TIMEOUT = process.env
     .DEFAULT_STREMIO_JACKETT_TIMEOUT
     ? parseInt(process.env.DEFAULT_STREMIO_JACKETT_TIMEOUT)
@@ -208,6 +211,14 @@ export class Settings {
   public static readonly DEFAULT_EASYNEWS_PLUS_TIMEMOUT = process.env
     .DEFAULT_EASYNEWS_PLUS_TIMEMOUT
     ? parseInt(process.env.DEFAULT_EASYNEWS_PLUS_TIMEMOUT)
+    : undefined;
+
+  public static readonly EASYNEWS_PLUS_PLUS_URL =
+    process.env.EASYNEWS_PLUS_PLUS_URL ||
+    'https://easynews-cloudflare-worker.jqrw92fchz.workers.dev/';
+  public static readonly DEFAULT_EASYNEWS_PLUS_PLUS_TIMEMOUT = process.env
+    .DEFAULT_EASYNEWS_PLUS_PLUS_TIMEMOUT
+    ? parseInt(process.env.DEFAULT_EASYNEWS_PLUS_PLUS_TIMEMOUT)
     : undefined;
 
   public static readonly DEBRIDIO_URL =
