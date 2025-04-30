@@ -14,6 +14,7 @@ export const allowedFormatters = [
   'torrentio',
   'torbox',
   'imposter',
+  'custom',
 ];
 
 export const allowedLanguages = [
@@ -302,12 +303,14 @@ export function validateConfig(
   }
 
   if (!allowedFormatters.includes(config.formatter)) {
-    if (config.formatter === 'custom') {
-      if (!config.customFormatter) {
+    if (config.formatter.startsWith('custom') && config.formatter.length > 7) {
+      const jsonString = config.formatter.slice(7);
+      const data = JSON.parse(jsonString);
+      if (!data.name || !data.description) {
         return createResponse(
           false,
-          'missingCustomFormatter',
-          'Custom formatter is required if custom formatter is selected'
+          'invalidCustomFormatter',
+          'Invalid custom formatter: name and description are required'
         );
       }
     } else {

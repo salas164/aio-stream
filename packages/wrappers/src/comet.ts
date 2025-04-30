@@ -24,7 +24,10 @@ export class Comet extends BaseWrapper {
       url,
       addonId,
       userConfig,
-      indexerTimeout || Settings.DEFAULT_COMET_TIMEOUT
+      indexerTimeout || Settings.DEFAULT_COMET_TIMEOUT,
+      {
+        'User-Agent': Settings.DEFAULT_COMET_USER_AGENT,
+      }
     );
   }
 

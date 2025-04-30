@@ -44,7 +44,10 @@ export class Torbox extends BaseWrapper {
       Settings.TORBOX_STREMIO_URL + apiKey + '/',
       addonId,
       userConfig,
-      indexerTimeout || Settings.DEFAULT_TORBOX_TIMEOUT
+      indexerTimeout || Settings.DEFAULT_TORBOX_TIMEOUT,
+      {
+        'User-Agent': Settings.DEFAULT_TORBOX_USER_AGENT,
+      }
     );
   }
 

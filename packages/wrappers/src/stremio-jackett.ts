@@ -30,7 +30,10 @@ export class StremioJackett extends BaseWrapper {
       url,
       addonId,
       userConfig,
-      indexerTimeout || Settings.DEFAULT_STREMIO_JACKETT_TIMEOUT
+      indexerTimeout || Settings.DEFAULT_STREMIO_JACKETT_TIMEOUT,
+      {
+        'User-Agent': Settings.DEFAULT_STREMIO_JACKETT_USER_AGENT,
+      }
     );
   }
 

@@ -1,4 +1,4 @@
-import { AddonDetail, StreamRequest } from '@aiostreams/types';
+import { AddonDetail, ParseResult, StreamRequest } from '@aiostreams/types';
 import { ParsedStream, Config } from '@aiostreams/types';
 import { BaseWrapper } from './base';
 import { addonDetails, createLogger } from '@aiostreams/utils';
@@ -25,8 +25,37 @@ export class Jackettio extends BaseWrapper {
       url,
       addonId,
       userConfig,
-      indexerTimeout || Settings.DEFAULT_JACKETTIO_TIMEOUT
+      indexerTimeout || Settings.DEFAULT_JACKETTIO_TIMEOUT,
+      {
+        'User-Agent': Settings.DEFAULT_JACKETTIO_USER_AGENT,
+      }
     );
+  }
+
+  protected parseStream(stream: { [key: string]: any }): ParseResult {
+    const parsedStream = super.parseStream(stream);
+    if (stream.url && parsedStream.type === 'stream') {
+      if (
+        Settings.FORCE_JACKETTIO_HOSTNAME !== null ||
+        Settings.FORCE_JACKETTIO_PORT !== null ||
+        Settings.FORCE_JACKETTIO_PROTOCOL !== null
+      ) {
+        // modify the URL according to settings, needed when using a local URL for requests but a public stream URL is needed.
+        const url = new URL(stream.url);
+
+        if (Settings.FORCE_JACKETTIO_PROTOCOL !== null) {
+          url.protocol = Settings.FORCE_JACKETTIO_PROTOCOL;
+        }
+        if (Settings.FORCE_JACKETTIO_PORT !== null) {
+          url.port = Settings.FORCE_JACKETTIO_PORT;
+        }
+        if (Settings.FORCE_JACKETTIO_HOSTNAME !== null) {
+          url.hostname = Settings.FORCE_JACKETTIO_HOSTNAME;
+        }
+        parsedStream.result.url = url.toString();
+      }
+    }
+    return parsedStream;
   }
 }
 

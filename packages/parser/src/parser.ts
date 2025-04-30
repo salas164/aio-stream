@@ -21,6 +21,11 @@ function matchMultiplePatterns(
     .map(([tag]) => tag);
 }
 
+function getMatchingPattern(filename: string, pattern: RegExp): string {
+  const match = filename.match(pattern);
+  return match ? match[1] : 'Unknown';
+}
+
 export function parseFilename(filename: string): ParsedNameData {
   const resolution = matchPattern(filename, PARSE_REGEX.resolutions);
   const quality = matchPattern(filename, PARSE_REGEX.qualities);
@@ -28,6 +33,7 @@ export function parseFilename(filename: string): ParsedNameData {
   const visualTags = matchMultiplePatterns(filename, PARSE_REGEX.visualTags);
   const audioTags = matchMultiplePatterns(filename, PARSE_REGEX.audioTags);
   const languages = matchMultiplePatterns(filename, PARSE_REGEX.languages);
+  const releaseGroup = getMatchingPattern(filename, PARSE_REGEX.releaseGroup);
 
   return {
     resolution,
@@ -36,5 +42,6 @@ export function parseFilename(filename: string): ParsedNameData {
     encode,
     audioTags,
     visualTags,
+    releaseGroup,
   };
 }

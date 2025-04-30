@@ -22,7 +22,10 @@ export class EasynewsPlusPlus extends BaseWrapper {
       url,
       addonId,
       userConfig,
-      indexerTimeout || Settings.DEFAULT_EASYNEWS_PLUS_PLUS_TIMEMOUT
+      indexerTimeout || Settings.DEFAULT_EASYNEWS_PLUS_PLUS_TIMEMOUT,
+      {
+        'User-Agent': Settings.DEFAULT_EASYNEWS_PLUS_PLUS_USER_AGENT,
+      }
     );
   }
 
@@ -30,6 +33,10 @@ export class EasynewsPlusPlus extends BaseWrapper {
     const parseResult = super.parseStream(stream);
     if (parseResult.type !== 'error') {
       parseResult.result.type = 'usenet';
+      const ageString = stream.description?.match(/📅\s*(\d+[a-zA-Z])/);
+      parseResult.result.usenet = {
+        age: ageString ? ageString[1] : '',
+      };
     }
     return parseResult;
   }
