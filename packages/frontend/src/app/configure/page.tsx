@@ -489,7 +489,9 @@ export default function Configure() {
       if (isValueEncrypted(config) || config.startsWith('B-')) {
         throw new Error('Encrypted Config Not Supported');
       } else {
-        decodedConfig = JSON.parse(atob(decodeURIComponent(config)));
+        decodedConfig = JSON.parse(
+          Buffer.from(decodeURIComponent(config), 'base64').toString('utf-8')
+        );
       }
       return decodedConfig;
     }
@@ -545,9 +547,7 @@ export default function Configure() {
           value: filter,
         })) || []
       );
-      setFormatter(
-        validateValue(decodedConfig.formatter, allowedFormatters) || 'gdrive'
-      );
+
       setServices(loadValidServices(decodedConfig.services));
       setMaxMovieSize(
         decodedConfig.maxMovieSize || decodedConfig.maxSize || null
@@ -578,6 +578,20 @@ export default function Configure() {
         decodedConfig.mediaFlowConfig?.proxiedServices || null
       );
       setApiKey(decodedConfig.apiKey || '');
+
+      // set formatter
+      const formatterValue = validateValue(
+        decodedConfig.formatter,
+        allowedFormatters
+      );
+      if (
+        decodedConfig.formatter.startsWith('custom') &&
+        decodedConfig.formatter.length > 7
+      ) {
+        setFormatter(decodedConfig.formatter);
+      } else if (formatterValue) {
+        setFormatter(formatterValue);
+      }
     }
 
     const path = window.location.pathname;
@@ -1117,7 +1131,10 @@ export default function Configure() {
             </div>
           </div>
           {formatter?.startsWith('custom') && (
-            <CustomFormatter setFormatter={setFormatter} />
+            <CustomFormatter
+              formatter={formatter}
+              setFormatter={setFormatter}
+            />
           )}
           <FormatterPreview formatter={formatter || 'gdrive'} />
         </div>

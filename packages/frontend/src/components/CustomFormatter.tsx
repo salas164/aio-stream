@@ -2,16 +2,28 @@ import React, { useState, useEffect } from 'react';
 import styles from './CustomFormatter.module.css';
 
 interface CustomFormatterProps {
+  formatter: string;
   setFormatter: (formatter: string) => void;
 }
 
-const CustomFormatter: React.FC<CustomFormatterProps> = ({ setFormatter }) => {
+const CustomFormatter: React.FC<CustomFormatterProps> = ({
+  formatter,
+  setFormatter,
+}) => {
   const [isExpanded, setIsExpanded] = useState(false);
-  const [customNameSyntax, setCustomNameSyntax] = useState('');
-  const [customDescSyntax, setCustomDescSyntax] = useState('');
+  let initialName = '';
+  let initialDesc = '';
+  if (formatter.startsWith('custom:') && formatter.length > 7) {
+    const formatterData = JSON.parse(formatter.substring(7));
+    initialName = formatterData.name || '';
+    initialDesc = formatterData.description || '';
+  }
 
+  const [customNameSyntax, setCustomNameSyntax] = useState(initialName);
+  const [customDescSyntax, setCustomDescSyntax] = useState(initialDesc);
+
+  // Load the existing formatter on component mount
   useEffect(() => {
-    // If both fields have content, update the formatter
     const formatterData = {
       name: customNameSyntax,
       description: customDescSyntax,

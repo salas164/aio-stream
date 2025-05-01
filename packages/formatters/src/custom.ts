@@ -1,6 +1,35 @@
 import { Config, CustomFormatter, ParsedStream } from '@aiostreams/types';
 import { serviceDetails } from '@aiostreams/utils';
-import { formatDuration, formatSize } from './utils';
+import { formatDuration, formatSize, languageToEmoji } from './utils';
+
+/**
+ *
+ * The custom formatter code in this file was adapted from https://github.com/diced/zipline/blob/trunk/src/lib/parser/index.ts
+ *
+ * The original code is licensed under the MIT License.
+ *
+ * MIT License
+ *
+ * Copyright (c) 2023 dicedtomato
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in all
+ * copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ */
 
 export function customFormat(
   stream: ParsedStream,
@@ -43,6 +72,7 @@ export type ParseValue = {
     quality: string | null;
     resolution: string | null;
     languages: string[] | null;
+    languageEmojis: string[] | null;
     visualTags: string[] | null;
     audioTags: string[] | null;
     releaseGroup: string | null;
@@ -79,6 +109,11 @@ const convertStreamToParseValue = (stream: ParsedStream): ParseValue => {
       quality: stream.quality === 'Unknown' ? null : stream.quality,
       resolution: stream.resolution === 'Unknown' ? null : stream.resolution,
       languages: stream.languages || null,
+      languageEmojis: stream.languages
+        ? stream.languages
+            .map((lang) => languageToEmoji(lang) || lang)
+            .filter((value, index, self) => self.indexOf(value) === index)
+        : null,
       visualTags: stream.visualTags,
       audioTags: stream.audioTags,
       releaseGroup:
@@ -471,7 +506,7 @@ function modifier(
     (['>', '>=', '=', '<=', '<', '~', '$', '^'].some((modif) =>
       mod.startsWith(modif)
     ) ||
-      ['istrue', 'exists'].includes(mod))
+      ['istrue', 'exists', 'isfalse'].includes(mod))
   ) {
     if (_value) return parseString(check_false, _value) || check_false;
     return check_false;
