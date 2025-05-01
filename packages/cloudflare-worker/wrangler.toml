@@ -18,8 +18,7 @@ command = "npm run build"
 type = "ESModule"
 globs = ["**/*.js"]
 
-[build.modules]
-external = ["node:sqlite"]
+
 
 # This part tells Wrangler to externalize (ignore bundling) node:sqlite module
 # so your deploy won't break when undici internally tries to require it.
