@@ -177,8 +177,6 @@ export default function Configure() {
   const [minMovieSize, setMinMovieSize] = useState<number | null>(null);
   const [maxEpisodeSize, setMaxEpisodeSize] = useState<number | null>(null);
   const [minEpisodeSize, setMinEpisodeSize] = useState<number | null>(null);
-  const [addonNameInDescription, setAddonNameInDescription] =
-    useState<boolean>(false);
   const [cleanResults, setCleanResults] = useState<boolean>(false);
   const [maxResultsPerResolution, setMaxResultsPerResolution] = useState<
     number | null
@@ -257,7 +255,6 @@ export default function Configure() {
       minMovieSize,
       maxEpisodeSize,
       minEpisodeSize,
-      addonNameInDescription,
       cleanResults,
       maxResultsPerResolution,
       strictIncludeFilters:
@@ -562,7 +559,6 @@ export default function Configure() {
         decodedConfig.minEpisodeSize || decodedConfig.minSize || null
       );
       setAddons(loadValidAddons(decodedConfig.addons));
-      setAddonNameInDescription(decodedConfig.addonNameInDescription || false);
       setCleanResults(decodedConfig.cleanResults || false);
       setMaxResultsPerResolution(decodedConfig.maxResultsPerResolution || null);
       setMediaFlowEnabled(
@@ -1137,34 +1133,6 @@ export default function Configure() {
             />
           )}
           <FormatterPreview formatter={formatter || 'gdrive'} />
-        </div>
-
-        <div className={styles.section}>
-          <div className={styles.setting}>
-            <div className={styles.settingDescription}>
-              <h2 style={{ padding: '5px' }}>Move Addon Name to Description</h2>
-              <p style={{ padding: '5px' }}>
-                Move the addon name to the description of the stream. This will
-                show <code>AIOStreams</code> as the stream title, but move the
-                name of the addon that the stream is from to the description.
-                This is useful for Vidi users.
-              </p>
-            </div>
-            <div className={styles.checkboxSettingInput}>
-              <input
-                type="checkbox"
-                checked={addonNameInDescription}
-                onChange={(e) => setAddonNameInDescription(e.target.checked)}
-                // move to the right
-                style={{
-                  marginLeft: 'auto',
-                  marginRight: '20px',
-                  width: '25px',
-                  height: '25px',
-                }}
-              />
-            </div>
-          </div>
         </div>
 
         <div className={styles.section}>
