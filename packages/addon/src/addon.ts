@@ -106,6 +106,8 @@ export class AIOStreams {
       sizeFilters: 0,
       duplicateStreams: 0,
       streamLimiters: 0,
+      excludeRegex: 0,
+      requiredRegex: 0,
     };
 
     logger.info(
@@ -341,6 +343,32 @@ export class AIOStreams {
           return false;
         }
       }
+
+      // apply regex filters if API key is set
+      if (this.config.apiKey && this.config.regexFilters) {
+        const { excludePattern, includePattern } = this.config.regexFilters;
+        
+        if (excludePattern) {
+          const regexExclude = new RegExp(excludePattern, 'i');
+          if (parsedStream.filename && regexExclude.test(parsedStream.filename)) {
+            skipReasons.excludeRegex++;
+            return false;
+          }
+          if (parsedStream.indexers && regexExclude.test(parsedStream.indexers)) {
+            skipReasons.excludeRegex++;
+            return false;
+          }
+        }
+        
+        if (includePattern) {
+          const regexInclude = new RegExp(includePattern, 'i');
+          if (!((parsedStream.filename && regexInclude.test(parsedStream.filename)) || (parsedStream.indexers && regexInclude.test(parsedStream.indexers)))) {
+            skipReasons.requiredRegex++;
+            return false;
+          }
+        }
+      }
+
       return true;
     });
 
@@ -609,9 +637,48 @@ export class AIOStreams {
   private async createStreamObjects(
     parsedStreams: ParsedStream[]
   ): Promise<Stream[]> {
-    // Step 1: Format all stream metadata
-    let streamObjects: Stream[] = await Promise.all(
-      parsedStreams.map(async (parsedStream) => {
+    // Identify streams that require proxying
+    const streamsToProxy = parsedStreams
+      .map((stream, index) => ({ stream, index }))
+      .filter(({ stream }) => stream.url && this.shouldProxyStream(stream));
+
+    const proxiedUrls = streamsToProxy.length
+      ? await generateMediaFlowStreams(
+          getMediaFlowConfig(this.config),
+          streamsToProxy.map(({ stream }) => ({
+            url: stream.url!,
+            filename: stream.filename,
+            headers: stream.stream?.behaviorHints?.proxyHeaders,
+          }))
+        )
+      : null;
+
+    const removeIndexes = new Set<number>();
+
+    // Apply proxied URLs and mark as proxied
+    streamsToProxy.forEach(({ stream, index }, i) => {
+      const proxiedUrl = proxiedUrls?.[i];
+      if (proxiedUrl) {
+        stream.url = proxiedUrl;
+        stream.proxied = true;
+      } else {
+        removeIndexes.add(index);
+      }
+    });
+
+    // Remove streams that failed to proxy
+    if (removeIndexes.size > 0) {
+      logger.error(
+        `Failed to proxy ${removeIndexes.size} streams, removing them from the final list`
+      );
+      parsedStreams = parsedStreams.filter(
+        (_, index) => !removeIndexes.has(index)
+      );
+    }
+
+    // Build final Stream objects
+    const streamObjects: Stream[] = await Promise.all(
+      parsedStreams.map((parsedStream) => {
         const { name, description } = this.getFormattedText(parsedStream);
 
         const combinedTags = [
@@ -628,14 +695,8 @@ export class AIOStreams {
           externalUrl: parsedStream.externalUrl,
           infoHash: parsedStream.torrent?.infoHash,
           fileIdx: parsedStream.torrent?.fileIdx,
-          name: this.config.addonNameInDescription
-            ? Settings.ADDON_NAME
-            : Settings.SHOW_DIE
-              ? `🎲 ${name}`
-              : name,
-          description: this.config.addonNameInDescription
-            ? `🎲 ${name.split('\n').join(' ')}\n${description}`
-            : description,
+          name,
+          description,
           subtitles: parsedStream.stream?.subtitles,
           sources: parsedStream.torrent?.sources,
           behaviorHints: {
@@ -643,68 +704,13 @@ export class AIOStreams {
               ? Math.floor(parsedStream.size)
               : undefined,
             filename: parsedStream.filename,
-            bingeGroup: `${Settings.ADDON_ID}|${parsedStream.addon.name}|${combinedTags.join('|')}`,
+            bingeGroup: `${parsedStream.proxied ? 'mfp.' : ''}${Settings.ADDON_ID}|${parsedStream.addon.name}|${combinedTags.join('|')}`,
             proxyHeaders: parsedStream.stream?.behaviorHints?.proxyHeaders,
             notWebReady: parsedStream.stream?.behaviorHints?.notWebReady,
           },
         };
       })
     );
-
-    // Determine which streams need proxying and remember their indexes
-    const streamsToProxy = parsedStreams
-      .map((stream, index) => ({ stream, index }))
-      .filter(({ stream }) => stream.url !== undefined) // cannot proxy a stream without a URL
-      .filter(({ stream }) => this.shouldProxyStream(stream));
-
-    // Generate proxied URLs
-    const proxiedUrls =
-      streamsToProxy.length > 0
-        ? await generateMediaFlowStreams(
-            getMediaFlowConfig(this.config),
-            streamsToProxy.map(({ stream }) => ({
-              url: stream.url!,
-              filename: stream.filename,
-              headers: stream.stream?.behaviorHints?.proxyHeaders,
-            }))
-          )
-        : null;
-
-    if (
-      streamsToProxy &&
-      proxiedUrls &&
-      proxiedUrls.length !== streamsToProxy.length
-    ) {
-      logger.error(
-        `Proxied URLs length (${proxiedUrls.length}) does not match streamsToProxy length (${streamsToProxy.length})`
-      );
-      return streamObjects;
-    } else if (streamsToProxy.length > 0 && !proxiedUrls) {
-      logger.error(
-        `Proxied URLs is null, but streamsToProxy length is ${streamsToProxy.length}, filtering out streams that needed proxying`
-      );
-      streamObjects = streamObjects.filter(
-        (_, index) => !streamsToProxy.some((s) => s.index === index)
-      );
-    } else if (proxiedUrls) {
-      // inject proxied URLs back into their original positions
-      streamsToProxy.forEach(({ index }, i) => {
-        streamObjects[index].url = proxiedUrls[i] || streamObjects[index].url;
-
-        streamObjects[index].name = this.config.addonNameInDescription
-          ? Settings.ADDON_NAME
-          : `🕵️ ${streamObjects[index].name}`;
-
-        streamObjects[index].description = this.config.addonNameInDescription
-          ? `🕵️ ${streamObjects[index].name.split('\n').join(' ')}\n${streamObjects[index].description}`
-          : streamObjects[index].description;
-
-        streamObjects[index].behaviorHints = {
-          ...streamObjects[index].behaviorHints,
-          bingeGroup: `mfp.${streamObjects[index].behaviorHints?.bingeGroup}`,
-        };
-      });
-    }
 
     return streamObjects;
   }
