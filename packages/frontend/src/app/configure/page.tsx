@@ -215,6 +215,10 @@ export default function Configure() {
   );
   const [showApiKeyInput, setShowApiKeyInput] = useState<boolean>(false);
   const [manifestUrl, setManifestUrl] = useState<string | null>(null);
+  const [regexFilters, setRegexFilters] = useState<{
+    excludePattern?: string;
+    includePattern?: string;
+  }>({});
 
   useEffect(() => {
     // get config from the server
@@ -276,6 +280,10 @@ export default function Configure() {
       },
       addons,
       services,
+      regexFilters: (regexFilters.excludePattern || regexFilters.includePattern) ? {
+        excludePattern: regexFilters.excludePattern || undefined,
+        includePattern: regexFilters.includePattern || undefined
+      } : undefined,
     };
     return config;
   };
@@ -544,6 +552,7 @@ export default function Configure() {
           value: filter,
         })) || []
       );
+      setRegexFilters(decodedConfig.regexFilters || {});
 
       setServices(loadValidServices(decodedConfig.services));
       setMaxMovieSize(
@@ -1336,6 +1345,63 @@ export default function Configure() {
                     placeholder: 'Enter your API key',
                   }}
                 />
+              </div>
+            </div>
+          </div>
+        )}
+
+        {showApiKeyInput && (
+          <div className={styles.section}>
+            <div>
+              <h2 style={{ padding: '5px', margin: '0px ' }}>Regex Filtering</h2>
+              <p style={{ margin: '5px 0 12px 5px' }}>
+                Configure regex patterns to filter streams. These filters will be applied in addition to keyword filters.
+              </p>
+            </div>
+            <div style={{ marginBottom: '0px' }}>
+              <div className={styles.section}>
+                <h3 style={{ margin: '2px 0 2px 0' }}>Exclude Pattern</h3>
+                <p style={{ margin: '10px 0 10px 0' }}>
+                  Enter a regex pattern to exclude streams. Streams will be excluded if their filename OR indexers match this pattern.
+                </p>
+                <input
+                  type="text"
+                  value={regexFilters.excludePattern || ''}
+                  onChange={(e) => setRegexFilters({
+                    ...regexFilters,
+                    excludePattern: e.target.value
+                  })}
+                  placeholder="Example: \b(0neshot|1XBET)"
+                  className={styles.input}
+                />
+                <p className={styles.helpText}>
+                  Example patterns:
+                  <br />
+                  - \b(0neshot|1XBET|24xHD) (exclude 0neshot, 1XBET, and 24xHD releases)
+                  <br />
+                  - ^.*Hi10.*$ (exclude Hi10 profile releases)
+                </p>
+              </div>
+              <div className={styles.section} style={{ marginBottom: '0px' }}>
+                <h3 style={{ margin: '2px 0 2px 0' }}>Include Pattern</h3>
+                <p style={{ margin: '10px 0 10px 0' }}>
+                  Enter a regex pattern to include streams. Only streams whose filename matches this pattern will be included.
+                </p>
+                <input
+                  type="text"
+                  value={regexFilters.includePattern || ''}
+                  onChange={(e) => setRegexFilters({
+                    ...regexFilters,
+                    includePattern: e.target.value
+                  })}
+                  placeholder="Example: \b(3L|BiZKiT)"
+                  className={styles.input}
+                />
+                <p className={styles.helpText}>
+                  Example patterns:
+                  <br />
+                  - \b(3L|BiZKiT|BLURANiUM) (only include 3L, BiZKiT, and BLURANiUM releases)
+                </p>
               </div>
             </div>
           </div>

@@ -106,6 +106,8 @@ export class AIOStreams {
       sizeFilters: 0,
       duplicateStreams: 0,
       streamLimiters: 0,
+      excludeRegex: 0,
+      requiredRegex: 0,
     };
 
     logger.info(
@@ -341,6 +343,32 @@ export class AIOStreams {
           return false;
         }
       }
+
+      // apply regex filters if API key is set
+      if (this.config.apiKey && this.config.regexFilters) {
+        const { excludePattern, includePattern } = this.config.regexFilters;
+        
+        if (excludePattern) {
+          const regexExclude = new RegExp(excludePattern, 'i');
+          if (parsedStream.filename && regexExclude.test(parsedStream.filename)) {
+            skipReasons.excludeRegex++;
+            return false;
+          }
+          if (parsedStream.indexers && regexExclude.test(parsedStream.indexers)) {
+            skipReasons.excludeRegex++;
+            return false;
+          }
+        }
+        
+        if (includePattern) {
+          const regexInclude = new RegExp(includePattern, 'i');
+          if (!((parsedStream.filename && regexInclude.test(parsedStream.filename)) || (parsedStream.indexers && regexInclude.test(parsedStream.indexers)))) {
+            skipReasons.requiredRegex++;
+            return false;
+          }
+        }
+      }
+
       return true;
     });
 

@@ -431,5 +431,39 @@ export function validateConfig(
     }
   });
 
+  if (config.regexFilters) {
+    if (!config.apiKey) {
+      return createResponse(
+        false,
+        'missingApiKey',
+        'Regex filtering requires an API key to be set'
+      );
+    }
+    
+    if (config.regexFilters.excludePattern) {
+      try {
+        new RegExp(config.regexFilters.excludePattern);
+      } catch (e) {
+        return createResponse(
+          false,
+          'invalidExcludeRegex',
+          'Invalid exclude regex pattern'
+        );
+      }
+    }
+    
+    if (config.regexFilters.includePattern) {
+      try {
+        new RegExp(config.regexFilters.includePattern);
+      } catch (e) {
+        return createResponse(
+          false,
+          'invalidIncludeRegex',
+          'Invalid include regex pattern'
+        );
+      }
+    }
+  }
+
   return createResponse(true, null, null);
 }

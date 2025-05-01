@@ -159,6 +159,10 @@ export interface Config {
   maxResultsPerResolution: number | null;
   excludeFilters: string[] | null;
   strictIncludeFilters: string[] | null;
+  regexFilters?: {
+    excludePattern?: string;
+    includePattern?: string;
+  };
   mediaFlowConfig?: {
     mediaFlowEnabled: boolean;
     proxyUrl: string;
