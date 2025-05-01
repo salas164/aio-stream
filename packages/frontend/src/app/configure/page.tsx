@@ -40,6 +40,8 @@ import CredentialInput from '@/components/CredentialInput';
 import CreateableSelect from '@/components/CreateableSelect';
 import MultiSelect from '@/components/MutliSelect';
 import InstallWindow from '@/components/InstallWindow';
+import FormatterPreview from '@/components/FormatterPreview';
+import CustomFormatter from '@/components/CustomFormatter';
 
 const version = addonPackage.version;
 
@@ -104,6 +106,7 @@ const defaultEncodes: Encode[] = [
 
 const defaultSortCriteria: SortBy[] = [
   { cached: true, direction: 'desc' },
+  { personal: true, direction: 'desc' },
   { resolution: true },
   { language: true },
   { size: true, direction: 'desc' },
@@ -174,8 +177,6 @@ export default function Configure() {
   const [minMovieSize, setMinMovieSize] = useState<number | null>(null);
   const [maxEpisodeSize, setMaxEpisodeSize] = useState<number | null>(null);
   const [minEpisodeSize, setMinEpisodeSize] = useState<number | null>(null);
-  const [addonNameInDescription, setAddonNameInDescription] =
-    useState<boolean>(false);
   const [cleanResults, setCleanResults] = useState<boolean>(false);
   const [maxResultsPerResolution, setMaxResultsPerResolution] = useState<
     number | null
@@ -254,7 +255,6 @@ export default function Configure() {
       minMovieSize,
       maxEpisodeSize,
       minEpisodeSize,
-      addonNameInDescription,
       cleanResults,
       maxResultsPerResolution,
       strictIncludeFilters:
@@ -283,7 +283,7 @@ export default function Configure() {
   const fetchWithTimeout = async (
     url: string,
     options: RequestInit | undefined,
-    timeoutMs = 5000
+    timeoutMs = 30000
   ) => {
     const controller = new AbortController();
     const timeout = setTimeout(() => controller.abort(), timeoutMs);
@@ -486,7 +486,9 @@ export default function Configure() {
       if (isValueEncrypted(config) || config.startsWith('B-')) {
         throw new Error('Encrypted Config Not Supported');
       } else {
-        decodedConfig = JSON.parse(atob(decodeURIComponent(config)));
+        decodedConfig = JSON.parse(
+          Buffer.from(decodeURIComponent(config), 'base64').toString('utf-8')
+        );
       }
       return decodedConfig;
     }
@@ -542,9 +544,7 @@ export default function Configure() {
           value: filter,
         })) || []
       );
-      setFormatter(
-        validateValue(decodedConfig.formatter, allowedFormatters) || 'gdrive'
-      );
+
       setServices(loadValidServices(decodedConfig.services));
       setMaxMovieSize(
         decodedConfig.maxMovieSize || decodedConfig.maxSize || null
@@ -559,7 +559,6 @@ export default function Configure() {
         decodedConfig.minEpisodeSize || decodedConfig.minSize || null
       );
       setAddons(loadValidAddons(decodedConfig.addons));
-      setAddonNameInDescription(decodedConfig.addonNameInDescription || false);
       setCleanResults(decodedConfig.cleanResults || false);
       setMaxResultsPerResolution(decodedConfig.maxResultsPerResolution || null);
       setMediaFlowEnabled(
@@ -575,6 +574,20 @@ export default function Configure() {
         decodedConfig.mediaFlowConfig?.proxiedServices || null
       );
       setApiKey(decodedConfig.apiKey || '');
+
+      // set formatter
+      const formatterValue = validateValue(
+        decodedConfig.formatter,
+        allowedFormatters
+      );
+      if (
+        decodedConfig.formatter.startsWith('custom') &&
+        decodedConfig.formatter.length > 7
+      ) {
+        setFormatter(decodedConfig.formatter);
+      } else if (formatterValue) {
+        setFormatter(formatterValue);
+      }
     }
 
     const path = window.location.pathname;
@@ -1102,7 +1115,7 @@ export default function Configure() {
             </div>
             <div className={styles.settingInput}>
               <select
-                value={formatter}
+                value={formatter?.startsWith('custom') ? 'custom' : formatter}
                 onChange={(e) => setFormatter(e.target.value)}
               >
                 {formatterOptions.map((formatter) => (
@@ -1113,34 +1126,13 @@ export default function Configure() {
               </select>
             </div>
           </div>
-        </div>
-
-        <div className={styles.section}>
-          <div className={styles.setting}>
-            <div className={styles.settingDescription}>
-              <h2 style={{ padding: '5px' }}>Move Addon Name to Description</h2>
-              <p style={{ padding: '5px' }}>
-                Move the addon name to the description of the stream. This will
-                show <code>AIOStreams</code> as the stream title, but move the
-                name of the addon that the stream is from to the description.
-                This is useful for Vidi users.
-              </p>
-            </div>
-            <div className={styles.checkboxSettingInput}>
-              <input
-                type="checkbox"
-                checked={addonNameInDescription}
-                onChange={(e) => setAddonNameInDescription(e.target.checked)}
-                // move to the right
-                style={{
-                  marginLeft: 'auto',
-                  marginRight: '20px',
-                  width: '25px',
-                  height: '25px',
-                }}
-              />
-            </div>
-          </div>
+          {formatter?.startsWith('custom') && (
+            <CustomFormatter
+              formatter={formatter}
+              setFormatter={setFormatter}
+            />
+          )}
+          <FormatterPreview formatter={formatter || 'gdrive'} />
         </div>
 
         <div className={styles.section}>

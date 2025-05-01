@@ -24,7 +24,10 @@ export class Torrentio extends BaseWrapper {
       url,
       addonId,
       userConfig,
-      indexerTimeout || Settings.DEFAULT_TORRENTIO_TIMEOUT
+      indexerTimeout || Settings.DEFAULT_TORRENTIO_TIMEOUT,
+      {
+        'User-Agent': Settings.DEFAULT_TORRENTIO_USER_AGENT,
+      }
     );
   }
 }

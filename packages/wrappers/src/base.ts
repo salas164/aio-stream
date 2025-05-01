@@ -13,10 +13,20 @@ import {
   serviceDetails,
   Settings,
   createLogger,
+  maskSensitiveInfo,
 } from '@aiostreams/utils';
 import { emojiToLanguage, codeToLanguage } from '@aiostreams/formatters';
 
 const logger = createLogger('wrappers');
+
+const IP_HEADERS = [
+  'X-Client-IP',
+  'X-Forwarded-For',
+  'X-Real-IP',
+  'True-Client-IP',
+  'X-Forwarded',
+  'Forwarded-For',
+];
 
 export class BaseWrapper {
   private readonly streamPath: string = 'stream/{type}/{id}.json';
@@ -25,18 +35,29 @@ export class BaseWrapper {
   private addonUrl: string;
   private addonId: string;
   private userConfig: Config;
+  private headers: Headers;
   constructor(
     addonName: string,
     addonUrl: string,
     addonId: string,
     userConfig: Config,
-    indexerTimeout?: number
+    indexerTimeout?: number,
+    requestHeaders?: HeadersInit
   ) {
     this.addonName = addonName;
     this.addonUrl = this.standardizeManifestUrl(addonUrl);
     this.addonId = addonId;
     (this.indexerTimeout = indexerTimeout || Settings.DEFAULT_TIMEOUT),
       (this.userConfig = userConfig);
+    this.headers = new Headers({
+      'User-Agent': Settings.DEFAULT_USER_AGENT,
+      ...(requestHeaders || {}),
+    });
+    for (const [key, value] of this.headers.entries()) {
+      if (!value) {
+        this.headers.delete(key);
+      }
+    }
   }
 
   protected standardizeManifestUrl(url: string): string {
@@ -127,19 +148,18 @@ export class BaseWrapper {
     const pathParts = urlObj.pathname.split('/');
     const redactedParts = pathParts.length > 3 ? pathParts.slice(1, -3) : [];
     return `${urlObj.protocol}//${urlObj.hostname}/${redactedParts
-      .map((part) => (Settings.LOG_SENSITIVE_INFO ? part : '<redacted>'))
+      .map(maskSensitiveInfo)
       .join(
         '/'
       )}${redactedParts.length ? '/' : ''}${pathParts.slice(-3).join('/')}`;
   }
 
   protected makeRequest(url: string): Promise<any> {
-    const headers = new Headers();
     const userIp = this.userConfig.requestingIp;
     if (userIp) {
-      headers.set('X-Client-IP', userIp);
-      headers.set('X-Forwarded-For', userIp);
-      headers.set('X-Real-IP', userIp);
+      for (const header of IP_HEADERS) {
+        this.headers.set(header, userIp);
+      }
     }
 
     let sanitisedUrl = this.getLoggableUrl(url);
@@ -147,23 +167,22 @@ export class BaseWrapper {
 
     logger.info(
       `Making a ${useProxy ? 'proxied' : 'direct'} request to ${this.addonName} (${sanitisedUrl}) with user IP ${
-        userIp
-          ? Settings.LOG_SENSITIVE_INFO
-            ? userIp
-            : '<redacted>'
-          : 'not set'
+        userIp ? maskSensitiveInfo(userIp) : 'not set'
       }`
+    );
+    logger.debug(
+      `Request Headers: ${maskSensitiveInfo(JSON.stringify(Object.fromEntries(this.headers)))}`
     );
 
     let response = useProxy
       ? fetch(url, {
           method: 'GET',
-          headers: headers,
+          headers: this.headers,
           signal: AbortSignal.timeout(this.indexerTimeout),
         })
       : fetch(url, {
           method: 'GET',
-          headers: headers,
+          headers: this.headers,
           signal: AbortSignal.timeout(this.indexerTimeout),
         });
 
@@ -209,9 +228,7 @@ export class BaseWrapper {
         message = `The stream request to ${this.addonName} timed out after ${this.indexerTimeout}ms`;
         return Promise.reject(message);
       }
-      const errorMessage = error.stack || String(error);
-      logger.error(`Error fetching streams from ${this.addonName}`);
-      logger.error(errorMessage);
+      logger.error(`Error fetching streams from ${this.addonName}: ${message}`);
       return Promise.reject(error.message);
     }
   }
@@ -234,6 +251,7 @@ export class BaseWrapper {
       type: 'stream',
       result: {
         ...parsedInfo,
+        proxied: false,
         message: message,
         addon: { name: this.addonName, id: this.addonId },
         filename: filename,
@@ -412,7 +430,7 @@ export class BaseWrapper {
     services.forEach((service) => {
       // for each service, generate a regexp which creates a regex with all known names separated by |
       const regex = new RegExp(
-        `(^|(?<![^ |[(_\\/\\-.]))(${service.knownNames.join('|')})(?=[ ⬇️⏳⚡+/|\\)\\]_.-]|$)`,
+        `(^|(?<![^ |[(_\\/\\-.]))(${service.knownNames.join('|')})(?=[ ⬇️⏳⚡+/|\\)\\]_.-]|$|\n)`,
         'i'
       );
       // check if the string contains the regex
