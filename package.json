@@ -36,6 +36,5 @@
     "node": ">=20.0.0"
   },
   "dependencies": {
-    "undici": "^7.2.3"
   }
 }
