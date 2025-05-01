@@ -1385,7 +1385,7 @@ export default function Configure() {
               <div className={styles.section} style={{ marginBottom: '0px' }}>
                 <h3 style={{ margin: '2px 0 2px 0' }}>Include Pattern</h3>
                 <p style={{ margin: '10px 0 10px 0' }}>
-                  Enter a regex pattern to include streams. Only streams whose filename matches this pattern will be included.
+                  Enter a regex pattern to include streams. Only streams whose filename or indexers match this pattern will be included.
                 </p>
                 <input
                   type="text"
