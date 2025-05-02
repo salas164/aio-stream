@@ -556,6 +556,7 @@ export default function Configure() {
         })) || []
       );
       setRegexFilters(decodedConfig.regexFilters || {});
+      setRegexSortPattern(decodedConfig.regexSortPattern || '');
 
       setServices(loadValidServices(decodedConfig.services));
       setMaxMovieSize(
