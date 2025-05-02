@@ -745,8 +745,8 @@ export class AIOStreams {
       
       try {
         const regex = new RegExp(this.config.regexSortPattern);
-        const aMatch = a.filename ? regex.exec(a.filename) : null;
-        const bMatch = b.filename ? regex.exec(b.filename) : null;
+        const aMatch = a.filename ? regex.test(a.filename) : false;
+        const bMatch = b.filename ? regex.test(b.filename) : false;
         
         // If both match or both don't match, they are equal
         if ((aMatch && bMatch) || (!aMatch && !bMatch)) return 0;
