@@ -474,6 +474,30 @@ export class AIOStreams {
       a.filename && b.filename ? a.filename.localeCompare(b.filename) : 0
     );
 
+    // Process regex patterns into separate sort fields
+    if (this.config.regexSortPatterns) {
+      const patterns = this.config.regexSortPatterns.split(/\s+/).filter(Boolean);
+      // Find the index where regexSort appears in sortBy
+      const regexSortIndex = this.config.sortBy.findIndex(
+        (sort) => Object.keys(sort).includes('regexSort')
+      );
+      
+      if (regexSortIndex !== -1) {
+        // Remove the original regexSort entry
+        const originalRegexSort = this.config.sortBy[regexSortIndex];
+        this.config.sortBy.splice(regexSortIndex, 1);
+        
+        // Insert the new regex pattern sort fields at the same position
+        const newSortFields = patterns.map((_, index) => ({
+          [`regexSort_${index}`]: true,
+          direction: originalRegexSort.direction || 'desc' // Use the original direction
+        }));
+        
+        this.config.sortBy.splice(regexSortIndex, 0, ...newSortFields);
+      }
+    }
+    // logger.info(this.config.sortBy); but this shows object objects, not strings
+    logger.info(this.config.sortBy.map((sort) => Object.keys(sort)[0]));
     // then apply our this.config sorting
     filteredResults.sort((a, b) => {
       for (const sortByField of this.config.sortBy) {
@@ -544,18 +568,19 @@ export class AIOStreams {
     const streamsStartTime = new Date().getTime();
     const streamObjects = await this.createStreamObjects(filteredResults);
     streams.push(...streamObjects.filter((s) => s !== null));
-
     // Add error streams to the end
     streams.push(
       ...errorStreams.map((e) => errorStream(e.error, e.addon.name))
     );
-
+    
     logger.info(
       `Created ${streams.length} stream objects in ${getTimeTakenSincePoint(streamsStartTime)}`
     );
     logger.info(
       `Total time taken to get streams: ${getTimeTakenSincePoint(startTime)}`
     );
+    // logger.info(streams); this shows object objects, not strings
+    logger.info(streams.map((s) => s.description).slice(0, 10).join('\n'));
     return streams;
   }
 
@@ -740,19 +765,25 @@ export class AIOStreams {
           (resolution) => resolution[b.resolution]
         )
       );
-    } else if (field === 'regexSort') {
-      if (!this.config.regexSortPattern) return 0;
+    } else if (field.startsWith('regexSort_')) {
+      // Extract the pattern index from the field name
+      const patternIndex = parseInt(field.split('_')[1]);
+      if (!this.config.regexSortPatterns) return 0;
       
       try {
-        const regex = new RegExp(this.config.regexSortPattern);
+        // Split patterns and get the specific pattern for this field
+        const patterns = this.config.regexSortPatterns.split(/\s+/).filter(Boolean);
+        if (patternIndex >= patterns.length) return 0;
+        
+        const regex = new RegExp(patterns[patternIndex]);
         const aMatch = a.filename ? regex.test(a.filename) : false;
         const bMatch = b.filename ? regex.test(b.filename) : false;
         
-        // If both match or both don't match, they are equal
+        // If both match or both don't match, return 0 to let other sort fields decide
         if ((aMatch && bMatch) || (!aMatch && !bMatch)) return 0;
         
-        // If one matches and the other doesn't, use direction to determine order
-        const direction = this.config.sortBy.find((sort) => Object.keys(sort)[0] === 'regexSort')?.direction;
+        // Get the direction for sorting of patterns
+        const direction = this.config.sortBy.find((sort) => Object.keys(sort)[0] === field)?.direction;
         if (direction === 'asc') {
           // In ascending order, matching files come last
           return aMatch ? 1 : -1;

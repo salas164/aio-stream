@@ -465,7 +465,7 @@ export function validateConfig(
     }
   }
 
-  if (config.regexSortPattern) {
+  if (config.regexSortPatterns) {
     if (!config.apiKey) {
       return createResponse(
         false,
@@ -474,14 +474,18 @@ export function validateConfig(
       );
     }
 
-    try {
-      new RegExp(config.regexSortPattern);
-    } catch (e) {
-      return createResponse(
-        false,
-        'invalidRegexSortPattern',
-        'Invalid regex sort pattern'
-      );
+    // Split the pattern by spaces and validate each one
+    const patterns = config.regexSortPatterns.split(/\s+/).filter(Boolean);
+    for (const pattern of patterns) {
+      try {
+        new RegExp(pattern);
+      } catch (e) {
+        return createResponse(
+          false,
+          'invalidRegexSortPattern',
+          `Invalid regex sort pattern: ${pattern}`
+        );
+      }
     }
   }
 

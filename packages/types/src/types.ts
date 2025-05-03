@@ -181,7 +181,8 @@ export interface Config {
     enabled: boolean;
     credentials: { [key: string]: string };
   }[];
-  regexSortPattern?: string;
+  /** Space-separated regex patterns to sort streams by. Streams will be sorted based on the order of matching patterns. */
+  regexSortPatterns?: string;
 }
 
 interface BaseOptionDetail {

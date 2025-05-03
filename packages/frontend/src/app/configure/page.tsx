@@ -220,7 +220,7 @@ export default function Configure() {
     excludePattern?: string;
     includePattern?: string;
   }>({});
-  const [regexSortPattern, setRegexSortPattern] = useState<string>('');
+  const [regexSortPatterns, setRegexSortPatterns] = useState<string>('');
 
   useEffect(() => {
     // get config from the server
@@ -286,7 +286,7 @@ export default function Configure() {
         excludePattern: regexFilters.excludePattern || undefined,
         includePattern: regexFilters.includePattern || undefined
       } : undefined,
-      regexSortPattern: regexSortPattern,
+      regexSortPattern: regexSortPatterns,
     };
     return config;
   };
@@ -556,7 +556,7 @@ export default function Configure() {
         })) || []
       );
       setRegexFilters(decodedConfig.regexFilters || {});
-      setRegexSortPattern(decodedConfig.regexSortPattern || '');
+      setRegexSortPatterns(decodedConfig.regexSortPatterns || '');
 
       setServices(loadValidServices(decodedConfig.services));
       setMaxMovieSize(
@@ -1032,13 +1032,13 @@ export default function Configure() {
                     ...regexFilters,
                     excludePattern: e.target.value
                   })}
-                  placeholder="Example: \b(0neshot|1XBET)"
+                  placeholder="Example: \b(0neshot|1XBET)\b"
                   className={styles.input}
                 />
                 <p className={styles.helpText}>
                   Example patterns:
                   <br />
-                  - \b(0neshot|1XBET|24xHD) (exclude 0neshot, 1XBET, and 24xHD releases)
+                  - \b(0neshot|1XBET|24xHD)\b (exclude 0neshot, 1XBET, and 24xHD releases)
                   <br />
                   - ^.*Hi10.*$ (exclude Hi10 profile releases)
                 </p>
@@ -1055,13 +1055,13 @@ export default function Configure() {
                     ...regexFilters,
                     includePattern: e.target.value
                   })}
-                  placeholder="Example: \b(3L|BiZKiT)"
+                  placeholder="Example: \b(3L|BiZKiT)\b"
                   className={styles.input}
                 />
                 <p className={styles.helpText}>
                   Example patterns:
                   <br />
-                  - \b(3L|BiZKiT|BLURANiUM) (only include 3L, BiZKiT, and BLURANiUM releases)
+                  - \b(3L|BiZKiT|BLURANiUM)\b (only include 3L, BiZKiT, and BLURANiUM releases)
                 </p>
               </div>
             </div>
@@ -1070,16 +1070,16 @@ export default function Configure() {
 
         {showApiKeyInput && (
           <div className={styles.section}>
-            <h2 style={{ padding: '5px' }}>Regex Sort Pattern</h2>
+            <h2 style={{ padding: '5px' }}>Regex Sort Patterns</h2>
             <p style={{ padding: '5px' }}>
-              Enter a regex pattern to sort streams. This will sort streams based on whether their filename matches the pattern. Matching files will come first in descending order, and last in ascending order.
+              Enter space-separated regex patterns to sort streams. Streams will be sorted based on the order of matching patterns. 
+              Matching files will come first in descending order, and last in ascending order for each pattern.
             </p>
-            {/* <div className={styles.settingInput}> */}
             <input
               type="text"
-              value={regexSortPattern}
-              onChange={(e) => setRegexSortPattern(e.target.value)}
-              placeholder="Example: \b(3L|BiZKiT|BLURANiUM)"
+              value={regexSortPatterns}
+              onChange={(e) => setRegexSortPatterns(e.target.value)}
+              placeholder="Example: \b(3L|BiZKiT)\b \b(FraMeSToR)\b"
               style={{
                 width: '97.5%',
                 padding: '5px',
@@ -1087,6 +1087,11 @@ export default function Configure() {
               }}
               className={styles.input}
             />
+            <p className={styles.helpText}>
+              Example patterns:
+              <br />
+              - \b(3L|BiZKiT|BLURANiUM)\b \b(FraMeSToR)\b (sort 3L/BiZKiT/BLURANiUM releases first, then FraMeSToR releases)
+            </p>
           </div>
         )}
         <div className={styles.section}>
