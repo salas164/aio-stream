@@ -465,5 +465,25 @@ export function validateConfig(
     }
   }
 
+  if (config.regexSortPattern) {
+    if (!config.apiKey) {
+      return createResponse(
+        false,
+        'missingApiKey',
+        'Regex sorting requires an API key to be set'
+      );
+    }
+
+    try {
+      new RegExp(config.regexSortPattern);
+    } catch (e) {
+      return createResponse(
+        false,
+        'invalidRegexSortPattern',
+        'Invalid regex sort pattern'
+      );
+    }
+  }
+
   return createResponse(true, null, null);
 }

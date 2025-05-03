@@ -740,6 +740,29 @@ export class AIOStreams {
           (resolution) => resolution[b.resolution]
         )
       );
+    } else if (field === 'regexSort') {
+      if (!this.config.regexSortPattern) return 0;
+      
+      try {
+        const regex = new RegExp(this.config.regexSortPattern);
+        const aMatch = a.filename ? regex.test(a.filename) : false;
+        const bMatch = b.filename ? regex.test(b.filename) : false;
+        
+        // If both match or both don't match, they are equal
+        if ((aMatch && bMatch) || (!aMatch && !bMatch)) return 0;
+        
+        // If one matches and the other doesn't, use direction to determine order
+        const direction = this.config.sortBy.find((sort) => Object.keys(sort)[0] === 'regexSort')?.direction;
+        if (direction === 'asc') {
+          // In ascending order, matching files come last
+          return aMatch ? 1 : -1;
+        } else {
+          // In descending order, matching files come first
+          return aMatch ? -1 : 1;
+        }
+      } catch (e) {
+        return 0;
+      }
     } else if (field === 'cached') {
       let aCanbeCached = a.provider;
       let bCanbeCached = b.provider;

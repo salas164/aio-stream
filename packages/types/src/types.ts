@@ -181,6 +181,7 @@ export interface Config {
     enabled: boolean;
     credentials: { [key: string]: string };
   }[];
+  regexSortPattern?: string;
 }
 
 interface BaseOptionDetail {

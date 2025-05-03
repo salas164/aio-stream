@@ -118,6 +118,7 @@ const defaultSortCriteria: SortBy[] = [
   { quality: false },
   { seeders: false, direction: 'desc' },
   { addon: false },
+  { regexSort: false, direction: 'desc' },
 ];
 
 const defaultResolutions: Resolution[] = [
@@ -219,6 +220,7 @@ export default function Configure() {
     excludePattern?: string;
     includePattern?: string;
   }>({});
+  const [regexSortPattern, setRegexSortPattern] = useState<string>('');
 
   useEffect(() => {
     // get config from the server
@@ -284,6 +286,7 @@ export default function Configure() {
         excludePattern: regexFilters.excludePattern || undefined,
         includePattern: regexFilters.includePattern || undefined
       } : undefined,
+      regexSortPattern: regexSortPattern,
     };
     return config;
   };
@@ -553,6 +556,7 @@ export default function Configure() {
         })) || []
       );
       setRegexFilters(decodedConfig.regexFilters || {});
+      setRegexSortPattern(decodedConfig.regexSortPattern || '');
 
       setServices(loadValidServices(decodedConfig.services));
       setMaxMovieSize(
@@ -1064,6 +1068,27 @@ export default function Configure() {
           </div>
         )}
 
+        {showApiKeyInput && (
+          <div className={styles.section}>
+            <h2 style={{ padding: '5px' }}>Regex Sort Pattern</h2>
+            <p style={{ padding: '5px' }}>
+              Enter a regex pattern to sort streams. This will sort streams based on whether their filename matches the pattern. Matching files will come first in descending order, and last in ascending order.
+            </p>
+            {/* <div className={styles.settingInput}> */}
+            <input
+              type="text"
+              value={regexSortPattern}
+              onChange={(e) => setRegexSortPattern(e.target.value)}
+              placeholder="Example: \b(3L|BiZKiT|BLURANiUM)"
+              style={{
+                width: '97.5%',
+                padding: '5px',
+                marginLeft: '5px',
+              }}
+              className={styles.input}
+            />
+          </div>
+        )}
         <div className={styles.section}>
           <div className={styles.slidersSetting}>
             <div>
