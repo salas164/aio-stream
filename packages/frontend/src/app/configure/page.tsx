@@ -286,7 +286,7 @@ export default function Configure() {
         excludePattern: regexFilters.excludePattern || undefined,
         includePattern: regexFilters.includePattern || undefined
       } : undefined,
-      regexSortPattern: regexSortPatterns,
+      regexSortPatterns: regexSortPatterns,
     };
     return config;
   };
