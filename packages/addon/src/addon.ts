@@ -496,8 +496,6 @@ export class AIOStreams {
         this.config.sortBy.splice(regexSortIndex, 0, ...newSortFields);
       }
     }
-    // logger.info(this.config.sortBy); but this shows object objects, not strings
-    logger.info(this.config.sortBy.map((sort) => Object.keys(sort)[0]));
     // then apply our this.config sorting
     filteredResults.sort((a, b) => {
       for (const sortByField of this.config.sortBy) {
@@ -568,6 +566,7 @@ export class AIOStreams {
     const streamsStartTime = new Date().getTime();
     const streamObjects = await this.createStreamObjects(filteredResults);
     streams.push(...streamObjects.filter((s) => s !== null));
+
     // Add error streams to the end
     streams.push(
       ...errorStreams.map((e) => errorStream(e.error, e.addon.name))
@@ -579,8 +578,6 @@ export class AIOStreams {
     logger.info(
       `Total time taken to get streams: ${getTimeTakenSincePoint(startTime)}`
     );
-    // logger.info(streams); this shows object objects, not strings
-    logger.info(streams.map((s) => s.description).slice(0, 10).join('\n'));
     return streams;
   }
 
