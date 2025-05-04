@@ -51,7 +51,16 @@ export class AIOStreams {
   private preCompiledRegexPatterns: RegExp[] = [];
 
   constructor(config: any) {
-    this.config = config;
+    // Merge environment defaults with user config
+    this.config = {
+      ...config,
+      regexFilters: config.regexFilters || {
+        excludePattern: Settings.DEFAULT_REGEX_EXCLUDE_PATTERN || undefined,
+        includePattern: Settings.DEFAULT_REGEX_INCLUDE_PATTERN || undefined
+      },
+      regexSortPatterns: config.regexSortPatterns || Settings.DEFAULT_REGEX_SORT_PATTERNS || undefined
+    };
+
     // Pre-compile regex patterns if they exist
     if (this.config.regexSortPatterns) {
       const regexSortPatterns = this.config.regexSortPatterns

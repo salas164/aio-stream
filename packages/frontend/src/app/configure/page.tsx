@@ -302,14 +302,16 @@ export default function Configure() {
       },
       addons,
       services,
-      regexFilters:
-        regexFilters.excludePattern || regexFilters.includePattern
-          ? {
-              excludePattern: regexFilters.excludePattern || undefined,
-              includePattern: regexFilters.includePattern || undefined,
-            }
-          : undefined,
-      regexSortPatterns: regexSortPatterns,
+      // Only include regex filters if they differ from environment defaults
+      regexFilters: (regexFilters.excludePattern !== process.env.NEXT_PUBLIC_DEFAULT_REGEX_EXCLUDE_PATTERN || 
+                    regexFilters.includePattern !== process.env.NEXT_PUBLIC_DEFAULT_REGEX_INCLUDE_PATTERN)
+        ? {
+            excludePattern: regexFilters.excludePattern || undefined,
+            includePattern: regexFilters.includePattern || undefined,
+          }
+        : undefined,
+      // Only include regex sort patterns if they differ from environment default
+      regexSortPatterns: regexSortPatterns !== process.env.NEXT_PUBLIC_DEFAULT_REGEX_SORT_PATTERNS ? regexSortPatterns : undefined,
     };
     return config;
   };
@@ -578,8 +580,17 @@ export default function Configure() {
           value: filter,
         })) || []
       );
-      setRegexFilters(decodedConfig.regexFilters || {});
-      setRegexSortPatterns(decodedConfig.regexSortPatterns || '');
+      // Only set regex filters and sort patterns if they differ from environment defaults
+      setRegexFilters({
+        excludePattern: decodedConfig.regexFilters?.excludePattern !== process.env.NEXT_PUBLIC_DEFAULT_REGEX_EXCLUDE_PATTERN 
+          ? decodedConfig.regexFilters?.excludePattern 
+          : '',
+        includePattern: decodedConfig.regexFilters?.includePattern !== process.env.NEXT_PUBLIC_DEFAULT_REGEX_INCLUDE_PATTERN
+          ? decodedConfig.regexFilters?.includePattern
+          : ''
+      });
+
+      setRegexSortPatterns(decodedConfig.regexSortPatterns && decodedConfig.regexSortPatterns !== process.env.NEXT_PUBLIC_DEFAULT_REGEX_SORT_PATTERNS ? decodedConfig.regexSortPatterns : '');
 
       setServices(loadValidServices(decodedConfig.services));
       setMaxMovieSize(

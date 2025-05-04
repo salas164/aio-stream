@@ -92,6 +92,9 @@ export class Settings {
     .MAX_REGEX_SORT_PATTERNS
     ? parseInt(process.env.MAX_REGEX_SORT_PATTERNS)
     : 20;
+  public static readonly DEFAULT_REGEX_EXCLUDE_PATTERN = process.env.DEFAULT_REGEX_EXCLUDE_PATTERN ?? '';
+  public static readonly DEFAULT_REGEX_INCLUDE_PATTERN = process.env.DEFAULT_REGEX_INCLUDE_PATTERN ?? '';
+  public static readonly DEFAULT_REGEX_SORT_PATTERNS = process.env.DEFAULT_REGEX_SORT_PATTERNS ?? '';
   public static readonly MAX_MOVIE_SIZE = process.env.MAX_MOVIE_SIZE
     ? parseInt(process.env.MAX_MOVIE_SIZE)
     : 161061273600; // 150GiB
