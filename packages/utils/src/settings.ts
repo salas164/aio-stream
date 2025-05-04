@@ -73,6 +73,10 @@ export class Settings {
     .CACHE_MEDIAFUSION_CONFIG_TTL
     ? parseInt(process.env.CACHE_MEDIAFUSION_CONFIG_TTL)
     : 30 * 24 * 60 * 60; // 30 days
+  public static readonly CACHE_STREMTHRU_IP_TTL = process.env
+    .CACHE_STREMTHRU_IP_TTL
+    ? parseInt(process.env.CACHE_STREMTHRU_IP_TTL)
+    : 900;
   public static readonly MAX_CACHE_SIZE = process.env.MAX_CACHE_SIZE
     ? parseInt(process.env.MAX_CACHE_SIZE)
     : 10240;
@@ -114,6 +118,19 @@ export class Settings {
     .ENCRYPT_MEDIAFLOW_URLS
     ? process.env.ENCRYPT_MEDIAFLOW_URLS === 'true'
     : false;
+
+  // StremThru settings
+  public static readonly DEFAULT_STREMTHRU_URL =
+    process.env.DEFAULT_STREMTHRU_URL ?? '';
+  public static readonly DEFAULT_STREMTHRU_CREDENTIAL =
+    process.env.DEFAULT_STREMTHRU_CREDENTIAL ?? '';
+  public static readonly DEFAULT_STREMTHRU_PUBLIC_IP =
+    process.env.DEFAULT_STREMTHRU_PUBLIC_IP ?? '';
+  public static readonly STREMTHRU_TIMEOUT = process.env.STREMTHRU_TIMEOUT
+    ? parseInt(process.env.STREMTHRU_TIMEOUT)
+    : 30000;
+  public static readonly ENCRYPT_STREMTHRU_URLS =
+    process.env.ENCRYPT_STREMTHRU_URLS === 'true';
 
   // Comet settings
   public static readonly COMET_URL =

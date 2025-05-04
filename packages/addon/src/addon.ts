@@ -37,6 +37,9 @@ import {
   Settings,
   createLogger,
   generateMediaFlowStreams,
+  getStremThruConfig,
+  getStremThruPublicIp,
+  generateStremThruStreams,
 } from '@aiostreams/utils';
 import { errorStream } from './responses';
 
@@ -74,6 +77,26 @@ export class AIOStreams {
       if (mediaFlowIp) {
         userIp = mediaFlowIp;
       }
+      return userIp;
+    }
+    const stremThruConfig = getStremThruConfig(this.config);
+    if (stremThruConfig.stremThruEnabled) {
+      let stremThruIp: string | null = null;
+      // if stremthru is enabled, we MUST use its IP and throw an error if we can't get it
+      for (let attempt = 1; attempt <= 3; attempt++) {
+        stremThruIp = await getStremThruPublicIp(
+          stremThruConfig,
+          this.config.instanceCache
+        );
+        if (stremThruIp) break;
+      }
+      if (!stremThruIp) {
+        throw new Error('Failed to get StremThru IP after 3 attempts');
+      }
+      if (stremThruIp) {
+        userIp = stremThruIp;
+      }
+      return userIp;
     }
     return userIp;
   }
@@ -86,7 +109,7 @@ export class AIOStreams {
       this.config.requestingIp = await this.getRequestingIp();
     } catch (error) {
       logger.error(error);
-      return [errorStream(`Failed to get MediaFlow IP`)];
+      return [errorStream(`Failed to get Proxy IP`)];
     }
 
     const { parsedStreams, errorStreams } =
@@ -559,35 +582,39 @@ export class AIOStreams {
     return streams;
   }
 
-  private shouldProxyStream(stream: ParsedStream): boolean {
-    const mediaFlowConfig = getMediaFlowConfig(this.config);
-    if (!mediaFlowConfig.mediaFlowEnabled) return false;
+  private shouldProxyStream(
+    stream: ParsedStream,
+    mediaFlowConfig: ReturnType<typeof getMediaFlowConfig>,
+    stremThruConfig: ReturnType<typeof getStremThruConfig>
+  ): boolean {
     if (!stream.url) return false;
+
+    const streamProvider = stream.provider ? stream.provider.id : 'none';
+
     // // now check if mediaFlowConfig.proxiedAddons or mediaFlowConfig.proxiedServices is not null
     // logger.info(this.config.mediaFlowConfig?.proxiedAddons);
     // logger.info(stream.addon.id);
     if (
-      mediaFlowConfig.proxiedAddons &&
-      mediaFlowConfig.proxiedAddons.length > 0 &&
-      !mediaFlowConfig.proxiedAddons.includes(stream.addon.id)
+      mediaFlowConfig.mediaFlowEnabled &&
+      (!mediaFlowConfig.proxiedAddons?.length ||
+        mediaFlowConfig.proxiedAddons.includes(stream.addon.id)) &&
+      (!mediaFlowConfig.proxiedServices?.length ||
+        mediaFlowConfig.proxiedServices.includes(streamProvider))
     ) {
-      return false;
+      return true;
     }
 
     if (
-      (mediaFlowConfig.proxiedServices &&
-        mediaFlowConfig.proxiedServices.length > 0 &&
-        stream.provider &&
-        !mediaFlowConfig.proxiedServices.includes(stream.provider.id)) ||
-      (mediaFlowConfig.proxiedServices &&
-        mediaFlowConfig.proxiedServices.length > 0 &&
-        !stream.provider &&
-        !mediaFlowConfig.proxiedServices.includes('none'))
+      stremThruConfig.stremThruEnabled &&
+      (!stremThruConfig.proxiedAddons?.length ||
+        stremThruConfig.proxiedAddons.includes(stream.addon.id)) &&
+      (!stremThruConfig.proxiedServices?.length ||
+        stremThruConfig.proxiedServices.includes(streamProvider))
     ) {
-      return false;
+      return true;
     }
 
-    return true;
+    return false;
   }
 
   private getFormattedText(parsedStream: ParsedStream): {
@@ -637,20 +664,34 @@ export class AIOStreams {
   private async createStreamObjects(
     parsedStreams: ParsedStream[]
   ): Promise<Stream[]> {
+    const mediaFlowConfig = getMediaFlowConfig(this.config);
+    const stremThruConfig = getStremThruConfig(this.config);
+
     // Identify streams that require proxying
     const streamsToProxy = parsedStreams
       .map((stream, index) => ({ stream, index }))
-      .filter(({ stream }) => stream.url && this.shouldProxyStream(stream));
+      .filter(({ stream }) => stream.url && this.shouldProxyStream(stream, mediaFlowConfig, stremThruConfig));
 
     const proxiedUrls = streamsToProxy.length
-      ? await generateMediaFlowStreams(
-          getMediaFlowConfig(this.config),
-          streamsToProxy.map(({ stream }) => ({
-            url: stream.url!,
-            filename: stream.filename,
-            headers: stream.stream?.behaviorHints?.proxyHeaders,
-          }))
-        )
+      ? mediaFlowConfig.mediaFlowEnabled
+        ? await generateMediaFlowStreams(
+            mediaFlowConfig,
+            streamsToProxy.map(({ stream }) => ({
+              url: stream.url!,
+              filename: stream.filename,
+              headers: stream.stream?.behaviorHints?.proxyHeaders,
+            }))
+          )
+        : stremThruConfig.stremThruEnabled
+          ? await generateStremThruStreams(
+              stremThruConfig,
+              streamsToProxy.map(({ stream }) => ({
+                url: stream.url!,
+                filename: stream.filename,
+                headers: stream.stream?.behaviorHints?.proxyHeaders,
+              }))
+            )
+          : null
       : null;
 
     const removeIndexes = new Set<number>();
@@ -677,6 +718,11 @@ export class AIOStreams {
     }
 
     // Build final Stream objects
+    const proxyBingeGroupPrefix = mediaFlowConfig.mediaFlowEnabled
+      ? 'mfp.'
+      : stremThruConfig.stremThruEnabled
+        ? 'st.'
+        : '';
     const streamObjects: Stream[] = await Promise.all(
       parsedStreams.map((parsedStream) => {
         const { name, description } = this.getFormattedText(parsedStream);
@@ -704,7 +750,7 @@ export class AIOStreams {
               ? Math.floor(parsedStream.size)
               : undefined,
             filename: parsedStream.filename,
-            bingeGroup: `${parsedStream.proxied ? 'mfp.' : ''}${Settings.ADDON_ID}|${parsedStream.addon.name}|${combinedTags.join('|')}`,
+            bingeGroup: `${parsedStream.proxied ? proxyBingeGroupPrefix : ''}${Settings.ADDON_ID}|${parsedStream.addon.name}|${combinedTags.join('|')}`,
             proxyHeaders: parsedStream.stream?.behaviorHints?.proxyHeaders,
             notWebReady: parsedStream.stream?.behaviorHints?.notWebReady,
           },

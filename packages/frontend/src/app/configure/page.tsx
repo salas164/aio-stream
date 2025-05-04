@@ -200,6 +200,18 @@ export default function Configure() {
   const [mediaFlowProxiedServices, setMediaFlowProxiedServices] = useState<
     string[] | null
   >(null);
+
+  const [stremThruEnabled, setStremThruEnabled] = useState<boolean>(false);
+  const [stremThruUrl, setStremThruUrl] = useState<string>('');
+  const [stremThruCredential, setStremThruCredential] = useState<string>('');
+  const [stremThruPublicIp, setStremThruPublicIp] = useState<string>('');
+  const [stremThruProxiedAddons, setStremThruProxiedAddons] = useState<
+    string[] | null
+  >(null);
+  const [stremThruProxiedServices, setStremThruProxiedServices] = useState<
+    string[] | null
+  >(null);
+
   const [overrideName, setOverrideName] = useState<string>('');
   const [apiKey, setApiKey] = useState<string>('');
 
@@ -271,12 +283,20 @@ export default function Configure() {
           : null,
       formatter: formatter || 'gdrive',
       mediaFlowConfig: {
-        mediaFlowEnabled,
+        mediaFlowEnabled: mediaFlowEnabled && !stremThruEnabled,
         proxyUrl: mediaFlowProxyUrl,
         apiPassword: mediaFlowApiPassword,
         publicIp: mediaFlowPublicIp,
         proxiedAddons: mediaFlowProxiedAddons,
         proxiedServices: mediaFlowProxiedServices,
+      },
+      stremThruConfig: {
+        stremThruEnabled: stremThruEnabled && !mediaFlowEnabled,
+        url: stremThruUrl,
+        credential: stremThruCredential,
+        publicIp: stremThruPublicIp,
+        proxiedAddons: stremThruProxiedAddons,
+        proxiedServices: stremThruProxiedServices,
       },
       addons,
       services,
@@ -1241,7 +1261,8 @@ export default function Configure() {
             <div className={styles.settingInput}>
               <input
                 type="checkbox"
-                checked={mediaFlowEnabled}
+                checked={mediaFlowEnabled && !stremThruEnabled}
+                disabled={stremThruEnabled}
                 onChange={(e) => {
                   setMediaFlowEnabled(e.target.checked);
                 }}
@@ -1375,6 +1396,155 @@ export default function Configure() {
                         );
                       }}
                       values={mediaFlowProxiedServices || undefined}
+                    />
+                  </div>
+                </div>
+              </div>
+            </div>
+          }
+        </div>
+
+        <div className={styles.section}>
+          <div className={styles.setting}>
+            <div className={styles.settingDescription}>
+              <h2 style={{ padding: '5px' }}>StremThru</h2>
+              <p style={{ padding: '5px' }}>
+                Use StremThru to proxy your streams
+              </p>
+            </div>
+            <div className={styles.settingInput}>
+              <input
+                type="checkbox"
+                checked={stremThruEnabled && !mediaFlowEnabled}
+                disabled={mediaFlowEnabled}
+                onChange={(e) => {
+                  setStremThruEnabled(e.target.checked);
+                }}
+                style={{
+                  width: '25px',
+                  height: '25px',
+                }}
+              />
+            </div>
+          </div>
+          {
+            <div
+              className={`${styles.stremThruConfig} ${stremThruEnabled ? '' : styles.hidden}`}
+            >
+              <div className={styles.stremThruSection}>
+                <div>
+                  <div>
+                    <h3 style={{ padding: '5px' }}>StremThru URL</h3>
+                    <p style={{ padding: '5px' }}>
+                      The URL of the StremThru server
+                    </p>
+                  </div>
+                  <div>
+                    <CredentialInput
+                      credential={stremThruUrl}
+                      setCredential={setStremThruUrl}
+                      inputProps={{
+                        placeholder: 'Enter your StremThru URL',
+                        disabled: !stremThruEnabled,
+                      }}
+                    />
+                  </div>
+                </div>
+                <div>
+                  <div>
+                    <h3 style={{ padding: '5px' }}>Credential</h3>
+                    <p style={{ padding: '5px' }}>Your StremThru Credential</p>
+                  </div>
+                  <div>
+                    <CredentialInput
+                      credential={stremThruCredential}
+                      setCredential={setStremThruCredential}
+                      inputProps={{
+                        placeholder: 'Enter your StremThru Credential',
+                        disabled: !stremThruEnabled,
+                      }}
+                    />
+                  </div>
+                </div>
+                <div>
+                  <div>
+                    <h3 style={{ padding: '5px' }}>Public IP (Optional)</h3>
+                    <p style={{ padding: '5px' }}>
+                      Set the publicly exposed IP for StremThru server.
+                    </p>
+                  </div>
+                  <div>
+                    <CredentialInput
+                      credential={stremThruPublicIp}
+                      setCredential={setStremThruPublicIp}
+                      inputProps={{
+                        placeholder: 'Enter your StremThru public IP',
+                        disabled: !stremThruEnabled,
+                      }}
+                    />
+                  </div>
+                </div>
+              </div>
+              <div className={styles.stremThruSection}>
+                <div>
+                  <div>
+                    <h3 style={{ padding: '5px' }}>Proxy Addons (Optional)</h3>
+                    <p style={{ padding: '5px' }}>
+                      By default, all streams from every addon are proxied.
+                      Choose specific addons here to proxy only their streams.
+                    </p>
+                  </div>
+                  <div>
+                    <MultiSelect
+                      options={
+                        addons.map((addon) => ({
+                          value: `${addon.id}-${JSON.stringify(addon.options)}`,
+                          label:
+                            addon.options.addonName ||
+                            addon.options.overrideName ||
+                            addon.options.name ||
+                            addon.id.charAt(0).toUpperCase() +
+                              addon.id.slice(1),
+                        })) || []
+                      }
+                      setValues={(selectedAddons) => {
+                        setStremThruProxiedAddons(
+                          selectedAddons.length === 0 ? null : selectedAddons
+                        );
+                      }}
+                      values={stremThruProxiedAddons || undefined}
+                    />
+                  </div>
+                </div>
+                <div>
+                  <div>
+                    <h3 style={{ padding: '5px' }}>
+                      Proxy Services (Optional)
+                    </h3>
+                    <p style={{ padding: '5px' }}>
+                      By default, all streams whether they are from a serivce or
+                      not are proxied. Choose which services you want to proxy
+                      through StremThru. Selecting None will also proxy streams
+                      that are not (detected to be) from a service.
+                    </p>
+                  </div>
+                  <div>
+                    <MultiSelect
+                      options={[
+                        { value: 'none', label: 'None' },
+                        ...serviceDetails.map((service) => ({
+                          value: service.id,
+                          label: service.name,
+                        })),
+                      ]}
+                      setValues={(selectedServices) => {
+                        setStremThruProxiedServices(
+                          selectedServices.length === 0
+                            ? null
+                            : selectedServices
+                        );
+                      }}
+                      values={stremThruProxiedServices || undefined}
                     />
                   </div>
                 </div>

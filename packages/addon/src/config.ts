@@ -383,6 +383,13 @@ export function validateConfig(
     );
   }
 
+  if (config.mediaFlowConfig?.mediaFlowEnabled && config.stremThruConfig?.stremThruEnabled) {
+    return createResponse(
+      false,
+      'multipleProxyServices',
+      'Multiple proxy services are not allowed'
+    );
+  }
   if (config.mediaFlowConfig?.mediaFlowEnabled) {
     if (!config.mediaFlowConfig.proxyUrl) {
       return createResponse(
@@ -399,6 +406,24 @@ export function validateConfig(
       );
     }
   }
+
+  if (config.stremThruConfig?.stremThruEnabled) {
+    if (!config.stremThruConfig.url) {
+      return createResponse(
+        false,
+        'missingUrl',
+        'URL is required if Stremthru is enabled'
+      );
+    }
+    if (!config.stremThruConfig.credential) {
+      return createResponse(
+        false,
+        'missingCredential',
+        'Credential is required if StremThru is enabled'
+      );
+    }
+  }
+
   if (
     (config.excludeFilters?.length ?? 0) > Settings.MAX_KEYWORD_FILTERS ||
     (config.strictIncludeFilters?.length ?? 0) > Settings.MAX_KEYWORD_FILTERS

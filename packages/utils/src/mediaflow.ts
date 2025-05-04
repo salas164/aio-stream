@@ -20,6 +20,9 @@ export async function generateMediaFlowStreams(
     };
   }[]
 ): Promise<string[] | null> {
+  if (!streams.length) {
+    return [];
+  }
   if (!mediaFlowConfig) {
     throw new Error('MediaFlow configuration is missing');
   }
