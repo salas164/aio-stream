@@ -36,6 +36,7 @@
     "node": ">=20.0.0"
   },
   "dependencies": {
+    "super-regex": "^1.0.0",
     "undici": "^7.2.3"
   }
 }

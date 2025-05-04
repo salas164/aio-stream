@@ -39,19 +39,20 @@ import {
   generateMediaFlowStreams,
 } from '@aiostreams/utils';
 import { errorStream } from './responses';
+import { safeRegexTest } from './utils/regex';
 
 const logger = createLogger('addon');
 
 export class AIOStreams {
   private config: Config;
-  private preCompiledPatterns: RegExp[] = [];
+  private preCompiledRegexPatterns: RegExp[] = [];
 
   constructor(config: any) {
     this.config = config;
     // Pre-compile regex patterns if they exist
     if (this.config.regexSortPatterns) {
       const regexSortPatterns = this.config.regexSortPatterns.split(/\s+/).filter(Boolean);
-      this.preCompiledPatterns = regexSortPatterns.map(pattern => new RegExp(pattern));
+      this.preCompiledRegexPatterns = regexSortPatterns.map(pattern => new RegExp(pattern));
     }
   }
 
@@ -356,11 +357,11 @@ export class AIOStreams {
         
         if (excludePattern) {
           const regexExclude = new RegExp(excludePattern, 'i');
-          if (parsedStream.filename && regexExclude.test(parsedStream.filename)) {
+          if (parsedStream.filename && safeRegexTest(regexExclude, parsedStream.filename)) {
             skipReasons.excludeRegex++;
             return false;
           }
-          if (parsedStream.indexers && regexExclude.test(parsedStream.indexers)) {
+          if (parsedStream.indexers && safeRegexTest(regexExclude, parsedStream.indexers)) {
             skipReasons.excludeRegex++;
             return false;
           }
@@ -368,7 +369,7 @@ export class AIOStreams {
         
         if (includePattern) {
           const regexInclude = new RegExp(includePattern, 'i');
-          if (!((parsedStream.filename && regexInclude.test(parsedStream.filename)) || (parsedStream.indexers && regexInclude.test(parsedStream.indexers)))) {
+          if (!((parsedStream.filename && safeRegexTest(regexInclude, parsedStream.filename)) || (parsedStream.indexers && safeRegexTest(regexInclude, parsedStream.indexers)))) {
             skipReasons.requiredRegex++;
             return false;
           }
@@ -750,10 +751,10 @@ export class AIOStreams {
       if (!this.config.regexSortPatterns) return 0;
       
       try {
-        for (let i = 0; i < this.preCompiledPatterns.length; i++) {
-          const regex = this.preCompiledPatterns[i];
-          const aMatch = a.filename ? regex.test(a.filename) : false;
-          const bMatch = b.filename ? regex.test(b.filename) : false;
+        for (let i = 0; i < this.preCompiledRegexPatterns.length; i++) {
+          const regex = this.preCompiledRegexPatterns[i];
+          const aMatch = a.filename ? safeRegexTest(regex, a.filename) : false;
+          const bMatch = b.filename ? safeRegexTest(regex, b.filename) : false;
           
           // If both match or both don't match, continue to next pattern
           if ((aMatch && bMatch) || (!aMatch && !bMatch)) continue;
