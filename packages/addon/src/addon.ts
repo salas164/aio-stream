@@ -474,28 +474,6 @@ export class AIOStreams {
       a.filename && b.filename ? a.filename.localeCompare(b.filename) : 0
     );
 
-    // Process regex patterns into separate sort fields
-    if (this.config.regexSortPatterns) {
-      const patterns = this.config.regexSortPatterns.split(/\s+/).filter(Boolean);
-      // Find the index where regexSort appears in sortBy
-      const regexSortIndex = this.config.sortBy.findIndex(
-        (sort) => Object.keys(sort).includes('regexSort')
-      );
-      
-      if (regexSortIndex !== -1) {
-        // Remove the original regexSort entry
-        const originalRegexSort = this.config.sortBy[regexSortIndex];
-        this.config.sortBy.splice(regexSortIndex, 1);
-        
-        // Insert the new regex pattern sort fields at the same position
-        const newSortFields = patterns.map((_, index) => ({
-          [`regexSort_${index}`]: true,
-          direction: originalRegexSort.direction || 'desc' // Use the original direction
-        }));
-        
-        this.config.sortBy.splice(regexSortIndex, 0, ...newSortFields);
-      }
-    }
     // then apply our this.config sorting
     filteredResults.sort((a, b) => {
       for (const sortByField of this.config.sortBy) {
@@ -571,7 +549,7 @@ export class AIOStreams {
     streams.push(
       ...errorStreams.map((e) => errorStream(e.error, e.addon.name))
     );
-    
+
     logger.info(
       `Created ${streams.length} stream objects in ${getTimeTakenSincePoint(streamsStartTime)}`
     );
@@ -762,32 +740,36 @@ export class AIOStreams {
           (resolution) => resolution[b.resolution]
         )
       );
-    } else if (field.startsWith('regexSort_')) {
-      // Extract the pattern index from the field name
-      const patternIndex = parseInt(field.split('_')[1]);
+    } else if (field === 'regexSort') {
       if (!this.config.regexSortPatterns) return 0;
       
       try {
-        // Split patterns and get the specific pattern for this field
+        // Split patterns and create regex objects
         const patterns = this.config.regexSortPatterns.split(/\s+/).filter(Boolean);
-        if (patternIndex >= patterns.length) return 0;
+        const regexes = patterns.map(pattern => new RegExp(pattern));
         
-        const regex = new RegExp(patterns[patternIndex]);
-        const aMatch = a.filename ? regex.test(a.filename) : false;
-        const bMatch = b.filename ? regex.test(b.filename) : false;
-        
-        // If both match or both don't match, return 0 to let other sort fields decide
-        if ((aMatch && bMatch) || (!aMatch && !bMatch)) return 0;
-        
-        // Get the direction for sorting of patterns
-        const direction = this.config.sortBy.find((sort) => Object.keys(sort)[0] === field)?.direction;
-        if (direction === 'asc') {
-          // In ascending order, matching files come last
-          return aMatch ? 1 : -1;
-        } else {
-          // In descending order, matching files come first
-          return aMatch ? -1 : 1;
+        // Check each pattern in order
+        for (let i = 0; i < regexes.length; i++) {
+          const regex = regexes[i];
+          const aMatch = a.filename ? regex.test(a.filename) : false;
+          const bMatch = b.filename ? regex.test(b.filename) : false;
+          
+          // If both match or both don't match, continue to next pattern
+          if ((aMatch && bMatch) || (!aMatch && !bMatch)) continue;
+          
+          // If one matches and the other doesn't, use direction to determine order
+          const direction = this.config.sortBy.find((sort) => Object.keys(sort)[0] === 'regexSort')?.direction;
+          if (direction === 'asc') {
+            // In ascending order, matching files come last
+            return aMatch ? 1 : -1;
+          } else {
+            // In descending order, matching files come first
+            return aMatch ? -1 : 1;
+          }
         }
+        
+        // If we get here, no patterns matched or all patterns matched the same way
+        return 0;
       } catch (e) {
         return 0;
       }
