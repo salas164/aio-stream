@@ -38,9 +38,12 @@ AIOStreams consoloidates multiple Stremio addons and debrid services into a sing
 - **🧰 Advanced Filtering**
   - Filter results by resolution, quality, visual tags (e.g., HDR, DV), audio tags (e.g., Atmos, DTS), and video encodes.
   - Filter by keywords present in the stream title.
+  - Filter by custom regex pattern.
   - Specify minimum and maximum file sizes individually for episodes and movies.
   - Prioritise and/or exclude specific languages.
-- **📊 Sophisticated Sorting** – Sort aggregated results by quality, resolution, size, cached status, visual tags, audio tags, encodes, seeders (for torrents), service provider, language, or personal.
+- **📊 Sophisticated Sorting** – Sort aggregated results by quality, resolution, size, cached status, visual tags, audio tags, encodes, seeders (for torrents), service provider, language, personal preferences, or custom regex patterns.
+  - **Multiple Pattern Support** - Define multiple regex patterns for more complex sorting rules.
+  > **Note:** Regex based sorting and filtering require self-hosting and an API_KEY set in the environment variables.
 - **🗂️ Intelligent Deduplication** - Intelligently removes duplicate results and prioritises specific services and addons for the same file based on your configuration.
 - **🚦 Result Limiting** - Limit the number of results shown per resolution.
 - **🎨 Customizable Formatting**:
