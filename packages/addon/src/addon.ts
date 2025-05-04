@@ -44,9 +44,15 @@ const logger = createLogger('addon');
 
 export class AIOStreams {
   private config: Config;
+  private preCompiledPatterns: RegExp[] = [];
 
   constructor(config: any) {
     this.config = config;
+    // Pre-compile regex patterns if they exist
+    if (this.config.regexSortPatterns) {
+      const regexSortPatterns = this.config.regexSortPatterns.split(/\s+/).filter(Boolean);
+      this.preCompiledPatterns = regexSortPatterns.map(pattern => new RegExp(pattern));
+    }
   }
 
   private async getRequestingIp() {
@@ -744,13 +750,8 @@ export class AIOStreams {
       if (!this.config.regexSortPatterns) return 0;
       
       try {
-        // Split patterns and create regex objects
-        const patterns = this.config.regexSortPatterns.split(/\s+/).filter(Boolean);
-        const regexes = patterns.map(pattern => new RegExp(pattern));
-        
-        // Check each pattern in order
-        for (let i = 0; i < regexes.length; i++) {
-          const regex = regexes[i];
+        for (let i = 0; i < this.preCompiledPatterns.length; i++) {
+          const regex = this.preCompiledPatterns[i];
           const aMatch = a.filename ? regex.test(a.filename) : false;
           const bMatch = b.filename ? regex.test(b.filename) : false;
           

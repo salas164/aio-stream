@@ -476,6 +476,15 @@ export function validateConfig(
 
     // Split the pattern by spaces and validate each one
     const patterns = config.regexSortPatterns.split(/\s+/).filter(Boolean);
+    // Enforce an upper bound on the number of patterns
+    if (patterns.length > Settings.MAX_REGEX_SORT_PATTERNS) {
+      return createResponse(
+        false,
+        'tooManyRegexSortPatterns',
+        `You can specify at most ${Settings.MAX_REGEX_SORT_PATTERNS} regex sort patterns`
+      );
+    }
+
     for (const pattern of patterns) {
       try {
         new RegExp(pattern);
