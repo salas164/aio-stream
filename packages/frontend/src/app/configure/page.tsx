@@ -609,6 +609,12 @@ export default function Configure() {
       setMediaFlowProxiedServices(
         decodedConfig.mediaFlowConfig?.proxiedServices || null
       );
+      setStremThruEnabled(
+        decodedConfig.stremThruConfig?.stremThruEnabled || false
+      );
+      setStremThruUrl(decodedConfig.stremThruConfig?.url || '');
+      setStremThruCredential(decodedConfig.stremThruConfig?.credential || '');
+      setStremThruPublicIp(decodedConfig.stremThruConfig?.publicIp || '');
       setApiKey(decodedConfig.apiKey || '');
 
       // set formatter

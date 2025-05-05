@@ -324,14 +324,14 @@ export class BaseWrapper {
     let filename = stream?.behaviorHints?.filename || stream.filename;
 
     // if filename behaviorHint is not present, attempt to look for a filename in the stream description or title
-    let description = stream.description || stream.title;
+    let description = stream.description || stream.title || '';
 
     // attempt to find a valid filename by looking for season/episode or year in the description line by line,
     // and fall back to using the full description.
     let parsedInfo: ParsedNameData | undefined = undefined;
     const potentialFilenames = [
       filename,
-      ...(description.split('\n') as string[]).splice(0, 5),
+      ...description.split('\n').splice(0, 5),
     ].filter((line) => line && line.length > 0);
     for (const line of potentialFilenames) {
       parsedInfo = parseFilename(line);
@@ -340,6 +340,7 @@ export class BaseWrapper {
         (parsedInfo.season && parsedInfo.episode) ||
         parsedInfo.episode
       ) {
+        filename = line;
         break;
       } else {
         parsedInfo = undefined;
@@ -348,6 +349,11 @@ export class BaseWrapper {
     if (!parsedInfo) {
       // fall back to using full description as info source
       parsedInfo = parseFilename(description);
+      filename = filename
+        ? filename
+        : description
+          ? description.split('\n')[0]
+          : undefined;
     }
 
     // look for size in one of the many random places it could be
