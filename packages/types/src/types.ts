@@ -159,10 +159,22 @@ export interface Config {
   maxResultsPerResolution: number | null;
   excludeFilters: string[] | null;
   strictIncludeFilters: string[] | null;
+  regexFilters?: {
+    excludePattern?: string;
+    includePattern?: string;
+  };
   mediaFlowConfig?: {
     mediaFlowEnabled: boolean;
     proxyUrl: string;
     apiPassword: string;
+    publicIp: string;
+    proxiedAddons: string[] | null;
+    proxiedServices: string[] | null;
+  };
+  stremThruConfig?: {
+    stremThruEnabled: boolean;
+    url: string;
+    credential: string;
     publicIp: string;
     proxiedAddons: string[] | null;
     proxiedServices: string[] | null;
@@ -177,6 +189,8 @@ export interface Config {
     enabled: boolean;
     credentials: { [key: string]: string };
   }[];
+  /** Space-separated regex patterns to sort streams by. Streams will be sorted based on the order of matching patterns. */
+  regexSortPatterns?: string;
 }
 
 interface BaseOptionDetail {
