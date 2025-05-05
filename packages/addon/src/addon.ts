@@ -816,7 +816,7 @@ export class AIOStreams {
         )
       );
     } else if (field === 'regexSort') {
-      if (!this.config.regexSortPatterns) return 0;
+      if (!this.config.regexSortPatterns || !this.config.apiKey) return 0;
 
       try {
         for (let i = 0; i < this.preCompiledRegexPatterns.length; i++) {
