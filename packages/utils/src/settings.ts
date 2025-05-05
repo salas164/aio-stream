@@ -91,7 +91,7 @@ export class Settings {
   public static readonly MAX_REGEX_SORT_PATTERNS = process.env
     .MAX_REGEX_SORT_PATTERNS
     ? parseInt(process.env.MAX_REGEX_SORT_PATTERNS)
-    : 20;
+    : 30;
 
   // for directly entering the regex patterns here, replace the process.env.DEFAULT_REGEX_EXCLUDE_PATTERN with the regex pattern/s
   public static readonly DEFAULT_REGEX_EXCLUDE_PATTERN = Settings.validateRegexPattern(process.env.DEFAULT_REGEX_EXCLUDE_PATTERN);
