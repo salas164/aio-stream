@@ -54,11 +54,11 @@ export class AIOStreams {
     // Merge environment defaults with user config
     this.config = {
       ...config,
-      regexFilters: config.regexFilters || {
-        excludePattern: Settings.DEFAULT_REGEX_EXCLUDE_PATTERN || undefined,
-        includePattern: Settings.DEFAULT_REGEX_INCLUDE_PATTERN || undefined
+      regexFilters: {
+        excludePattern: config.regexFilters?.excludePattern ?? Settings.DEFAULT_REGEX_EXCLUDE_PATTERN,
+        includePattern: config.regexFilters?.includePattern ?? Settings.DEFAULT_REGEX_INCLUDE_PATTERN
       },
-      regexSortPatterns: config.regexSortPatterns || Settings.DEFAULT_REGEX_SORT_PATTERNS || undefined
+      regexSortPatterns: config.regexSortPatterns ?? Settings.DEFAULT_REGEX_SORT_PATTERNS
     };
 
     // Pre-compile regex patterns if they exist

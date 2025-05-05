@@ -24,9 +24,6 @@ const nextConfig: NextConfig = {
   },
   env: {
     NEXT_PUBLIC_BRANDING: branding,
-    NEXT_PUBLIC_DEFAULT_REGEX_EXCLUDE_PATTERN: process.env.DEFAULT_REGEX_EXCLUDE_PATTERN,
-    NEXT_PUBLIC_DEFAULT_REGEX_INCLUDE_PATTERN: process.env.DEFAULT_REGEX_INCLUDE_PATTERN,
-    NEXT_PUBLIC_DEFAULT_REGEX_SORT_PATTERNS: process.env.DEFAULT_REGEX_SORT_PATTERNS,
   },
   webpack(config) {
     config.resolve.fallback = {
