@@ -58,10 +58,10 @@ export class AIOStreams {
     this.config = {
       ...config,
       regexFilters: {
-        excludePattern: config.regexFilters?.excludePattern ?? Settings.DEFAULT_REGEX_EXCLUDE_PATTERN,
-        includePattern: config.regexFilters?.includePattern ?? Settings.DEFAULT_REGEX_INCLUDE_PATTERN
+        excludePattern: config.regexFilters?.excludePattern || Settings.DEFAULT_REGEX_EXCLUDE_PATTERN,
+        includePattern: config.regexFilters?.includePattern || Settings.DEFAULT_REGEX_INCLUDE_PATTERN
       },
-      regexSortPatterns: config.regexSortPatterns ?? Settings.DEFAULT_REGEX_SORT_PATTERNS
+      regexSortPatterns: config.regexSortPatterns || Settings.DEFAULT_REGEX_SORT_PATTERNS
     };
 
     // Pre-compile regex patterns if they exist
@@ -70,14 +70,14 @@ export class AIOStreams {
         .split(/\s+/)
         .filter(Boolean);
       this.preCompiledRegexSortPatterns = regexSortPatterns.map(
-        (pattern) => new RegExp(pattern)
+        (pattern) => new RegExp(pattern, 'i')
       );
     }
     if(this.config?.regexFilters?.includePattern) {
-      this.preCompiledRegexFilterIncludePattern = new RegExp(this.config?.regexFilters?.includePattern);
+      this.preCompiledRegexFilterIncludePattern = new RegExp(this.config?.regexFilters?.includePattern, 'i');
     }
     if(this.config?.regexFilters?.excludePattern) {
-      this.preCompiledRegexFilterExcludePattern = new RegExp(this.config?.regexFilters?.excludePattern);
+      this.preCompiledRegexFilterExcludePattern = new RegExp(this.config?.regexFilters?.excludePattern, 'i');
     }
   }
 
