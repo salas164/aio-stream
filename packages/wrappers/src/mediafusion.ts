@@ -23,8 +23,11 @@ export class MediaFusion extends BaseWrapper {
       userConfig,
       indexerTimeout || Settings.DEFAULT_MEDIAFUSION_TIMEOUT,
       {
-        'User-Agent': Settings.DEFAULT_MEDIAFUSION_USER_AGENT,
         encoded_user_data: configString && !overrideUrl ? configString : '',
+        // only set the user agent if it is defined in the settings, otherwise user agent would be empty in base class
+        ...(Settings.DEFAULT_MEDIAFUSION_USER_AGENT
+          ? { 'User-Agent': Settings.DEFAULT_MEDIAFUSION_USER_AGENT }
+          : {}),
       }
     );
   }
@@ -36,7 +39,21 @@ export class MediaFusion extends BaseWrapper {
         result: stream.description,
       };
     }
-    return super.parseStream(stream);
+    const parseResult = super.parseStream(stream);
+    if (parseResult.type === 'stream' && parseResult.result) {
+      const torrentNameRegex = /📂\s*(.+)/;
+      const description = stream.description || stream.title;
+      const match = torrentNameRegex.exec(description || '');
+      if (match && match[1].trim() !== parseResult.result.filename?.trim()) {
+        parseResult.result.folderName = match[1].trim();
+        if (parseResult.result.folderName.split('┈➤')[1]) {
+          parseResult.result.filename = parseResult.result.folderName
+            .split('┈➤')[1]
+            .trim();
+        }
+      }
+    }
+    return parseResult;
   }
 }
 

@@ -190,15 +190,6 @@ export class BaseWrapper {
   }
   protected async getStreams(streamRequest: StreamRequest): Promise<Stream[]> {
     const url = this.getStreamUrl(streamRequest);
-    const cache = this.userConfig.instanceCache;
-    const requestCacheKey = getTextHash(url);
-    const cachedStreams = cache ? cache.get(requestCacheKey) : undefined;
-    if (cachedStreams) {
-      logger.info(
-        `Returning cached streams for ${this.addonName} (${this.getLoggableUrl(url)})`
-      );
-      return cachedStreams;
-    }
     try {
       const response = await this.makeRequest(url);
       if (!response.ok) {
@@ -214,13 +205,6 @@ export class BaseWrapper {
       if (!results.streams) {
         throw new Error('Failed to respond with streams');
       }
-      if (Settings.CACHE_STREAM_RESULTS && cache) {
-        cache.set(
-          requestCacheKey,
-          results.streams,
-          Settings.CACHE_STREAM_RESULTS_TTL
-        );
-      }
       return results.streams;
     } catch (error: any) {
       let message = error.message;
@@ -233,68 +217,73 @@ export class BaseWrapper {
     }
   }
 
-  protected createParsedResult(
-    parsedInfo: ParsedNameData,
-    stream: Stream,
-    filename?: string,
-    size?: number,
-    provider?: ParsedStream['provider'],
-    seeders?: number,
-    usenetAge?: string,
-    indexer?: string,
-    duration?: number,
-    personal?: boolean,
-    infoHash?: string,
-    message?: string
-  ): ParseResult {
+  protected createParsedResult(data: {
+    parsedInfo: ParsedNameData;
+    stream: Stream;
+    filename?: string;
+    folderName?: string;
+    size?: number;
+    provider?: ParsedStream['provider'];
+    seeders?: number;
+    usenetAge?: string;
+    indexer?: string;
+    duration?: number;
+    personal?: boolean;
+    infoHash?: string;
+    message?: string;
+  }): ParseResult {
+    if (data.folderName === data.filename) {
+      data.folderName = undefined;
+    }
     return {
       type: 'stream',
       result: {
-        ...parsedInfo,
+        ...data.parsedInfo,
         proxied: false,
-        message: message,
+        message: data.message,
         addon: { name: this.addonName, id: this.addonId },
-        filename: filename,
-        size: size,
-        url: stream.url,
-        externalUrl: stream.externalUrl,
-        _infoHash: infoHash,
+        filename: data.filename,
+        folderName: data.folderName,
+        size: data.size,
+        url: data.stream.url,
+        externalUrl: data.stream.externalUrl,
+        _infoHash: data.infoHash,
         torrent: {
-          infoHash: stream.infoHash,
-          fileIdx: stream.fileIdx,
-          sources: stream.sources,
-          seeders: seeders,
+          infoHash: data.stream.infoHash,
+          fileIdx: data.stream.fileIdx,
+          sources: data.stream.sources,
+          seeders: data.seeders,
         },
-        provider: provider,
+        provider: data.provider,
         usenet: {
-          age: usenetAge,
+          age: data.usenetAge,
         },
-        indexers: indexer,
-        duration: duration,
-        personal: personal,
-        type: stream.infoHash
+        indexers: data.indexer,
+        duration: data.duration,
+        personal: data.personal,
+        type: data.stream.infoHash
           ? 'p2p'
-          : usenetAge
+          : data.usenetAge
             ? 'usenet'
-            : provider
+            : data.provider
               ? 'debrid'
-              : stream.url?.endsWith('.m3u8')
+              : data.stream.url?.endsWith('.m3u8')
                 ? 'live'
                 : 'unknown',
         stream: {
-          subtitles: stream.subtitles,
+          subtitles: data.stream.subtitles,
           behaviorHints: {
-            countryWhitelist: stream.behaviorHints?.countryWhitelist,
-            notWebReady: stream.behaviorHints?.notWebReady,
+            countryWhitelist: data.stream.behaviorHints?.countryWhitelist,
+            notWebReady: data.stream.behaviorHints?.notWebReady,
             proxyHeaders:
-              stream.behaviorHints?.proxyHeaders?.request ||
-              stream.behaviorHints?.proxyHeaders?.response
+              data.stream.behaviorHints?.proxyHeaders?.request ||
+              data.stream.behaviorHints?.proxyHeaders?.response
                 ? {
-                    request: stream.behaviorHints?.proxyHeaders?.request,
-                    response: stream.behaviorHints?.proxyHeaders?.response,
+                    request: data.stream.behaviorHints?.proxyHeaders?.request,
+                    response: data.stream.behaviorHints?.proxyHeaders?.response,
                   }
                 : undefined,
-            videoHash: stream.behaviorHints?.videoHash,
+            videoHash: data.stream.behaviorHints?.videoHash,
           },
         },
       },
@@ -319,23 +308,37 @@ export class BaseWrapper {
     let filename = stream?.behaviorHints?.filename || stream.filename;
 
     // if filename behaviorHint is not present, attempt to look for a filename in the stream description or title
-    let description = stream.description || stream.title;
-    const episodeRegex =
-      /(?<![^ [_(\-.]])(?:s(?:eason)?[ .\-_]?(\d+)[ .\-_]?(?:e(?:pisode)?[ .\-_]?(\d+))?|(\d+)[xX](\d+))(?![^ \])_.-])/;
-    const yearRegex = /(?<![^ [_(\-.])(\d{4})(?=[ \])_.-]|$)/i;
-    if (!filename && description) {
-      const lines = description.split('\n');
-      filename =
-        lines.find(
-          (line: string) => line.match(episodeRegex) || line.match(yearRegex)
-        ) || lines[0];
-    }
+    let description = stream.description || stream.title || '';
 
-    let stringToParse: string = filename || description || '';
-    if (!(filename.match(episodeRegex) || filename.match(yearRegex))) {
-      stringToParse = description.replace(/\n/g, ' ').trim();
+    // attempt to find a valid filename by looking for season/episode or year in the description line by line,
+    // and fall back to using the full description.
+    let parsedInfo: ParsedNameData | undefined = undefined;
+    const potentialFilenames = [
+      filename,
+      ...description.split('\n').splice(0, 5),
+    ].filter((line) => line && line.length > 0);
+    for (const line of potentialFilenames) {
+      parsedInfo = parseFilename(line);
+      if (
+        parsedInfo.year ||
+        (parsedInfo.season && parsedInfo.episode) ||
+        parsedInfo.episode
+      ) {
+        filename = line;
+        break;
+      } else {
+        parsedInfo = undefined;
+      }
     }
-    let parsedInfo: ParsedNameData = parseFilename(stringToParse);
+    if (!parsedInfo) {
+      // fall back to using full description as info source
+      parsedInfo = parseFilename(description);
+      filename = filename
+        ? filename
+        : description
+          ? description.split('\n')[0]
+          : undefined;
+    }
 
     // look for size in one of the many random places it could be
     let size: number | undefined;
@@ -404,19 +407,18 @@ export class BaseWrapper {
       // if its a p2p result, it is not from a debrid service
       provider = undefined;
     }
-    return this.createParsedResult(
+    return this.createParsedResult({
       parsedInfo,
       stream,
       filename,
       size,
       provider,
-      seeders ? parseInt(seeders) : undefined,
-      undefined,
+      seeders: seeders ? parseInt(seeders) : undefined,
       indexer,
       duration,
-      stream.personal,
-      stream.infoHash || this.extractInfoHash(stream.url || '')
-    );
+      personal: stream.personal,
+      infoHash: stream.infoHash || this.extractInfoHash(stream.url || ''),
+    });
   }
 
   protected parseServiceData(

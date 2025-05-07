@@ -93,10 +93,11 @@ export function gdriveFormat(
     description += '\n';
   }
 
-  if (!minimalistic && stream.filename) {
-    description += stream.filename ? `📄 ${stream.filename}` : '📄 Unknown';
-    description += '\n';
+  if (!minimalistic && (stream.filename || stream.folderName)) {
+    description += stream.folderName ? `📁 ${stream.folderName}\n` : '';
+    description += stream.filename ? `📄 ${stream.filename}\n` : '📄 Unknown\n';
   }
+
   if (stream.message) {
     description += `📢 ${stream.message}`;
   }

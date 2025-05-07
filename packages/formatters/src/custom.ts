@@ -70,7 +70,10 @@ export type ParseValue = {
     showDie: boolean | null;
   };
   stream?: {
+    /** @deprecated Use filename instead */
     name: string | null;
+    filename: string | null;
+    folderName: string | null;
     size: number | null;
     personal: boolean | null;
     quality: string | null;
@@ -117,7 +120,9 @@ const convertStreamToParseValue = (stream: ParsedStream): ParseValue => {
       showDie: Settings.SHOW_DIE,
     },
     stream: {
+      filename: stream.filename || null,
       name: stream.filename || null,
+      folderName: stream.folderName || null,
       size: stream.size || null,
       personal: stream.personal !== undefined ? stream.personal : null,
       quality: stream.quality === 'Unknown' ? null : stream.quality,
@@ -241,8 +246,11 @@ function parseString(str: string, value: ParseValue) {
   return str
     .replace(/\\n/g, '\n')
     .split('\n')
-    .filter((line) => line.trim() !== '')
-    .join('\n');
+    .filter(
+      (line) => line.trim() !== '' && !line.includes('{tools.removeLine}')
+    )
+    .join('\n')
+    .replace(/\{tools.newLine\}/g, '\n');
 }
 
 function modifier(
