@@ -23,7 +23,7 @@
 
 ## 📦 Description
 
-AIOStreams consolidated multiple Stremio addons and debrid services into a single, easily configurable addon. It allows highly customisable filtering, sorting, and formatting of results and supports proxying all your streams through [MediaFlow Proxy](https://github.com/mhdzumair/mediaflow-proxy) or [StremThru](https://github.com/MunifTanjim/stremthru) for improved compatibility and IP restriction bypassing.
+AIOStreams consolidates multiple Stremio addons and debrid services into a single, easily configurable addon. It allows highly customisable filtering, sorting, and formatting of results and supports proxying all your streams through [MediaFlow Proxy](https://github.com/mhdzumair/mediaflow-proxy) or [StremThru](https://github.com/MunifTanjim/stremthru) for improved compatibility and IP restriction bypassing.
 
 ## ✨ Key Features
 
@@ -109,7 +109,7 @@ Regardless of the method you choose, once AIOStreams is accessible, navigate to 
 AIOStreams is a free and open-source project maintained by me and its contributors. If you find it useful, you can support its development in the following ways:
 
 - ⭐ **Star the Repository** - Show your support and help boost visibility.
-- ⭐ **Star on [Stremio Addons](https://beta.stremio-addons.net/addons/aiostreams-elfhosted)** - Spread the word.
+- ⭐ **Star on [Stremio Addons](https://beta.stremio-addons.net/addons/aiostreams)** - Spread the word.
 - 🤝 **Contributions Welcome** - Issues, pull requests, and ideas for improvement are always appreciated.
 - ☕ **Donate**
   - [Ko-fi](https://ko-fi.com/viren070)
@@ -125,6 +125,6 @@ AIOStreams and its developer do not host, store, or distribute any content. All 
 
 - Thanks to [sleeyax/stremio-easynews-addon](https://github.com/Sleeyax/stremio-easynews-addon) for the repository structure and Dockerfile..
 - Thanks to all the developers of the upstream addons that AIOStreams integrates.
-- [MediaFlow](https://github.com/Mhdzumair/mediaflow-proxy) for the MediaFlow Proxy integration used in this addon.
+- [Mhdzumair/MediaFlow](https://github.com/Mhdzumair/mediaflow-proxy) and [MunifTanjim/stremthru](https://github.com/MunifTanjim/stremthru) which allow stream proxying. 
 - Issue templates adapted from [5rahim/seanime](https://github.com/5rahim/seanime).
 - Custom formatter system inspired by and adapted from [diced/zipline](https://github.com/diced/zipline).
