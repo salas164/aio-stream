@@ -155,7 +155,10 @@ export async function getStremThruPublicIp(
     }
 
     const data = await response.json();
-    const publicIp = data.data?.ip?.machine;
+    const publicIp =
+      typeof data.data?.ip?.exposed === 'object' // available from `v0.71.0`
+        ? data.data.ip.exposed['*'] || data.data.ip.machine
+        : data.data?.ip?.machine;
     if (publicIp && cache) {
       cache.set(cacheKey, publicIp, Settings.CACHE_STREMTHRU_IP_TTL);
     } else {
