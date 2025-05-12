@@ -46,6 +46,9 @@ export async function generateStremThruStreams(
       }
     }
     data.append(`req_headers[${i}]`, req_headers);
+    if (stream.filename) {
+      data.append(`filename[${i}]`, stream.filename);
+    }
   });
 
   if (Settings.ENCRYPT_STREMTHRU_URLS) {
