@@ -161,7 +161,7 @@ export const Settings = cleanEnv(process.env, {
     desc: 'Secret key for the addon, used for encryption and must be 64 characters of hex',
   }),
   API_KEY: str({
-    default: 'tvgeniekodi',
+    default: '',
     desc: 'API key for the addon, can be set to anything',
   }),
   SHOW_DIE: bool({
