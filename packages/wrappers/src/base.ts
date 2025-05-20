@@ -15,7 +15,6 @@ import {
   createLogger,
   maskSensitiveInfo,
 } from '@aiostreams/utils';
-import { fetch as uFetch, ProxyAgent } from 'undici';
 import { emojiToLanguage, codeToLanguage } from '@aiostreams/formatters';
 
 const logger = createLogger('wrappers');
