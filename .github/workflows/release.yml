@@ -15,6 +15,7 @@ jobs:
       actions: write
       contents: write
       pull-requests: write
+      issues: write
     steps:
       - name: Release
         id: release
