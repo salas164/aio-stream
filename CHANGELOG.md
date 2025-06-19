@@ -1,5 +1,14 @@
 # Changelog
 
+## [2.0.1](https://github.com/Viren070/AIOStreams/compare/v2.0.0...v2.0.1) (2025-06-19)
+
+
+### Bug Fixes
+
+* add audio channel to skipReasons ([ef1763c](https://github.com/Viren070/AIOStreams/commit/ef1763cbe60fe5c279138a152e1a8d677f30f0ce))
+* correctly handle overriding URL for mediafusion ([9bf3838](https://github.com/Viren070/AIOStreams/commit/9bf3838732542c5cac1ef189cd5afefc13fe0204))
+* ensure instances is defined ([7e00e32](https://github.com/Viren070/AIOStreams/commit/7e00e32bbe93a5610d4f94bc3d78a78e48d32c6b))
+
 ## [2.0.0](https://github.com/Viren070/AIOStreams/compare/v1.22.0...v2.0.0) (2025-06-18)
 
 ### 🚀 The Big Upgrades in v2 🚀
