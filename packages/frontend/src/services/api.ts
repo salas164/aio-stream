@@ -17,7 +17,7 @@ interface LoadUserResponse {
 }
 
 export class UserConfigAPI {
-  private static BASE_URL = '/api/v1';
+  private static BASE_URL = process.env.NEXT_PUBLIC_BACKEND_BASE_URL || '/api/v1';
 
   static async loadConfig(
     uuid: string,

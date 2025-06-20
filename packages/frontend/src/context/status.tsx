@@ -22,13 +22,15 @@ const StatusContext = createContext<StatusContextType>({
 
 export const useStatus = () => useContext(StatusContext);
 
+const baseUrl = process.env.NEXT_PUBLIC_BACKEND_BASE_URL || '/api/v1';
+
 export function StatusProvider({ children }: { children: ReactNode }) {
   const [status, setStatus] = useState<StatusResponse | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    fetch('/api/v1/status')
+    fetch(`${baseUrl}/status`)
       .then((res) => {
         if (!res.ok) throw new Error('Failed to fetch status');
         return res.json();

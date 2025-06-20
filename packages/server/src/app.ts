@@ -41,6 +41,12 @@ app.use(loggerMiddleware);
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
+// Allow all origins in development for easier testing
+if (Env.NODE_ENV === 'development') {
+  logger.info('CORS enabled for all origins in development');
+  app.use(corsMiddleware);
+}
+
 // API Routes
 const apiRouter = express.Router();
 apiRouter.use('/user', userApi);
