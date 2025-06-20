@@ -42,6 +42,11 @@ const manifest = async (config?: UserData): Promise<Manifest> => {
     description: config?.addonDescription || Env.DESCRIPTION,
     catalogs,
     resources,
+    types: resources.reduce((types, resource) => {
+      const resourceTypes =
+        typeof resource === 'string' ? [resource] : resource.types;
+      return [...new Set([...types, ...resourceTypes])];
+    }, [] as string[]),
     background:
       config?.addonBackground ||
       'https://raw.githubusercontent.com/Viren070/AIOStreams/refs/heads/main/packages/frontend/public/assets/background.png',

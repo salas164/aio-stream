@@ -327,12 +327,33 @@ export class MediaFusionPreset extends Preset {
     options: Record<string, any>,
     serviceId: ServiceId | undefined
   ) {
+    let pikpakCredentials = undefined;
+    if (serviceId === constants.PIKPAK_SERVICE) {
+      pikpakCredentials = this.getServiceCredential(serviceId, userData, {
+        [constants.PIKPAK_SERVICE]: (credentials) => {
+          if (!credentials.email || !credentials.password) {
+            throw new Error(
+              `Missing email or password for ${serviceId}. Please add an email and password.`
+            );
+          }
+          return {
+            email: credentials.email,
+            password: credentials.password,
+          };
+        },
+      });
+    }
     const encodedUserData = this.base64EncodeJSON(
       {
         streaming_provider: !serviceId
           ? null
           : {
-              token: this.getServiceCredential(serviceId, userData),
+              token:
+                serviceId != constants.PIKPAK_SERVICE
+                  ? this.getServiceCredential(serviceId, userData)
+                  : undefined,
+              email: pikpakCredentials?.email,
+              password: pikpakCredentials?.password,
               service: serviceId,
               enable_watchlist_catalogs:
                 options.enableWatchlistCatalogs || false,

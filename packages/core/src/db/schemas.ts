@@ -445,7 +445,7 @@ export const ManifestSchema = z
     name: z.string().min(1),
     description: z.string().min(1),
     version: z.string().min(1),
-    types: z.array(z.string()).optional(),
+    types: z.array(z.string()),
     idPrefixes: z.array(z.string().min(1)).optional(),
     resources: z.array(ManifestResourceSchema),
     catalogs: z.array(ManifestCatalogSchema),

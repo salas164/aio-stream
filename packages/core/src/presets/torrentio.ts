@@ -26,6 +26,98 @@ export class TorrentioParser extends StreamParser {
 }
 
 export class TorrentioPreset extends Preset {
+  static defaultProviders = [
+    {
+      value: 'yts',
+      label: 'YTS',
+    },
+    {
+      value: 'eztv',
+      label: 'EZTV',
+    },
+
+    {
+      value: 'rarbg',
+      label: 'RARBG',
+    },
+    {
+      value: '1337x',
+      label: '1337X',
+    },
+    {
+      value: 'thepiratebay',
+      label: 'The Pirate Bay',
+    },
+    {
+      value: 'kickasstorrents',
+      label: 'Kickass Torrents',
+    },
+    {
+      value: 'torrentgalaxy',
+      label: 'Torrent Galaxy',
+    },
+    {
+      value: 'magnetdl',
+      label: 'MagnetDL',
+    },
+    {
+      value: 'horriblesubs',
+      label: 'HorribleSubs',
+    },
+    {
+      value: 'nyaasi',
+      label: 'Nyaa.si',
+    },
+    {
+      value: 'tokyotosho',
+      label: 'Tokyo Tosho',
+    },
+    {
+      value: 'anidex',
+      label: 'AniDex',
+    },
+    {
+      value: 'rutor',
+      label: 'Rutor',
+    },
+    {
+      value: 'rutracker',
+      label: 'Rutracker',
+    },
+    {
+      value: 'comando',
+      label: 'Comando',
+    },
+    {
+      value: 'bludv',
+      label: 'BluDV',
+    },
+    {
+      value: 'torrent9',
+      label: 'Torrent9',
+    },
+    {
+      value: 'ilcorsaronero',
+      label: 'iLCorSaRoNeRo',
+    },
+    {
+      value: 'mejortorrent',
+      label: 'MejorTorrent',
+    },
+    {
+      value: 'wolfmax4k',
+      label: 'Wolfmax4K',
+    },
+    {
+      value: 'cinecalidad',
+      label: 'Cinecalidad',
+    },
+    {
+      value: 'besttorrents',
+      label: 'BestTorrents',
+    },
+  ];
+
   static override getParser(): typeof StreamParser {
     return TorrentioParser;
   }
@@ -53,6 +145,19 @@ export class TorrentioPreset extends Preset {
         supportedResources,
         Env.DEFAULT_TORRENTIO_TIMEOUT
       ),
+      {
+        id: 'providers',
+        name: 'Providers',
+        description:
+          'Optionally override the providers that are used. If not specified, then the default providers will be used.',
+        type: 'multi-select',
+        required: false,
+        options: TorrentioPreset.defaultProviders,
+        default: TorrentioPreset.defaultProviders.map(
+          (provider) => provider.value
+        ),
+        emptyIsUndefined: true,
+      },
       {
         id: 'services',
         name: 'Services',
@@ -154,7 +259,7 @@ export class TorrentioPreset extends Preset {
           : options.url?.endsWith('/manifest.json')
             ? undefined
             : 'p2p',
-      manifestUrl: this.generateManifestUrl(userData, services, options.url),
+      manifestUrl: this.generateManifestUrl(userData, services, options),
       enabled: true,
       resources: options.resources || this.METADATA.SUPPORTED_RESOURCES,
       timeout: options.timeout || this.METADATA.TIMEOUT,
@@ -169,23 +274,29 @@ export class TorrentioPreset extends Preset {
   private static generateManifestUrl(
     userData: UserData,
     services: ServiceId[],
-    url?: string
+    options: Record<string, any>
   ) {
-    url = url || this.METADATA.URL;
+    const url = options.url || this.METADATA.URL;
     if (url.endsWith('/manifest.json')) {
       return url;
     }
+    let providers = options.providers;
+
+    if (!providers) {
+      providers = TorrentioPreset.defaultProviders;
+    }
 
     const configString = services.length
-      ? this.urlEncodeKeyValuePairs(
-          services.map((service) => [
+      ? this.urlEncodeKeyValuePairs([
+          ...services.map((service) => [
             service,
             this.getServiceCredential(service, userData, {
               [constants.PUTIO_SERVICE]: (credentials: any) =>
                 `${credentials.clientId}@${credentials.token}`,
             }),
-          ])
-        )
+          ]),
+          ['providers', providers.join(',')],
+        ])
       : '';
 
     return `${url}${configString ? '/' + configString : ''}/manifest.json`;
