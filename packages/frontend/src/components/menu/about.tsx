@@ -301,7 +301,7 @@ function ChangelogBox({ version }: { version: string }) {
   const [error, setError] = React.useState<string | null>(null);
 
   React.useEffect(() => {
-    if (!version || version === 'Unknown') {
+    if (!version || version.toLowerCase() === 'unknown') {
       setError('No version available.');
       setLoading(false);
       return;
