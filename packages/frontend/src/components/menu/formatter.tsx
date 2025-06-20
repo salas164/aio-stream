@@ -568,23 +568,23 @@ function SnippetsButton() {
           {SNIPPETS.map((snippet, idx) => (
             <div
               key={idx}
-              className="flex items-center justify-between border rounded-md p-3 bg-gray-900 border-gray-800"
+              className="flex flex-col sm:flex-row sm:items-center sm:justify-between border rounded-md p-3 bg-gray-900 border-gray-800 gap-3"
             >
               <div>
                 <div className="font-semibold text-base mb-1">
                   {snippet.name}
                 </div>
-                <div className="text-sm text-muted-foreground mb-1">
+                <div className="text-sm text-muted-foreground mb-1 break-words">
                   {snippet.description}
                 </div>
-                <div className="font-mono text-xs bg-gray-800 rounded px-2 py-1 inline-block">
+                <div className="font-mono text-xs bg-gray-800 rounded px-2 py-1 inline-block break-all">
                   {snippet.value}
                 </div>
               </div>
               <Button
                 size="sm"
                 intent="primary-outline"
-                className="ml-4"
+                className="sm:ml-4 flex-shrink-0"
                 onClick={async () => {
                   if (!navigator.clipboard) {
                     toast.error(
