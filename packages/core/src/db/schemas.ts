@@ -407,7 +407,7 @@ export const TABLES = {
 
 const strictManifestResourceSchema = z.object({
   name: z.enum(constants.RESOURCES),
-  types: z.array(z.string()),
+  types: z.array(z.string()).optional(),
   idPrefixes: z.array(z.string().min(1)).optional(),
 });
 

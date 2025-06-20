@@ -428,7 +428,7 @@ export class AIOStreams {
       const resource = resources.find(
         (r) =>
           r.name === 'meta' &&
-          r.types.includes(type) &&
+          (!r.types || r.types.includes(type)) &&
           r.idPrefixes?.some((prefix) => id.startsWith(prefix))
       );
 
@@ -456,7 +456,7 @@ export class AIOStreams {
       // look for addons that support the type, but don't have an id prefix
       const resource = resources.find(
         (r) =>
-          r.name === 'meta' && r.types.includes(type) && !r.idPrefixes?.length
+          r.name === 'meta' && (!r.types || r.types.includes(type)) && !r.idPrefixes?.length
       );
 
       if (resource) {
@@ -561,7 +561,7 @@ export class AIOStreams {
       const resource = addonResources.find(
         (r) =>
           r.name === 'subtitles' &&
-          r.types.includes(type) &&
+          (!r.types || r.types.includes(type)) &&
           (r.idPrefixes
             ? r.idPrefixes.some((prefix) => id.startsWith(prefix))
             : true)
@@ -767,7 +767,7 @@ export class AIOStreams {
         // will not send a request to AIOStreams for other id prefixes even though our other addon that didn't specify
         // an id prefix technically says it supports all ids
         if (existing) {
-          existing.types = [...new Set([...existing.types, ...resource.types])];
+          existing.types = [...new Set([...(existing.types || []), ...(resource.types || [])])];
           // if (resource.idPrefixes) {
           //   existing.idPrefixes = existing.idPrefixes || [];
           //   existing.idPrefixes = [
@@ -1021,7 +1021,7 @@ export class AIOStreams {
       const resource = addonResources.find(
         (r) =>
           r.name === 'stream' &&
-          r.types.includes(type) &&
+          (!r.types || r.types.includes(type)) &&
           (r.idPrefixes
             ? r.idPrefixes?.some((prefix) => id.startsWith(prefix))
             : true) // if no id prefixes are defined, assume it supports all IDs

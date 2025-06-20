@@ -11,7 +11,8 @@ export class ResourceManager {
       resourceName
     );
     if (!fs.existsSync(filePath)) {
-      throw new Error(`Resource ${resourceName} not found at ${filePath}`);
+      console.warn(`Resource ${resourceName} not found at ${filePath}`);
+      return undefined;
     }
     return JSON.parse(fs.readFileSync(filePath, 'utf8'));
   }
