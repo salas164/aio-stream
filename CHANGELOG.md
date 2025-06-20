@@ -1,5 +1,56 @@
 # Changelog
 
+## [2.1.0](https://github.com/Viren070/AIOStreams/compare/v2.0.1...v2.1.0) (2025-06-20)
+
+
+### Features
+
+* allow disabling pruning and disable it by default ([85c0ec1](https://github.com/Viren070/AIOStreams/commit/85c0ec1b5436af1115f97149f87b41aba41fe3ff))
+* allow specifying providers in torrentio ([8e5f4b5](https://github.com/Viren070/AIOStreams/commit/8e5f4b520cbcf472598a955039dc33bdda676bd5))
+* enable conditional operators in parser, allowing ternary statements in filter conditions ([eb6edfc](https://github.com/Viren070/AIOStreams/commit/eb6edfc3f1cb1c6a79400d2311cbe8811f1d284c))
+* extract folder size for stremthru torz ([e775562](https://github.com/Viren070/AIOStreams/commit/e775562e3c736fb4d652a161a7e29f3fcd28be1f))
+* improve cache stats logging ([d47eee0](https://github.com/Viren070/AIOStreams/commit/d47eee002112f6330d1b74920199bface0105eed))
+* improve save install page ([a115e59](https://github.com/Viren070/AIOStreams/commit/a115e5906f568b630425276cf321a931b37aadf1))
+* only add foldername if different and parse info from both folder and filename ([6eed23f](https://github.com/Viren070/AIOStreams/commit/6eed23f445d017ae6d18e9874978a8874350d006))
+
+
+### Bug Fixes
+
+* add enableCollectionFromMovie option to TMDB Collections ([71d9fe0](https://github.com/Viren070/AIOStreams/commit/71d9fe093cad1566172206d0a87662358bd446a6)), closes [#194](https://github.com/Viren070/AIOStreams/issues/194)
+* add stream as supported resource for TMDB Collections ([d2ef215](https://github.com/Viren070/AIOStreams/commit/d2ef2154fda902900751c47527ff52390506bd54))
+* add validation to pruneUsers method to ensure negative maxDays input is not used ([6b597b3](https://github.com/Viren070/AIOStreams/commit/6b597b31306fbe42d4104a71f9f330db32d9cda5))
+* adjust idPrefixes handling to improve compatibility in most cases ([7fa8ba7](https://github.com/Viren070/AIOStreams/commit/7fa8ba71fbb682d077fb5c8ccfbadfb0050bea80))
+* change all debrid service name to AllDebrid ([a89cdca](https://github.com/Viren070/AIOStreams/commit/a89cdca583e50c3bf66432bbb721797954323ba6)), closes [#208](https://github.com/Viren070/AIOStreams/issues/208)
+* convert live types to http for webstreamr ([64977ca](https://github.com/Viren070/AIOStreams/commit/64977caeffe2cb6b95714916c14bfa006502c386))
+* don't pass encoded_user_data header if URL is overriden ([ed2c0f5](https://github.com/Viren070/AIOStreams/commit/ed2c0f5800592c6bf140dc1f9ea8bdb9057d1d55))
+* exit auto prune when max days is less than 0 ([ee1ddc0](https://github.com/Viren070/AIOStreams/commit/ee1ddc07389d01b382f19fa46e434ca93f41d3e8))
+* explicitly check for unknown in version and default to 0.0.0 for manifest response ([8664e00](https://github.com/Viren070/AIOStreams/commit/8664e004e2553ffb675131488a4c4eab70ede7b3)), closes [#198](https://github.com/Viren070/AIOStreams/issues/198)
+* extract size for nuviostreams ([ebbd7ec](https://github.com/Viren070/AIOStreams/commit/ebbd7ec3b24d11abc2806e9edbd2aeaee45faa09))
+* fix error handling in config modal ([5182a07](https://github.com/Viren070/AIOStreams/commit/5182a07ac49d1aa79f515d72c71c7494a27866dd))
+* **frontend:** filter out proxy credentials and url in export when exclude credentials is true ([3c31939](https://github.com/Viren070/AIOStreams/commit/3c319391b86e6efa530aab5b8cd04ad9341867d1))
+* handle empty addon name in stream results and update description for addon name field ([5612140](https://github.com/Viren070/AIOStreams/commit/5612140ffee8b8e8804d36efdfd22e6f110b32ef))
+* handle pikpak credentials for mediafusion ([eee444f](https://github.com/Viren070/AIOStreams/commit/eee444f376136ed04257187c4bb1ddc05f05a3f5))
+* include addon name in error messages for invalid manifest URLs ([abf99c1](https://github.com/Viren070/AIOStreams/commit/abf99c1768f3cf86d6f58ec256705ae235f9d8f9))
+* make types optional in ManifestSchema ([5281756](https://github.com/Viren070/AIOStreams/commit/5281756c78e362d3c48cc4469c07c17df9350d9c))
+* make types required and provide array based on resources object array ([01cf37f](https://github.com/Viren070/AIOStreams/commit/01cf37f8340a9fd130ecb19c93dc7a9863eab012))
+* manually override type to http for watchtower and nuviostreams ([1fb00a4](https://github.com/Viren070/AIOStreams/commit/1fb00a4317605ee9a5d0da73a4b363bf08b9bf6f))
+* map defaultProviders to their values in TorrentioPreset configuration ([9b04403](https://github.com/Viren070/AIOStreams/commit/9b044037d38b46270e23172914d1e35f72f51e1f))
+* normalize version check ([#206](https://github.com/Viren070/AIOStreams/issues/206)) ([05cc116](https://github.com/Viren070/AIOStreams/commit/05cc116fafc9ba6d0f40b7e10938e2505085ea10))
+* only add to idPrefixes if not null ([6fb5f7b](https://github.com/Viren070/AIOStreams/commit/6fb5f7b841872b0261023766c2472c7f5201be95))
+* overlapping snippets modal ([#202](https://github.com/Viren070/AIOStreams/issues/202)) ([195da69](https://github.com/Viren070/AIOStreams/commit/195da69f19ca8e15acd000420c1187fd4116de1f))
+* prevent title from being parsed for info ([f8b2e2d](https://github.com/Viren070/AIOStreams/commit/f8b2e2d66ce07ae4342db974ed6f169c0474d1d2))
+* remove idPrefixes from top level manifest ([908b4ff](https://github.com/Viren070/AIOStreams/commit/908b4ffa399439ab3f9428357b30a6ae7bc0f29d))
+* remove outdated decoding of credentials causing issues with some credentials ([609931e](https://github.com/Viren070/AIOStreams/commit/609931e5318c8b6d782cc04cf6a6691269bba287))
+* remove timestamp from cache stats ([509e3bd](https://github.com/Viren070/AIOStreams/commit/509e3bd2098f10d041a2a776d9b4099567fe4370))
+* remove unused method handler for unsupported HTTP methods ([7405d27](https://github.com/Viren070/AIOStreams/commit/7405d272ab79321d8b1e97ee4bcd1a2b2f8c12a5))
+* rename web_dl to webdl in stremthru store ([3fb57c5](https://github.com/Viren070/AIOStreams/commit/3fb57c5d04e23585e71a5e9f0643735f675671c7))
+* simplify and fix configuration generation for services and providers in TorrentioPreset ([cfafeec](https://github.com/Viren070/AIOStreams/commit/cfafeecda3591c342d5f2aeb756fde4adc536024))
+* try explicitly setting idPrefixes to an empty array ([c16060f](https://github.com/Viren070/AIOStreams/commit/c16060f7a5ffa5b5142fe5a0753046748f682f0a))
+* try removing types ([10c4e2d](https://github.com/Viren070/AIOStreams/commit/10c4e2d51f7a0ba05d6214da1c848b66ec9237ca))
+* try setting idPrefixes to null ([a5f32df](https://github.com/Viren070/AIOStreams/commit/a5f32df451c7ba73438322c217ffa431e9a84125))
+* update descriptions for filtering options in menu component to clarify behavior ([67bb204](https://github.com/Viren070/AIOStreams/commit/67bb204362951ef3998c690ba1c0055c1a4cc12b))
+* use password type where necessary ([0a12d33](https://github.com/Viren070/AIOStreams/commit/0a12d335c34b8181c9ac849bed623ea77b43a84c))
+
 ## [2.0.1](https://github.com/Viren070/AIOStreams/compare/v2.0.0...v2.0.1) (2025-06-19)
 
 
