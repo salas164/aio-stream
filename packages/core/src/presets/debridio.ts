@@ -14,7 +14,14 @@ export const debridioSocialOption: Option = {
 
 export class DebridioPreset extends Preset {
   static override get METADATA() {
-    const supportedServices: ServiceId[] = [constants.EASYDEBRID_SERVICE];
+    const supportedServices: ServiceId[] = [
+      constants.REALDEBRID_SERVICE,
+      constants.ALLEDEBRID_SERVICE,
+      constants.DEBRIDLINK_SERVICE,
+      constants.PREMIUMIZE_SERVICE,
+      constants.TORBOX_SERVICE,
+      constants.EASYDEBRID_SERVICE,
+    ];
     const supportedResources = [constants.STREAM_RESOURCE];
 
     const options: Option[] = [
@@ -23,30 +30,29 @@ export class DebridioPreset extends Preset {
         supportedResources,
         Env.DEFAULT_DEBRIDIO_TIMEOUT
       ),
+      {
+        id: 'debridioApiKey',
+        name: 'Debridio API Key',
+        description:
+          'Your Debridio API Key, located at your [account settings](https://debridio.com/account)',
+        type: 'password',
+        required: true,
+      },
+      {
+        id: 'services',
+        name: 'Services',
+        description:
+          'Optionally override the services that are used. If not specified, then the services that are enabled and supported will be used.',
+        type: 'multi-select',
+        required: false,
+        options: supportedServices.map((service) => ({
+          value: service,
+          label: constants.SERVICE_DETAILS[service].name,
+        })),
+        default: undefined,
+        emptyIsUndefined: true,
+      },
       debridioSocialOption,
-      // {
-      //   id: 'services',
-      //   name: 'Services',
-      //   description:
-      //     'Optionally override the services that are used. If not specified, then the services that are enabled and supported will be used.',
-      //   type: 'multi-select',
-      //   required: false,
-      //   options: supportedServices.map((service) => ({
-      //     value: service,
-      //     label: constants.SERVICE_DETAILS[service].name,
-      //   })),
-      //   default: undefined,
-      //   emptyIsUndefined: true,
-      // },
-      // {
-      //   id: 'useMultipleInstances',
-      //   name: 'Use Multiple Instances',
-      //   description:
-      //     'When using multiple services, use a different Torrentio addon for each service, rather than using one instance for all services',
-      //   type: 'boolean',
-      //   default: false,
-      //   required: true,
-      // },
     ];
 
     return {
@@ -69,7 +75,7 @@ export class DebridioPreset extends Preset {
     options: Record<string, any>
   ): Promise<Addon[]> {
     if (options?.url?.endsWith('/manifest.json')) {
-      return [this.generateAddon(userData, options, undefined)];
+      return [this.generateAddon(userData, options)];
     }
 
     const usableServices = this.getUsableServices(userData);
@@ -101,7 +107,7 @@ export class DebridioPreset extends Preset {
       identifier: service
         ? `${constants.SERVICE_DETAILS[service].shortName}`
         : 'custom',
-      manifestUrl: this.generateManifestUrl(userData, service, options.url),
+      manifestUrl: this.generateManifestUrl(userData, options, service),
       enabled: true,
       resources: options.resources || this.METADATA.SUPPORTED_RESOURCES,
       timeout: options.timeout || this.METADATA.TIMEOUT,
@@ -115,10 +121,10 @@ export class DebridioPreset extends Preset {
 
   private static generateManifestUrl(
     userData: UserData,
-    service?: ServiceId,
-    url?: string
+    options: Record<string, any>,
+    service?: ServiceId
   ) {
-    url = url || this.METADATA.URL;
+    const url = options?.url || this.METADATA.URL;
     if (url.endsWith('/manifest.json')) {
       return url;
     }
@@ -131,12 +137,14 @@ export class DebridioPreset extends Preset {
     }
 
     const configString = this.base64EncodeJSON({
+      api_key: options.debridioApiKey,
       provider: service,
-      apiKey: this.getServiceCredential(service, userData),
+      providerKey: this.getServiceCredential(service, userData),
       disableUncached: false,
-      qualityOrder: [],
-      excludeSize: '',
+      maxSize: '',
       maxReturnPerQuality: '',
+      resolutions: ['4k', '1440p', '1080p', '720p', '480p', '360p', 'unknown'],
+      excludedQualities: [],
     });
 
     return `${url}${configString ? '/' + configString : ''}/manifest.json`;

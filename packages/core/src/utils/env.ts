@@ -780,7 +780,7 @@ export const Env = cleanEnv(process.env, {
 
   // Debridio Settings
   DEBRIDIO_URL: url({
-    default: 'https://debridio.adobotec.com',
+    default: 'https://addon.debridio.com',
     desc: 'Debridio URL',
   }),
   DEFAULT_DEBRIDIO_TIMEOUT: num({
