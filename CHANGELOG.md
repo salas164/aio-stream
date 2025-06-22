@@ -1,5 +1,16 @@
 # Changelog
 
+## [2.2.1](https://github.com/Viren070/AIOStreams/compare/v2.2.0...v2.2.1) (2025-06-22)
+
+
+### Bug Fixes
+
+* add catalog and meta resources to mediafusion preset ([ee492e2](https://github.com/Viren070/AIOStreams/commit/ee492e2b218bbad813426368ec7f30ecedc79e59))
+* add min and max constraints validation for options in config ([675eaf0](https://github.com/Viren070/AIOStreams/commit/675eaf0b6340ed52b2d0267442a24448048b04cb))
+* allow null values in options array for manifest extras ([99d66e8](https://github.com/Viren070/AIOStreams/commit/99d66e835c421af0ad6c86500dc38f93b8d85ca3))
+* correct property name from 'seeders' to 'seeder' in includedReasons ([912fa49](https://github.com/Viren070/AIOStreams/commit/912fa4910e097c2ec1424ac360482d56b51e6022))
+* **frontend:** add sensible steps and remove min max constraint in NumberInput for TemplateOption ([1119721](https://github.com/Viren070/AIOStreams/commit/1119721054d77cf7729ed27cf7b4593237bc3675))
+
 ## [2.2.0](https://github.com/Viren070/AIOStreams/compare/v2.1.0...v2.2.0) (2025-06-22)
 
 
