@@ -1,5 +1,14 @@
 # Changelog
 
+## [2.3.2](https://github.com/Viren070/AIOStreams/compare/v2.3.1...v2.3.2) (2025-06-24)
+
+
+### Bug Fixes
+
+* only show warning when no idPrefixes are given ([832deae](https://github.com/Viren070/AIOStreams/commit/832deaed64ea977d493d3815a58f7528aa7b03e1))
+* remove folderSize from downloadable streams ([baf4c46](https://github.com/Viren070/AIOStreams/commit/baf4c461682fae5dd30e809897498f5d5a62482b))
+* remove length requirement for string properties in ManifestSchema ([b009511](https://github.com/Viren070/AIOStreams/commit/b00951144925f174a30b0e2858f963c6cbee3837))
+
 ## [2.3.1](https://github.com/Viren070/AIOStreams/compare/v2.3.0...v2.3.1) (2025-06-24)
 
 
