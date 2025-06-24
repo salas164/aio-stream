@@ -1,5 +1,24 @@
 # Changelog
 
+## [2.3.0](https://github.com/Viren070/AIOStreams/compare/v2.2.1...v2.3.0) (2025-06-24)
+
+
+### Features
+
+* add `EXPOSE_USER_COUNT` set to false by default ([3e9820b](https://github.com/Viren070/AIOStreams/commit/3e9820bc3de6bca391259026523a07d63e8c90e7))
+* add more fields to bingeGroup ([f53c8ca](https://github.com/Viren070/AIOStreams/commit/f53c8cab1f3465ebf639e035824b7b3c2e069203))
+* add tmdb addon ([96bf1de](https://github.com/Viren070/AIOStreams/commit/96bf1de8bd5a44b10bc3ada6dd8e1cd5c11b1d2e))
+* add torrentsdb ([aebef33](https://github.com/Viren070/AIOStreams/commit/aebef33432d9d21c5c90577da73fc21803432b83))
+* improve parsing for debridio tv ([320dbb2](https://github.com/Viren070/AIOStreams/commit/320dbb29020cc499c4d806f904feb0f4d45730d3))
+
+
+### Bug Fixes
+
+* add discovery+ option to streaming catalogs ([3b47339](https://github.com/Viren070/AIOStreams/commit/3b473393e201c32afbe5301a1d5ff9026b1f5718))
+* make sorting in deduplicator consistent ([b15efd5](https://github.com/Viren070/AIOStreams/commit/b15efd5529d1246e538b25797930bcbab874b73b))
+* only extract folder size if difference is large enough ([3d7808b](https://github.com/Viren070/AIOStreams/commit/3d7808b92cde840dac242ad8f52fd671a02199fb))
+* set idPrefixes to undefined when an addon for that resource doesn't provide it ([f3ff7c5](https://github.com/Viren070/AIOStreams/commit/f3ff7c53d2ad4d6c809c1f27d5be3177969f4841))
+
 ## [2.2.1](https://github.com/Viren070/AIOStreams/compare/v2.2.0...v2.2.1) (2025-06-22)
 
 
