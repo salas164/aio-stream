@@ -1,5 +1,12 @@
 # Changelog
 
+## [2.3.1](https://github.com/Viren070/AIOStreams/compare/v2.3.0...v2.3.1) (2025-06-24)
+
+
+### Bug Fixes
+
+* set idPrefixes to undefined for new resources too ([97894be](https://github.com/Viren070/AIOStreams/commit/97894be562ef28a4ddd3887093481f60d4e6b3f1))
+
 ## [2.3.0](https://github.com/Viren070/AIOStreams/compare/v2.2.1...v2.3.0) (2025-06-24)
 
 
