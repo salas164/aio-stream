@@ -1,5 +1,12 @@
 # Changelog
 
+## [2.4.2](https://github.com/Viren070/AIOStreams/compare/v2.4.1...v2.4.2) (2025-06-27)
+
+
+### Bug Fixes
+
+* **debridio:** add Italy option ([7774310](https://github.com/Viren070/AIOStreams/commit/77743105de53e5de76ef4f4224883d57cc559bee))
+
 ## [2.4.1](https://github.com/Viren070/AIOStreams/compare/v2.4.0...v2.4.1) (2025-06-27)
 
 
