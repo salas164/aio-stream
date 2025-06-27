@@ -1,5 +1,13 @@
 # Changelog
 
+## [2.4.1](https://github.com/Viren070/AIOStreams/compare/v2.4.0...v2.4.1) (2025-06-27)
+
+
+### Bug Fixes
+
+* add 'Clip' as valid type for Trailer ([025f622](https://github.com/Viren070/AIOStreams/commit/025f622002c1409ed6d0e997ac4ee3d857bf10ba))
+* adjust defaults ([78d4d60](https://github.com/Viren070/AIOStreams/commit/78d4d604ca732d4f96ba9927724c7935e9a956d8))
+
 ## [2.4.0](https://github.com/Viren070/AIOStreams/compare/v2.3.2...v2.4.0) (2025-06-27)
 
 
