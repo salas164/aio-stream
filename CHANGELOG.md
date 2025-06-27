@@ -1,5 +1,26 @@
 # Changelog
 
+## [2.4.0](https://github.com/Viren070/AIOStreams/compare/v2.3.2...v2.4.0) (2025-06-27)
+
+
+### Features
+
+* add always precache option ([d4ff4a2](https://github.com/Viren070/AIOStreams/commit/d4ff4a2c0c913e7c6e3754ecb9fd72b45b1f864d))
+* add slice function to stream expression ([321b325](https://github.com/Viren070/AIOStreams/commit/321b32584014d20d8e78f66b4cef313d0cd22f0c))
+* add USA TV and Argentina TV ([e29800a](https://github.com/Viren070/AIOStreams/commit/e29800a0ab159940cafa11f0d69d4bc3f46c918c))
+* allow disabling user agent ([305ebd8](https://github.com/Viren070/AIOStreams/commit/305ebd84c8040866fc45fe1879921e3a7bb93997))
+
+
+### Bug Fixes
+
+* apply filters and precomputation to streams after each group fetch ([78144d0](https://github.com/Viren070/AIOStreams/commit/78144d02135072681237eae8bd5b11bf8fc3f991))
+* fix filtering ([32b1c3c](https://github.com/Viren070/AIOStreams/commit/32b1c3c3b384fad4109520c5730e8076cb2c6ebc))
+* include headers in logs ([4b9f268](https://github.com/Viren070/AIOStreams/commit/4b9f268b8f399a30f47d2140ecd9afd2856f284a))
+* pass specified services in DebridioPreset ([e264db6](https://github.com/Viren070/AIOStreams/commit/e264db6fc57ce58da476deadef5b3684228eba73))
+* set excludeUncached to false during pre-caching ([62aed42](https://github.com/Viren070/AIOStreams/commit/62aed42b07adf24c42cd5ac6c3a43d323e210890))
+* skip failed addons on manifest fetch ([cada0de](https://github.com/Viren070/AIOStreams/commit/cada0de63ac8602adabd2af2b04015f87697668e))
+* **streamfusion:** remove service requirement, enable torrent providers, lower limits ([3d856a2](https://github.com/Viren070/AIOStreams/commit/3d856a252dd77d27c81d4539ad848af95f1ca0dd))
+
 ## [2.3.2](https://github.com/Viren070/AIOStreams/compare/v2.3.1...v2.3.2) (2025-06-24)
 
 
