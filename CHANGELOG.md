@@ -1,5 +1,48 @@
 # Changelog
 
+## [2.5.0](https://github.com/Viren070/AIOStreams/compare/v2.4.2...v2.5.0) (2025-07-03)
+
+
+### Features
+
+* add 'donate' option to social icons ([bcbc793](https://github.com/Viren070/AIOStreams/commit/bcbc7936e5049fc7d42a183298b473c2bd324509))
+* add configurable minimum interval for precaching same episode by same user ([dd9b476](https://github.com/Viren070/AIOStreams/commit/dd9b476fd1ec9210cb0f1566894b6af6faf39ee2))
+* add configure button for custom addons ([4ebd110](https://github.com/Viren070/AIOStreams/commit/4ebd1107737080bbe561b7e7e5735c6fb7d58a00))
+* add disable search catalog modifier ([7a824d0](https://github.com/Viren070/AIOStreams/commit/7a824d0d2d525ac7d10ca5f4efc8b47e9dbec754))
+* add included stream expression filters ([102c71f](https://github.com/Viren070/AIOStreams/commit/102c71f53164b950bba03e30571f8a2432b8aafd))
+* add OpenSubtitles V3 +/Pro ([64e0d4d](https://github.com/Viren070/AIOStreams/commit/64e0d4df39c2405d72a5c14fde93070e55b30708))
+* add separate configurable timeouts for different resource requests ([be18508](https://github.com/Viren070/AIOStreams/commit/be18508174d416826e31dc50c434c3a6e283503f))
+* add SubDL addon ([5245a7a](https://github.com/Viren070/AIOStreams/commit/5245a7a9b862b78104b616b2ae5fdb197d4a49c1))
+* add subsource ([98d890b](https://github.com/Viren070/AIOStreams/commit/98d890bae81509f5eaa106e17841c4ba6cf5c26e))
+* add validation for min/max constraints in multi-select options ([e9d74bd](https://github.com/Viren070/AIOStreams/commit/e9d74bd1177f8d8ecc1a1f89fd0a12419d2d3417))
+* allow hiding all catalogs from home and preserve 'None' option ([a82edc0](https://github.com/Viren070/AIOStreams/commit/a82edc0911cdea46cca306ad97abc39ad48ac67f))
+* allow setting headers for specific domains ([160d9a7](https://github.com/Viren070/AIOStreams/commit/160d9a72a9e734bb2bd209b281448eb2dab83873))
+* expose value of LOG_SENSITIVE_INFO through status API ([e8183aa](https://github.com/Viren070/AIOStreams/commit/e8183aa7255c0f5baf2ec2929359a7782f90cb90))
+* implement SkipStreamError to handle external download streams from wrapped AIOs ([3631ff6](https://github.com/Viren070/AIOStreams/commit/3631ff6ab55e1fdd5b8c574ac261d4cc1d54636b))
+* improve ui consistency for type input in edit modal for catalgos ([e913bd7](https://github.com/Viren070/AIOStreams/commit/e913bd7ea6ca5eb0e0fc0f72a30b600e15868788))
+* lower default timeout to 10000 ([4a2998e](https://github.com/Viren070/AIOStreams/commit/4a2998e30ad459d1a6434bfdc11d7eb340c1c112))
+* **mediafusion:** add 'Contributor Streams' option and parsing ([838f031](https://github.com/Viren070/AIOStreams/commit/838f0318d49f150acee7f28c2032593d2325f19b))
+* perform deduplication on each group fetch ([8d02554](https://github.com/Viren070/AIOStreams/commit/8d02554351ae34c2450bffbe90d72125cc7764f0))
+* swap addon name and type position for each catalog ([efc99ab](https://github.com/Viren070/AIOStreams/commit/efc99abb9e02008eebc43f392509ae82197a60d8))
+* update .env.sample and startup logging ([16c9958](https://github.com/Viren070/AIOStreams/commit/16c9958162ac897e31165e191790250ff6659f74))
+* update OpenSubtitles V3 Pro description ([cfa9cfc](https://github.com/Viren070/AIOStreams/commit/cfa9cfcfefe65f735ea916d73f37ffe552d710a8))
+
+
+### Bug Fixes
+
+* add space after link in AddonGroupCard for improved readability ([b9ef30c](https://github.com/Viren070/AIOStreams/commit/b9ef30cc519d2c095f0019e72b406eacf3d646a8))
+* add validation for all stream expression filters ([6039a57](https://github.com/Viren070/AIOStreams/commit/6039a57e90a11411649990d646b2bc96723ea8bf))
+* correctly log headers ([5e2053a](https://github.com/Viren070/AIOStreams/commit/5e2053a73b5b8a60d81d56d1867cd45ad214c759))
+* increase maximum length for stream expression filters ([e2d75b4](https://github.com/Viren070/AIOStreams/commit/e2d75b4d311b9ad72cfcf832ec346219489ac860))
+* **mediafusion:** ensure contributor streams are only included for one instance ([0e5dd95](https://github.com/Viren070/AIOStreams/commit/0e5dd95980e0efc0bc903d1f7becfe7681540848))
+* **nuviostreams:** update provider list ([2867d03](https://github.com/Viren070/AIOStreams/commit/2867d035370854d06ac1984e04685d9cc1285375))
+* only allow hiding catalogs that don't have any extra requirement ([6997f1c](https://github.com/Viren070/AIOStreams/commit/6997f1c2eeea1fb63b86528b43b2ad58b920c35e))
+* remove addon name and regex matched from external download links ([11e5fec](https://github.com/Viren070/AIOStreams/commit/11e5fecf9d524fe6f3cf7ecd613f83f1496fcb65))
+* return an empty array when no included stream expressions are provided ([74c764c](https://github.com/Viren070/AIOStreams/commit/74c764cdac87e15982d0d395c7dc7fa40b2f8c59))
+* support selecting unknown visual tags, audio tags, audio channels, and languages in SEL ([735a326](https://github.com/Viren070/AIOStreams/commit/735a326aa4a882667741f7b5773aaa0e54a67978))
+* use correct env var name for stream expression limit in startup logs ([e7709e7](https://github.com/Viren070/AIOStreams/commit/e7709e73ab414c0325c9d055d648f9103aff9a05))
+* use correct env var name in sample .env for ST Torz/Store URL adjustments ([322a5e1](https://github.com/Viren070/AIOStreams/commit/322a5e14ac1a26428ea12a351a30e12bc621a779))
+
 ## [2.4.2](https://github.com/Viren070/AIOStreams/compare/v2.4.1...v2.4.2) (2025-06-27)
 
 
