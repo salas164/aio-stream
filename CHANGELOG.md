@@ -1,5 +1,14 @@
 # Changelog
 
+## [2.5.1](https://github.com/Viren070/AIOStreams/compare/v2.5.0...v2.5.1) (2025-07-04)
+
+
+### Bug Fixes
+
+* ensure proxy IP is only used when enabled ([12434b2](https://github.com/Viren070/AIOStreams/commit/12434b29decb55deb6a99d99e727fc3750ab25f3))
+* ensure searchable is false when no extras are defined ([ff5c9b2](https://github.com/Viren070/AIOStreams/commit/ff5c9b28cb19e89171254d832a53989d4474f6e9))
+* support configuring custom addons with stremio:// protocol ([5040980](https://github.com/Viren070/AIOStreams/commit/5040980c82f019fa8543a7f74a1ac153430620b0))
+
 ## [2.5.0](https://github.com/Viren070/AIOStreams/compare/v2.4.2...v2.5.0) (2025-07-03)
 
 
