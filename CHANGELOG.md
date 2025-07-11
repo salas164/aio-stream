@@ -1,5 +1,13 @@
 # Changelog
 
+## [2.5.3](https://github.com/Viren070/AIOStreams/compare/v2.5.2...v2.5.3) (2025-07-11)
+
+
+### Bug Fixes
+
+* only add aiostreamserror to idPrefixes if already defined ([ebe46d7](https://github.com/Viren070/AIOStreams/commit/ebe46d7c43acc70fdb52f7aeca41aeda27bf7df7))
+* only log warning for missing idPrefixes when needed ([08ec779](https://github.com/Viren070/AIOStreams/commit/08ec779be3bd307e0fda9766301d80fdc39a8f3e))
+
 ## [2.5.2](https://github.com/Viren070/AIOStreams/compare/v2.5.1...v2.5.2) (2025-07-11)
 
 
