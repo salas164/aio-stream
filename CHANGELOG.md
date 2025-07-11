@@ -1,5 +1,33 @@
 # Changelog
 
+## [2.5.2](https://github.com/Viren070/AIOStreams/compare/v2.5.1...v2.5.2) (2025-07-11)
+
+
+### Features
+
+* add statistic stream options to see statistics in stremio ([261b878](https://github.com/Viren070/AIOStreams/commit/261b87872a2882886ec26970614a504dc2f7cd97))
+
+
+### Bug Fixes
+
+* account for query parameters in manifest urls for custom addons during validation ([3ad1e7c](https://github.com/Viren070/AIOStreams/commit/3ad1e7c61f36d12dfb046c676a401b0e3f97604b))
+* add skipReasons logging for seeder ranges ([a06ac34](https://github.com/Viren070/AIOStreams/commit/a06ac34061e571fe7599eeca5a0fce6d9607b37f))
+* correct spelling of 'Crunchyroll' in streaming catalogs preset ([cb423d1](https://github.com/Viren070/AIOStreams/commit/cb423d152dc015b37b3d317c80907b357f7ee154))
+* **debridio-watchtower:** ensure resolution is always parsed ([6a0bf09](https://github.com/Viren070/AIOStreams/commit/6a0bf09de660198cd317bcd97ec8777aa4723e74))
+* **debridio-watchtower:** update stream parser ([542863e](https://github.com/Viren070/AIOStreams/commit/542863e2a807d18cd6d32c7ba8fa111a711ec37a))
+* forward manifest parsing errors ([9748ecb](https://github.com/Viren070/AIOStreams/commit/9748ecb576320db85c3a5c81a9d67e8f80dd5a4c))
+* **frontend:** remove menu query param on start/'about' menu ([275a2de](https://github.com/Viren070/AIOStreams/commit/275a2de9605c01911714574a040d27f2c3977c76))
+* only log warning for missing idPrefixes for non 'catlaog' resources ([f8065c9](https://github.com/Viren070/AIOStreams/commit/f8065c9e9ad6959c51f664f377ee75a221a92c32))
+* only standardise upon valdiation ([e980c1e](https://github.com/Viren070/AIOStreams/commit/e980c1e0b3a5026b5efdfd8bd812b6bfef90bc45))
+* pass fileIdx through for p2p streams ([0076339](https://github.com/Viren070/AIOStreams/commit/00763397a1b2952f2a99c2e57e8c275863d5aa54))
+* provide meta for catalog errors ([f4050d6](https://github.com/Viren070/AIOStreams/commit/f4050d6f388a774751412f89a1e1ff1210aa76c0))
+* set customised logo to undefined when empty ([7d0b60e](https://github.com/Viren070/AIOStreams/commit/7d0b60efa1f4ec1fc2de6402ffe8b2f6b2c9d2ca))
+* set loading to false in the case of an error upon fetching the new manifest URL ([707a1f3](https://github.com/Viren070/AIOStreams/commit/707a1f3fecb781650078d5c3ca7db3842c102869))
+* standardise manifest URL during validation for custom addon updates ([8314cae](https://github.com/Viren070/AIOStreams/commit/8314cae4811d7e2307498dc0cda12b7822518708))
+* update director to allow string ([2c924ba](https://github.com/Viren070/AIOStreams/commit/2c924bac56e2a3d81cc1fe6ae380286e7fe93b58))
+* update publicIp schema to allow empty string in addition to valid IP ([0539fe4](https://github.com/Viren070/AIOStreams/commit/0539fe49a8cfe8d18525262256388a60691b8e23)), closes [#250](https://github.com/Viren070/AIOStreams/issues/250)
+* use correct property in skipReasons for seeder ranges ([c54b2b6](https://github.com/Viren070/AIOStreams/commit/c54b2b66f050827b6e41db1bf486da3140683487))
+
 ## [2.5.1](https://github.com/Viren070/AIOStreams/compare/v2.5.0...v2.5.1) (2025-07-04)
 
 
