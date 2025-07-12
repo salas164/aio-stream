@@ -1,5 +1,12 @@
 # Changelog
 
+## [2.5.4](https://github.com/Viren070/AIOStreams/compare/v2.5.3...v2.5.4) (2025-07-12)
+
+
+### Bug Fixes
+
+* ensure catalog.extra is initialised before pushing new genre options ([dc9c8a4](https://github.com/Viren070/AIOStreams/commit/dc9c8a40775ba13d66ff7a762147b50e4b414974))
+
 ## [2.5.3](https://github.com/Viren070/AIOStreams/compare/v2.5.2...v2.5.3) (2025-07-11)
 
 
