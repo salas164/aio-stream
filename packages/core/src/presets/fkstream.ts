@@ -11,6 +11,16 @@ export class FKStreamPreset extends Preset {
       constants.META_RESOURCE,
       constants.STREAM_RESOURCE,
     ];
+    const supportedServices: ServiceId[] = [
+      constants.TORBOX_SERVICE,
+      constants.EASYDEBRID_SERVICE,
+      constants.REALDEBRID_SERVICE,
+      constants.DEBRIDLINK_SERVICE,
+      constants.ALLDEBRID_SERVICE,
+      constants.PREMIUMIZE_SERVICE,
+      constants.OFFCLOUD_SERVICE,
+      constants.PIKPAK_SERVICE,
+    ];
 
     const options: Option[] = [
       ...baseOptions(
@@ -40,6 +50,20 @@ export class FKStreamPreset extends Preset {
         default: false,
       },
       {
+        id: 'services',
+        name: 'Services',
+        description:
+          'Optionally override the services that are used. If not specified, then the services that are enabled and supported will be used.',
+        type: 'multi-select',
+        required: false,
+        options: supportedServices.map((service) => ({
+          value: service,
+          label: constants.SERVICE_DETAILS[service].name,
+        })),
+        default: undefined,
+        emptyIsUndefined: true,
+      },
+      {
         id: 'socials',
         name: '',
         description: '',
@@ -55,16 +79,7 @@ export class FKStreamPreset extends Preset {
       URL: Env.FKSTREAM_URL,
       TIMEOUT: Env.DEFAULT_FKSTREAM_TIMEOUT || Env.DEFAULT_TIMEOUT,
       USER_AGENT: Env.DEFAULT_FKSTREAM_USER_AGENT || Env.DEFAULT_USER_AGENT,
-      SUPPORTED_SERVICES: [
-        constants.TORBOX_SERVICE,
-        constants.EASYDEBRID_SERVICE,
-        constants.REALDEBRID_SERVICE,
-        constants.DEBRIDLINK_SERVICE,
-        constants.ALLDEBRID_SERVICE,
-        constants.PREMIUMIZE_SERVICE,
-        constants.OFFCLOUD_SERVICE,
-        constants.PIKPAK_SERVICE,
-      ],
+      SUPPORTED_SERVICES: supportedServices,
       DESCRIPTION:
         'An unofficial addon for Fankai - French focused anime content. Bleach, One Piece, Dragon Ball, Naruto et une soixantaine de Kai. Viens voir !',
       OPTIONS: options,
