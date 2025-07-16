@@ -1,5 +1,14 @@
 # Changelog
 
+## [2.6.1](https://github.com/Viren070/AIOStreams/compare/v2.6.0...v2.6.1) (2025-07-16)
+
+
+### Bug Fixes
+
+* correctly extract extras for subtitle requests ([a1cbeb2](https://github.com/Viren070/AIOStreams/commit/a1cbeb2880a4abaf43f3c2fe9eabab8239e024df))
+* **debridio-tv:** add new zealand option ([3dd2e7a](https://github.com/Viren070/AIOStreams/commit/3dd2e7a3c5189da1b31dbc6f3044477cd065dc91))
+* **fkstream:** allow overriding services ([952dda8](https://github.com/Viren070/AIOStreams/commit/952dda8bd106a5176d12d554280e620219576d12)), closes [#268](https://github.com/Viren070/AIOStreams/issues/268)
+
 ## [2.6.0](https://github.com/Viren070/AIOStreams/compare/v2.5.4...v2.6.0) (2025-07-16)
 
 
