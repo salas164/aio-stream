@@ -1,5 +1,47 @@
 # Changelog
 
+## [2.6.0](https://github.com/Viren070/AIOStreams/compare/v2.5.4...v2.6.0) (2025-07-16)
+
+
+### Features
+
+* add ai search addon to marketplace ([c9c1bab](https://github.com/Viren070/AIOStreams/commit/c9c1babc2acaa5d92e3230382bf3dcfca2f874d5))
+* add AIO Subtitle addon to marketplace ([db191fd](https://github.com/Viren070/AIOStreams/commit/db191fd430b17b8452fc6e4a0b2f776f9463f3b3))
+* add fkstream to marketplace ([ee72f3a](https://github.com/Viren070/AIOStreams/commit/ee72f3a1ed4f137ba07a1e23c381b257acaa2bde)), closes [#260](https://github.com/Viren070/AIOStreams/issues/260)
+* add statistics position option to control where statistic streams appear ([47656d0](https://github.com/Viren070/AIOStreams/commit/47656d0413996ae475b6c25d9503fb60595f8429))
+* add subhero to the marketplace ([e70920a](https://github.com/Viren070/AIOStreams/commit/e70920a2701db19796146c486558a59939e616cd))
+* extract episode count during precaching to automatically precache next season when necessary ([6f0e79a](https://github.com/Viren070/AIOStreams/commit/6f0e79a5d9a8951e882251dc7a48d7a70046a0d8))
+* **frontend:** move tmdb access token setting to services menu ([9101acb](https://github.com/Viren070/AIOStreams/commit/9101acb72f02ec5d5573e41e138797040ef39c0a))
+* **webstreamr:** update provider list and automatically provide mediaflow details if possible ([dbde122](https://github.com/Viren070/AIOStreams/commit/dbde1225e4b7c3505009b97e1454fd3f09840625))
+
+
+### Bug Fixes
+
+* add fkstream, subhero, aio subtitle to startup logs and sample .env ([130be7d](https://github.com/Viren070/AIOStreams/commit/130be7dc16ce2e4e37d59d7ff3c66afe5b08f5b6))
+* add socials option to ai search ([28f7863](https://github.com/Viren070/AIOStreams/commit/28f786339e12b182856764d31605c76610a75335))
+* adjust extras schema to allow more than 1 extra ([7ba880e](https://github.com/Viren070/AIOStreams/commit/7ba880e9a74b5f6e7b49b2bcff8dbda6b13a159d)), closes [#263](https://github.com/Viren070/AIOStreams/issues/263)
+* **aiosubtitle:** rename language option to languages and use correct default timeout ([603af9a](https://github.com/Viren070/AIOStreams/commit/603af9a7e97226272300377f5ac6dc2bb62e816b))
+* allow any string for thumbnail ([4652eb6](https://github.com/Viren070/AIOStreams/commit/4652eb650273f780cb77e42c8aaab34e63ce90a0))
+* **core:** set groups to undefined during precaching ([02d4cf7](https://github.com/Viren070/AIOStreams/commit/02d4cf742b0d6be75b4cf281b47ef7dd75a9affb))
+* **core:** use structuredClone for cache item values to ensure immutability ([465b7a4](https://github.com/Viren070/AIOStreams/commit/465b7a40a34909bc84290da37cefbe82f3131ea4))
+* correct spelling of ALLEDEBRID_SERVICE to ALLDEBRID_SERVICE ([b67f38a](https://github.com/Viren070/AIOStreams/commit/b67f38ac85033f48efea412f90945f7f15802ee0))
+* **debridio-tv:** update channel list ([67509a4](https://github.com/Viren070/AIOStreams/commit/67509a43def9e01250beaa62bddb6207d399b5be))
+* ensure number types always have integer step of at least 1 ([ac4d209](https://github.com/Viren070/AIOStreams/commit/ac4d209879b64a64d7df600a2b01c8164fe726c5))
+* ensure string validations are carried out against password type ([66d4a96](https://github.com/Viren070/AIOStreams/commit/66d4a96ad20cea105cc23c19945febdf4cf10e56))
+* **frontend:** revert 3a82b796c56627d21ede53b91f47315cbb46c1e4 and clean options before processing ([880817a](https://github.com/Viren070/AIOStreams/commit/880817a1ad100799826dbde10e87c303b74b958e))
+* **frontend:** show puzzle icon for addons without logo ([f74fbb2](https://github.com/Viren070/AIOStreams/commit/f74fbb289b208f1ea082e74675b7bd274153d5f4))
+* **frontend:** strictly rely on value during selection ([3a82b79](https://github.com/Viren070/AIOStreams/commit/3a82b796c56627d21ede53b91f47315cbb46c1e4))
+* improve parsing for debridio watchtower, nuviostreams, and webstreamr ([9febeeb](https://github.com/Viren070/AIOStreams/commit/9febeeb86af023fed32dc25dc89dfdad09406886))
+* **nuviostreams:** add animepahe provider ([00862c0](https://github.com/Viren070/AIOStreams/commit/00862c05926a18766592bc3a177075b14ced90a4))
+* only move to next season when it exists and correct logs ([3050b41](https://github.com/Viren070/AIOStreams/commit/3050b41e937fa24dcfb146a953862c4054cf4a0f))
+* remove unnecessary debug logs ([0e24a6a](https://github.com/Viren070/AIOStreams/commit/0e24a6aa961c0dee200ea018caec06b23134d6cb))
+* replace discover deep links where possible ([aa084d3](https://github.com/Viren070/AIOStreams/commit/aa084d35d646f05cc2dea7111ad34ba5d1a6d661)), closes [#264](https://github.com/Viren070/AIOStreams/issues/264)
+
+
+### Performance Improvements
+
+* always fetch from all groups in parallel ([0ce1338](https://github.com/Viren070/AIOStreams/commit/0ce13389a066a05184bc1aaea0b2806b22d01a1f))
+
 ## [2.5.4](https://github.com/Viren070/AIOStreams/compare/v2.5.3...v2.5.4) (2025-07-12)
 
 
