@@ -141,7 +141,7 @@ export const PARSE_REGEX: PARSE_REGEX = {
     Portuguese: createLanguageRegex('portuguese|por'),
     Spanish: createLanguageRegex('spanish|spa|esp'),
     French: createLanguageRegex('french|fra|fr|vf|vff|vfi|vf2|vfq|truefrench'),
-    German: createLanguageRegex('de(u)?(tsch)?(land)?|ger(man)?(y)?'),
+    German: createLanguageRegex('deu(tsch)?|ger(man)?'),
     Italian: createLanguageRegex('italian|ita'),
     Korean: createLanguageRegex('korean|kor'),
     Hindi: createLanguageRegex('hindi|hin'),
