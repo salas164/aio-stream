@@ -23,11 +23,11 @@ jobs:
           ref: ${{inputs.ref}}
           token: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Login to Docker Hub
-        uses: docker/login-action@v3
-        with:
-          username: ${{ secrets.DOCKERHUB_USERNAME }}
-          password: ${{ secrets.DOCKERHUB_TOKEN }}
+      # - name: Login to Docker Hub
+      #   uses: docker/login-action@v3
+      #   with:
+      #     username: ${{ secrets.DOCKERHUB_USERNAME }}
+      #     password: ${{ secrets.DOCKERHUB_TOKEN }}
 
       - name: Login to GitHub Container Registry
         uses: docker/login-action@v3
@@ -72,8 +72,7 @@ jobs:
           {
             echo 'DOCKER_IMAGE_TAGS<<EOF'
             for tag in ${TAGS}; do
-            echo "viren070/aiostreams:${tag}"
-            echo "ghcr.io/viren070/aiostreams:${tag}"
+            echo "ghcr.io/arrarragikun/kothimeerallmproject:${tag}"
             done
             echo EOF
           } >> "${GITHUB_ENV}"
@@ -104,94 +103,95 @@ jobs:
           file: ./Dockerfile
           tags: ${{env.DOCKER_IMAGE_TAGS}}
 
-      - name: Send Discord Notification
-        env:
-          CHANNEL: ${{env.CHANNEL}}
-          TAGS: ${{env.TAGS}}
-        run: |
-          # Determine role based on channel
-          if [ "$CHANNEL" = "stable" ]; then
-            ROLE_ID="<@&1384627130272452638>"
-            COLOR=5763719  # Green
-            TITLE="🎉 Stable Release"
-          else
-            ROLE_ID="<@&1384627462155272242>"
-            COLOR=15844367  # Orange
-            TITLE="🌙 Nightly Build"
-          fi
+      # - name: Send Discord Notification
+      #   env:
+      #     CHANNEL: ${{env.CHANNEL}}
+      #     TAGS: ${{env.TAGS}}
+      #   run: |
+      #     # Determine role based on channel
+      #     if [ "$CHANNEL" = "stable" ]; then
+      #       ROLE_ID="<@&1384627130272452638>"
+      #       COLOR=5763719  # Green
+      #       TITLE="🎉 Stable Release"
+      #     else
+      #       ROLE_ID="<@&1384627462155272242>"
+      #       COLOR=15844367  # Orange
+      #       TITLE="🌙 Nightly Build"
+      #     fi
 
-          # Format tags for display (each tag on a new line with bullet points)
-          FORMATTED_TAGS=""
-          for tag in $TAGS; do
-            if [ -z "$FORMATTED_TAGS" ]; then
-              FORMATTED_TAGS="• \`$tag\`"
-            else
-              FORMATTED_TAGS="$FORMATTED_TAGS\n• \`$tag\`"
-            fi
-          done
+      #     # Format tags for display (each tag on a new line with bullet points)
+      #     FORMATTED_TAGS=""
+      #     for tag in $TAGS; do
+      #       if [ -z "$FORMATTED_TAGS" ]; then
+      #         FORMATTED_TAGS="• \`$tag\`"
+      #       else
+      #         FORMATTED_TAGS="$FORMATTED_TAGS\n• \`$tag\`"
+      #       fi
+      #     done
 
-          # Get current timestamp in ISO 8601 format UTC
-          TIMESTAMP=$(date -u +"%Y-%m-%dT%H:%M:%SZ")
+      #     # Get current timestamp in ISO 8601 format UTC
+      #     TIMESTAMP=$(date -u +"%Y-%m-%dT%H:%M:%SZ")
 
-          # Create JSON payload file
-          cat << EOF > discord_payload.json
-          {
-            "content": "$ROLE_ID",
-            "embeds": [
-              {
-                "title": "$TITLE - Docker Images Published",
-                "description": "New Docker images have been built and pushed to registries.",
-                "color": $COLOR,
-                "fields": [
-                  {
-                    "name": "📦 Channel",
-                    "value": "• \`$CHANNEL\`",
-                    "inline": true
-                  },
-                  {
-                    "name": "🏷️ Tags Published",
-                    "value": "$FORMATTED_TAGS",
-                    "inline": false
-                  },
-                  {
-                    "name": "📍 View Images",
-                    "value": "[Docker Hub](https://hub.docker.com/r/viren070/aiostreams) · [GHCR](https://github.com/Viren070/AIOStreams/pkgs/container/aiostreams)",
-                    "inline": false
-                  },
-                  {
-                    "name": "🔗 View Build",
-                    "value": "[GitHub Actions](https://github.com/Viren070/aiostreams/actions/runs/${{ github.run_id }})",
-                    "inline": false
-                  }
-                ],
-                "footer": {
-                  "text": "AIOStreams CI",
-                  "icon_url": "https://github.com/Viren070.png"
-                },
-                "timestamp": "$TIMESTAMP"
-              }
-            ]
-          }
-          EOF
+          # # Create JSON payload file
+          # cat << EOF > discord_payload.json
+          # {
+          #   "content": "$ROLE_ID",
+          #   "embeds": [
+          #     {
+          #       "title": "$TITLE - Docker Images Published",
+          #       "description": "New Docker images have been built and pushed to registries.",
+          #       "color": $COLOR,
+          #       "fields": [
+          #         {
+          #           "name": "📦 Channel",
+          #           "value": "• \`$CHANNEL\`",
+          #           "inline": true
+          #         },
+          #         {
+          #           "name": "🏷️ Tags Published",
+          #           "value": "$FORMATTED_TAGS",
+          #           "inline": false
+          #         },
+          #         {
+          #           "name": "📍 View Images",
+          #           "value": "[GHCR](https://github.com/ArrarragiKun/KothimeeraLLMProject/pkgs/container/kothimeerallmproject)",
+          #           "inline": false
+          #         },
+          #         {
+          #           "name": "🔗 View Build",
+          #           "value": "[GitHub Actions](https://github.com/Viren070/aiostreams/actions/runs/${{ github.run_id }})",
+          #           "inline": false
+          #         }
+          #       ],
+          #       "footer": {
+          #         "text": "AIOStreams CI",
+          #         "icon_url": "https://github.com/Viren070.png"
+          #       },
+          #       "timestamp": "$TIMESTAMP"
+          #     }
+          #   ]
+          # }
+          # EOF
 
-          echo "Sending to Discord:"
-          cat discord_payload.json
+          # echo "Sending to Discord:"
+          # cat discord_payload.json
 
-          # Send payload to Discord and capture response and status code
-          http_response=$(curl -s -w "\n%{http_code}" -H "Content-Type: application/json" \
-            -X POST \
-            -d @discord_payload.json \
-            "${{ secrets.DISCORD_WEBHOOK_URL }}")
+          # # Send payload to Discord and capture response and status code
+          # http_response=$(curl -s -w "\n%{http_code}" -H "Content-Type: application/json" \
+          #   -X POST \
+          #   -d @discord_payload.json \
+          #   "${{ secrets.DISCORD_WEBHOOK_URL }}")
 
-          http_body=$(echo "$http_response" | sed '$d')
-          http_code=$(echo "$http_response" | tail -n1)
+          # http_body=$(echo "$http_response" | sed '$d')
+          # http_code=$(echo "$http_response" | tail -n1)
 
-          echo "HTTP Status Code: $http_code"
-          echo "Discord Response Body: $http_body"
+          # echo "HTTP Status Code: $http_code"
+          # echo "Discord Response Body: $http_body"
 
-          if [ "$http_code" != "204" ]; then
-            echo "Error sending to Discord webhook."
-            exit 1
-          fi
+          # if [ "$http_code" != "204" ]; then
+          #   echo "Error sending to Discord webhook."
+          #   exit 1
+          # fi
 
-          echo "Message sent successfully!"
+          # echo "Message sent successfully!"
+          echo " ******** DONE *********"
