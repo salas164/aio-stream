@@ -1,5 +1,26 @@
 # Changelog
 
+## [2.8.0](https://github.com/Viren070/AIOStreams/compare/v2.7.0...v2.8.0) (2025-07-29)
+
+
+### Features
+
+* add explicit redirect handling to avoid external requests and refactor precaching logic ([0e40299](https://github.com/Viren070/AIOStreams/commit/0e4029901bc3dd75570778ec937afa50fc2084f1))
+* add force to top option for custom addons ([6a26e11](https://github.com/Viren070/AIOStreams/commit/6a26e11efcab5d96c4c96c8c79b06c44b42db2af))
+* add more like this ([b1e46a2](https://github.com/Viren070/AIOStreams/commit/b1e46a2bd35a53c85c85ef568c68725a039a0940))
+* add options to force streams to the top of the list in MoreLikeThis and TmdbCollections presets ([08adc25](https://github.com/Viren070/AIOStreams/commit/08adc25218549ab9f57a6511003b10d8bfeae54b))
+* add result passthrough option ([86f7057](https://github.com/Viren070/AIOStreams/commit/86f7057a9fcc32ce2a603525719d49af4ed0b50d))
+* add streamasia ([03afc6e](https://github.com/Viren070/AIOStreams/commit/03afc6e9aa1874b741c504bea1a32c0d73c7284b))
+* **debridio-tv:** enable result passthrough by default and remove debug logs ([096751a](https://github.com/Viren070/AIOStreams/commit/096751a74ac7b7264ff58ba827ce19feb7817bbd))
+
+
+### Bug Fixes
+
+* allow empty id prefixes ([d39a301](https://github.com/Viren070/AIOStreams/commit/d39a301be60e8a3cf99d1cd1bfd795c333ee62d0))
+* correctly handle encrypted public proxy url ([7c08137](https://github.com/Viren070/AIOStreams/commit/7c081377d12f36ac433541a2fe61e2a0d8f5cf5e))
+* enable result passthrough for usa tv, argentina tv, and more like this ([74179aa](https://github.com/Viren070/AIOStreams/commit/74179aab4c929756a4ee178a0098df78cabc43ed))
+* prevent streams from being proxied if urls match proxy or already have proxied set to true ([5320fcf](https://github.com/Viren070/AIOStreams/commit/5320fcf80f832955d7d4cefe9c6b1dca652293ae))
+
 ## [2.7.0](https://github.com/Viren070/AIOStreams/compare/v2.6.1...v2.7.0) (2025-07-28)
 
 
