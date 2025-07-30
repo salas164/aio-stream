@@ -1,5 +1,15 @@
 # Changelog
 
+## [2.8.2](https://github.com/Viren070/AIOStreams/compare/v2.8.1...v2.8.2) (2025-07-30)
+
+
+### Bug Fixes
+
+* allow all extra keys ([f8388ed](https://github.com/Viren070/AIOStreams/commit/f8388edfa04e7392c300742d44123f56dd32e1fc))
+* assign encoded token to correct credential ID ([4963123](https://github.com/Viren070/AIOStreams/commit/49631231a1f2581b32f3deffc0584a369fb90326))
+* **streamasia:** url encode mediaflow proxy password ([5bd55b5](https://github.com/Viren070/AIOStreams/commit/5bd55b5a58684fbb07293615a9118f06b5715ca3))
+* url encode extra values ([2eea0a9](https://github.com/Viren070/AIOStreams/commit/2eea0a9ed5ea285d084973edfb4f63e9c5550525))
+
 ## [2.8.1](https://github.com/Viren070/AIOStreams/compare/v2.8.0...v2.8.1) (2025-07-30)
 
 
