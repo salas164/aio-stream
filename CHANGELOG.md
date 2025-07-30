@@ -1,5 +1,20 @@
 # Changelog
 
+## [2.8.1](https://github.com/Viren070/AIOStreams/compare/v2.8.0...v2.8.1) (2025-07-30)
+
+
+### Features
+
+* support socks5 proxy for `ADDON_PROXY` ([de587bb](https://github.com/Viren070/AIOStreams/commit/de587bb2ff0c9f163453f9a67785dc6c3c440f50))
+
+
+### Bug Fixes
+
+* add explicit handling of passthrough type in deduplicator ([4797a33](https://github.com/Viren070/AIOStreams/commit/4797a33f7f4503298253489c00d32f56f88d73c4))
+* adjust forced to top sort handling to avoid modifying sort criterias ([146cf16](https://github.com/Viren070/AIOStreams/commit/146cf16fbdcef338b352d6abb0506178ba8ba13a))
+* correctly sanitise filename ([aa66213](https://github.com/Viren070/AIOStreams/commit/aa66213450739d3b5fdb0dc93551978a585b1311))
+* enable result passthrough for tmdb collections ([2408109](https://github.com/Viren070/AIOStreams/commit/2408109bf2c17565c53a4dfc1f76e7521af3164c))
+
 ## [2.8.0](https://github.com/Viren070/AIOStreams/compare/v2.7.0...v2.8.0) (2025-07-29)
 
 
