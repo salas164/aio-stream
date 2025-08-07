@@ -34,7 +34,7 @@ class WebStreamrStreamParser extends StreamParser {
     stream: Stream,
     currentParsedStream: ParsedStream
   ): string | undefined {
-    const messageRegex = this.getRegexForTextAfterEmojis(['🐢', '🚦']);
+    const messageRegex = this.getRegexForTextAfterEmojis(['🐢', '🚦', '⚠️', '⏳', '❌']);
 
     let messages = [stream.description?.match(messageRegex)?.[1]];
     if (stream.name?.includes('external')) {
