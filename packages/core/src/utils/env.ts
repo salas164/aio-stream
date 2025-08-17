@@ -604,6 +604,10 @@ export const Env = cleanEnv(process.env, {
     default: undefined,
     desc: 'Default EasyDebrid API key',
   }),
+  DEFAULT_DEBRIDER_API_KEY: str({
+    default: undefined,
+    desc: 'Default Debrider API key',
+  }),
   DEFAULT_PIKPAK_EMAIL: str({
     default: undefined,
     desc: 'Default PikPak email',
@@ -669,6 +673,10 @@ export const Env = cleanEnv(process.env, {
   FORCED_EASYDEBRID_API_KEY: str({
     default: undefined,
     desc: 'Forced EasyDebrid API key',
+  }),
+  FORCED_DEBRIDER_API_KEY: str({
+    default: undefined,
+    desc: 'Forced Debrider API key',
   }),
   FORCED_PIKPAK_EMAIL: str({
     default: undefined,

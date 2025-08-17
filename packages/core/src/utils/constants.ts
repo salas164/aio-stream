@@ -173,6 +173,7 @@ const PREMIUMIZE_SERVICE = 'premiumize';
 const ALLDEBRID_SERVICE = 'alldebrid';
 const TORBOX_SERVICE = 'torbox';
 const EASYDEBRID_SERVICE = 'easydebrid';
+const DEBRIDER_SERVICE = 'debrider';
 const PUTIO_SERVICE = 'putio';
 const PIKPAK_SERVICE = 'pikpak';
 const OFFCLOUD_SERVICE = 'offcloud';
@@ -186,6 +187,7 @@ const SERVICES = [
   ALLDEBRID_SERVICE,
   TORBOX_SERVICE,
   EASYDEBRID_SERVICE,
+  DEBRIDER_SERVICE,
   PUTIO_SERVICE,
   PIKPAK_SERVICE,
   OFFCLOUD_SERVICE,
@@ -425,6 +427,24 @@ const SERVICE_DETAILS: Record<
         name: 'API Key',
         description:
           'Your EasyDebrid API key. Obtain it from [here](https://paradise-cloud.com/dashboard/)',
+        type: 'password',
+        required: true,
+      },
+    ],
+  },
+  [DEBRIDER_SERVICE]: {
+    id: DEBRIDER_SERVICE,
+    name: 'Debrider',
+    shortName: 'DBD',
+    knownNames: ['DBD', 'Debrider'],
+    signUpText:
+      "Don't have an account? [Sign up here](https://debrider.app/)",
+    credentials: [
+      {
+        id: 'apiKey',
+        name: 'API Key',
+        description:
+          'Your Debrider API key. Obtain it from [here](https://debrider.app/dashboard/account)',
         type: 'password',
         required: true,
       },
@@ -898,6 +918,7 @@ export {
   DEBRIDLINK_SERVICE,
   TORBOX_SERVICE,
   EASYDEBRID_SERVICE,
+  DEBRIDER_SERVICE,
   PUTIO_SERVICE,
   PIKPAK_SERVICE,
   OFFCLOUD_SERVICE,

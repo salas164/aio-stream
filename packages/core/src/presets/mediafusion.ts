@@ -132,6 +132,7 @@ export class MediaFusionPreset extends Preset {
       constants.TORBOX_SERVICE,
       constants.DEBRIDLINK_SERVICE,
       constants.EASYDEBRID_SERVICE,
+      constants.DEBRIDER_SERVICE,
       constants.OFFCLOUD_SERVICE,
       constants.PIKPAK_SERVICE,
       constants.SEEDR_SERVICE,

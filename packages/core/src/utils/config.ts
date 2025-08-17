@@ -84,6 +84,12 @@ function getServiceCredentialDefault(
           return Env.DEFAULT_EASYDEBRID_API_KEY;
       }
       break;
+    case constants.DEBRIDER_SERVICE:
+      switch (credentialId) {
+        case 'apiKey':
+          return Env.DEFAULT_DEBRIDER_API_KEY;
+      }
+      break;
     case constants.PUTIO_SERVICE:
       switch (credentialId) {
         case 'clientId':
@@ -169,6 +175,12 @@ function getServiceCredentialForced(
       switch (credentialId) {
         case 'apiKey':
           return Env.FORCED_EASYDEBRID_API_KEY;
+      }
+      break;
+    case constants.DEBRIDER_SERVICE:
+      switch (credentialId) {
+        case 'apiKey':
+          return Env.FORCED_DEBRIDER_API_KEY;
       }
       break;
     case constants.PUTIO_SERVICE:
