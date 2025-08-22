@@ -326,9 +326,9 @@ export class AIOStreams {
 
     // Apply reverse order modification (after shuffle if both are enabled)
     if (modification?.reverse && !(extras && extras.includes('search'))) {
-      catalog = catalog.reverse();
+      // reverse a copy to avoid mutating any cached array instance
+      catalog = [...catalog].reverse();
     }
-
     const rpdbApiKey =
       modification?.rpdb && this.userData.rpdbApiKey
         ? this.userData.rpdbApiKey
