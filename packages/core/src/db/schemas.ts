@@ -281,7 +281,6 @@ const CatalogModification = z.object({
   addonName: z.string().min(1).optional(), // the name of the addon that provides the catalog
 });
 
-
 export const UserDataSchema = z.object({
   uuid: z.string().uuid().optional(),
   encryptedPassword: z.string().min(1).optional(),

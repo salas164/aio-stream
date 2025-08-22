@@ -68,7 +68,12 @@ import {
   AccordionContent,
   AccordionItem,
 } from '../ui/accordion';
-import { FaArrowRightLong, FaRankingStar, FaShuffle, FaArrowsUpDown } from 'react-icons/fa6';
+import {
+  FaArrowRightLong,
+  FaRankingStar,
+  FaShuffle,
+  FaArrowsUpDown,
+} from 'react-icons/fa6';
 import { PiStarFill, PiStarBold } from 'react-icons/pi';
 import { IoExtensionPuzzle } from 'react-icons/io5';
 import { NumberInput } from '../ui/number-input';
@@ -81,6 +86,7 @@ interface CatalogModification {
   overrideType?: string;
   enabled?: boolean;
   shuffle?: boolean;
+  reverse?: boolean;
   persistShuffleFor?: number;
   rpdb?: boolean;
   onlyOnDiscover?: boolean;
