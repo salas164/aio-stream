@@ -68,7 +68,7 @@ import {
   AccordionContent,
   AccordionItem,
 } from '../ui/accordion';
-import { FaArrowRightLong, FaRankingStar, FaShuffle } from 'react-icons/fa6';
+import { FaArrowRightLong, FaRankingStar, FaShuffle, FaArrowsUpDown } from 'react-icons/fa6';
 import { PiStarFill, PiStarBold } from 'react-icons/pi';
 import { IoExtensionPuzzle } from 'react-icons/io5';
 import { NumberInput } from '../ui/number-input';
@@ -1766,6 +1766,36 @@ function SortableCatalogItem({
                       trigger={
                         <IconButton
                           className={dynamicIconSize}
+                          icon={
+                            catalog.reverse ? (
+                              <FaArrowsUpDown />
+                            ) : (
+                              <FaArrowRightLong />
+                            )
+                          }
+                          intent="primary-subtle"
+                          rounded
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            setUserData((prev) => ({
+                              ...prev,
+                              catalogModifications:
+                                prev.catalogModifications?.map((c) =>
+                                  c.id === catalog.id && c.type === catalog.type
+                                    ? { ...c, reverse: !c.reverse }
+                                    : c
+                                ),
+                            }));
+                          }}
+                        />
+                      }
+                    >
+                      Reverse Order
+                    </Tooltip>
+                    <Tooltip
+                      trigger={
+                        <IconButton
+                          className={dynamicIconSize}
                           icon={catalog.rpdb ? <PiStarFill /> : <PiStarBold />}
                           intent="primary-subtle"
                           rounded
@@ -1879,6 +1909,24 @@ function SortableCatalogItem({
                             (c) =>
                               c.id === catalog.id && c.type === catalog.type
                                 ? { ...c, shuffle }
+                                : c
+                          ),
+                        }));
+                      }}
+                    />
+
+                    <Switch
+                      label="Reverse Order"
+                      help="Reverse the order of catalog items (newest first instead of oldest first)"
+                      side="right"
+                      value={catalog.reverse ?? false}
+                      onValueChange={(reverse) => {
+                        setUserData((prev) => ({
+                          ...prev,
+                          catalogModifications: prev.catalogModifications?.map(
+                            (c) =>
+                              c.id === catalog.id && c.type === catalog.type
+                                ? { ...c, reverse }
                                 : c
                           ),
                         }));

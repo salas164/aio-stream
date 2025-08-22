@@ -269,6 +269,7 @@ const CatalogModification = z.object({
   type: z.string().min(1), // the type of catalog modification
   name: z.string().min(1).optional(), // override the name of the catalog
   shuffle: z.boolean().optional(), // shuffle the catalog
+  reverse: z.boolean().optional(), // reverse the order of catalog items (newest first)
   persistShuffleFor: z.number().min(0).max(24).optional(), // persist the shuffle for a given amount of time (in hours)
   onlyOnDiscover: z.boolean().optional(), // only show the catalog on the discover page
   disableSearch: z.boolean().optional(), // disable the search for the catalog
@@ -279,6 +280,7 @@ const CatalogModification = z.object({
   searchable: z.boolean().optional(), // property of whether the catalog is searchable (not a search only catalog)
   addonName: z.string().min(1).optional(), // the name of the addon that provides the catalog
 });
+
 
 export const UserDataSchema = z.object({
   uuid: z.string().uuid().optional(),
