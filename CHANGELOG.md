@@ -1,5 +1,17 @@
 # Changelog
 
+## [2.11.1](https://github.com/Viren070/AIOStreams/compare/v2.11.0...v2.11.1) (2025-08-24)
+
+
+### Bug Fixes
+
+* add handling for RATE_LIMIT_EXCEEDED errors in middleware ([3af18db](https://github.com/Viren070/AIOStreams/commit/3af18db213f787baca55a5fa5e5293040815a660))
+* determine useProxy after mapping ([9effbf8](https://github.com/Viren070/AIOStreams/commit/9effbf84b03b291c850667b7307461bd59981277))
+* make description optional in manifest ([7bcbccb](https://github.com/Viren070/AIOStreams/commit/7bcbccb573fcff8935d6e2d45f9e76fa51c4c7f4))
+* **presets/ai-companion:** adjust validation schema ([8f9f68b](https://github.com/Viren070/AIOStreams/commit/8f9f68bdf8c27a24adbdf152fb76a3122fd51c1b)), closes [#319](https://github.com/Viren070/AIOStreams/issues/319)
+* **presets/comet:** add debrider to supported services ([a30419d](https://github.com/Viren070/AIOStreams/commit/a30419da0051fe80c1f4eec6f98917b9aa162576))
+* **redis:** prevent setting cache with zero TTL ([69e76e1](https://github.com/Viren070/AIOStreams/commit/69e76e1a3054f4d54a570f2e552e2083fb34a889))
+
 ## [2.11.0](https://github.com/Viren070/AIOStreams/compare/v2.10.0...v2.11.0) (2025-08-24)
 
 
