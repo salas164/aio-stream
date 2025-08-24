@@ -1,5 +1,13 @@
 # Changelog
 
+## [2.11.2](https://github.com/Viren070/AIOStreams/compare/v2.11.1...v2.11.2) (2025-08-24)
+
+
+### Bug Fixes
+
+* add 'DB' to known names for debrider ([8ac29e0](https://github.com/Viren070/AIOStreams/commit/8ac29e0d19bcf583da9fdf2bc6fd31a02445400d))
+* add rpdb api key to cache key ([d81206f](https://github.com/Viren070/AIOStreams/commit/d81206ff200f484bc7dbd8eee6b5422ec2b3b4dc))
+
 ## [2.11.1](https://github.com/Viren070/AIOStreams/compare/v2.11.0...v2.11.1) (2025-08-24)
 
 
