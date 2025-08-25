@@ -1,5 +1,19 @@
 # Changelog
 
+## [2.11.3](https://github.com/Viren070/AIOStreams/compare/v2.11.2...v2.11.3) (2025-08-25)
+
+
+### Features
+
+* add alternate `u` prefixed formatter language variables and sort language variables based on language settings ([271c183](https://github.com/Viren070/AIOStreams/commit/271c1836a81a352466158a44629be991277bf9ea)), closes [#323](https://github.com/Viren070/AIOStreams/issues/323)
+
+
+### Bug Fixes
+
+* add helper function for adding usenet download ([34075d5](https://github.com/Viren070/AIOStreams/commit/34075d58865cdf7d51abf8eb41338d372c67956d))
+* **frontend:** improve clarity of descriptions and add alerts for auto play and exporting ([4855cf9](https://github.com/Viren070/AIOStreams/commit/4855cf97d7e1d348454ebe334bcf466939035896))
+* **presets/mediafusion:** include encoded user data hash in manifest url ([200d1b7](https://github.com/Viren070/AIOStreams/commit/200d1b7b44bb0d0f1d5066923ff8e64bf4b716db))
+
 ## [2.11.2](https://github.com/Viren070/AIOStreams/compare/v2.11.1...v2.11.2) (2025-08-24)
 
 
