@@ -1,5 +1,13 @@
 # Changelog
 
+## [2.11.5](https://github.com/Viren070/AIOStreams/compare/v2.11.4...v2.11.5) (2025-08-26)
+
+
+### Bug Fixes
+
+* **parser:** improve BluRay REMUX regex ([4a658a1](https://github.com/Viren070/AIOStreams/commit/4a658a11159cfd9e15198b8f4f0dfa53e5e0b56e))
+* **presets/webstreamr:** return original parsed file when no resolution matched ([07db3d9](https://github.com/Viren070/AIOStreams/commit/07db3d9d542d51c15f5364a1be543c6c8578c9c4))
+
 ## [2.11.4](https://github.com/Viren070/AIOStreams/compare/v2.11.3...v2.11.4) (2025-08-26)
 
 
