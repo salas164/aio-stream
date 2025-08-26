@@ -1,5 +1,14 @@
 # Changelog
 
+## [2.11.4](https://github.com/Viren070/AIOStreams/compare/v2.11.3...v2.11.4) (2025-08-26)
+
+
+### Bug Fixes
+
+* fallback to undefined when name is null ([757138e](https://github.com/Viren070/AIOStreams/commit/757138ee4073cc1badec96cb0208d483ddf94df9))
+* only define bingeGroup when auto play is enabled ([de47fff](https://github.com/Viren070/AIOStreams/commit/de47fffdee081669c82808c7986f2aabd833b49d))
+* **presets/webstreamr:** update provider list, add show error option, parse error streams, only use resolution from stream name, ([1fd6730](https://github.com/Viren070/AIOStreams/commit/1fd67309b0306058f04f31502d49045524d004d8))
+
 ## [2.11.3](https://github.com/Viren070/AIOStreams/compare/v2.11.2...v2.11.3) (2025-08-25)
 
 
