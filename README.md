@@ -98,7 +98,7 @@ Take control of your Stremio home page. AIOStreams lets you manage catalogs from
 <p align="center">
   <sub>
     This format was created by one of our community members in the 
-    <a href="https://discord.gg/aiostreams">Discord Server</a>
+    <a href="https://discord.viren070.me">Discord Server</a>
   </sub>
 </p>
 
