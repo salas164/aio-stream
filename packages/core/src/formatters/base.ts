@@ -107,6 +107,141 @@ export interface ParseValue {
   };
 }
 
+const hardcodedParseValueKeysForRegexMatching: ParseValue = {
+  stream: {
+    filename: null,
+    folderName: null,
+    size: null,
+    folderSize: null,
+    library: null,
+    quality: null,
+    resolution: null,
+    languages: null,
+    uLanguages: null,
+    languageEmojis: null,
+    uLanguageEmojis: null,
+    languageCodes: null,
+    uLanguageCodes: null,
+    smallLanguageCodes: null,
+    uSmallLanguageCodes: null,
+    wedontknowwhatakilometeris: null,
+    uWedontknowwhatakilometeris: null,
+    visualTags: null,
+    audioTags: null,
+    releaseGroup: null,
+    regexMatched: null,
+    encode: null,
+    audioChannels: null,
+    indexer: null,
+    year: null,
+    title: null,
+    season: null,
+    seasons: null,
+    episode: null,
+    seasonEpisode: null,
+    seeders: null,
+    age: null,
+    duration: null,
+    infoHash: null,
+    type: null,
+    message: null,
+    proxied: null,
+  },
+  service: {
+    id: null,
+    shortName: null,
+    name: null,
+    cached: null,
+  },
+  addon: {
+    name: "",
+    presetId: "",
+    manifestUrl: "",
+  },
+  config: {
+    addonName: null,
+  },
+}
+
+const stringModifiers = {
+  'upper': (value: string) => value.toUpperCase(),
+  'lower': (value: string) => value.toLowerCase(),
+  'title': (value: string) => value
+            .split(' ')
+            .map((word) => word.toLowerCase())
+            .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+            .join(' '),
+  'length': (value: string) => value.length.toString(),
+  'reverse': (value: string) => value.split('').reverse().join(''),
+  'base64': (value: string) => btoa(value),
+  'string': (value: string) => value,
+}
+
+const arrayModifierGetOrDefault = (value: string[], i: number) => value.length > 0 ? String(value[i]) : '';
+const arrayModifiers = {
+  'join': (value: string[]) => value.join(", "),
+  'length': (value: string[]) => value.length.toString(),
+  'first': (value: string[]) => arrayModifierGetOrDefault(value, 0),
+  'last': (value: string[]) => arrayModifierGetOrDefault(value, value.length - 1),
+  'random': (value: string[]) => arrayModifierGetOrDefault(value, Math.floor(Math.random() * value.length)),
+  'sort': (value: string[]) => [...value].sort().join(', '),
+  'reverse': (value: string[]) => [...value].reverse().join(', '),
+}
+          
+const numberModifiers = {
+  'comma': (value: number) => value.toLocaleString(),
+  'hex': (value: number) => value.toString(16),
+  'octal': (value: number) => value.toString(8),
+  'binary': (value: number) => value.toString(2),
+  'bytes': (value: number) => formatBytes(value, 1000),
+  'bytes10': (value: number) => formatBytes(value, 1000),
+  'bytes2': (value: number) => formatBytes(value, 1024),
+  'string': (value: number) => value.toString(),
+  'time': (value: number) => formatDuration(value),
+}
+
+const conditionalModifiers = {
+  exact: {
+    'istrue': (value: any) => value === true,
+    'isfalse': (value: any) => value === false,
+    'exists': (value: any) => value.length > 0,
+  },
+
+  // ordering of keys matters here (example: <= should come before < for matching purposes)
+  prefix: {
+    '$': (value: any, check: any) => value.startsWith(check),
+    '^': (value: any, check: any) => value.endsWith(check),
+    '~': (value: any, check: any) => value.includes(check),
+    '=': (value: any, check: any) => value == check,
+    '>=': (value: any, check: any) => value >= check,
+    '>': (value: any, check: any) => value > check,
+    '<=': (value: any, check: any) => value <= check,
+    '<': (value: any, check: any) => value < check,
+  },
+}
+
+const hardcodedModifiersForRegexMatching = {
+  "join('\\w+')": null,
+  'join("\\w+")': null,
+  "$\\w+": null,
+  "^\\w+": null,
+  "~\\w+": null,
+  "=\\w+": null,
+  ">=\\w+": null,
+  ">\\w+": null,
+  "<=\\w+": null,
+  "<\\w+": null,
+}
+
+const modifiers = {
+  ...stringModifiers,
+  ...numberModifiers,
+  ...arrayModifiers,
+  ...conditionalModifiers.exact,
+  ...conditionalModifiers.prefix,
+  ...hardcodedModifiersForRegexMatching,
+}
+
 export abstract class BaseFormatter {
   protected config: FormatterConfig;
   protected userData: UserData;
@@ -257,6 +392,41 @@ export abstract class BaseFormatter {
     };
   }
 
+  protected buildRegexExpression(): RegExp {
+    // Dynamically build the `variable` regex pattern from ParseValue keys
+    // Futureproof: if we add new keys to ParseValue interface, we must add them here too
+    const validVariables: (keyof ParseValue)[] = Object.keys(hardcodedParseValueKeysForRegexMatching) as (keyof ParseValue)[];
+    // Get all valid properties (subkeys) from ParseValue structure
+    const validProperties = validVariables.flatMap(sectionKey => {
+      const section = hardcodedParseValueKeysForRegexMatching[sectionKey as keyof ParseValue];
+      if (section && typeof section === 'object' && section !== null) {
+        return Object.keys(section);
+      }
+      return [];
+    });
+    const variable = `(?<variableName>${validVariables.join('|')})\\.(?<propertyName>${validProperties.join('|')})`;
+
+    // Dynamically build the `modifier` regex pattern from modifier keys
+    // Sort by length (longest first) to ensure more specific patterns match before shorter ones
+    const validModifiers = Object.keys(modifiers)
+      .map(key => key.replace(/[\(\)\'\"\$\^\~\=\>\<]/g, '\\$&'))
+      .sort((a, b) => b.length - a.length); // Sort by length, longest first
+    
+    const modifier = `::(?<mod>${validModifiers.join('|')})`;
+    
+    // Build the conditional check pattern separately
+    const checkTrue = `(?<mod_check_true>.+?)`;
+    const checkFalse = `(?<mod_check_false>.+?)`;
+    const checkTF = `\\[(?<mod_check>"${checkTrue}"\\|"${checkFalse}")\\]`;
+
+    // TZ Locale pattern (e.g. 'UTC', 'GMT', 'EST', 'PST', 'en-US', 'en-GB', 'Europe/London', 'America/New_York')
+    const modTZLocale = `::(?<mod_tzlocale>[A-Za-z]{2,3}(?:-[A-Z]{2})?|[A-Za-z]+/[A-Za-z_]+)`;
+
+    const regexPattern = `\\{${variable}(${modifier})?(${modTZLocale})?(${checkTF})?\\}`;
+    
+    return new RegExp(regexPattern, 'gi')
+  }
+
   protected parseString(str: string, value: ParseValue): string | null {
     if (!str) return null;
 
@@ -264,20 +434,15 @@ export abstract class BaseFormatter {
       return value;
     };
 
-    const data = {
-      stream: value.stream,
-      service: value.service,
-      addon: value.addon,
-      config: value.config,
-    };
+    const data = { ...value, debug: undefined };
 
     value.debug = {
       json: JSON.stringify(data, replacer),
       jsonf: JSON.stringify(data, replacer, 2),
     };
 
-    const re =
-      /\{(?<type>stream|service|addon|config|debug)\.(?<prop>\w+)(::(?<mod>(\w+(\([^)]*\))?|<|<=|=|>=|>|\^|\$|~|\/)+))?((::(?<mod_tzlocale>\S+?))|(?<mod_check>\[(?<mod_check_true>".*?")\|\|(?<mod_check_false>".*?")\]))?\}/gi;
+
+    const re = this.buildRegexExpression();
     let matches: RegExpExecArray | null;
 
     while ((matches = re.exec(str))) {
@@ -285,12 +450,12 @@ export abstract class BaseFormatter {
 
       const index = matches.index as number;
 
-      const getV = value[matches.groups.type as keyof ParseValue];
-
-      if (!getV) {
+      // Validate - VariableName
+      const dataVariable = data[matches.groups.variableName as keyof ParseValue];
+      if (!dataVariable) {
         str = this.replaceCharsFromString(
           str,
-          '{unknown_type}',
+          '{unknown_variableName}',
           index,
           re.lastIndex
         );
@@ -298,18 +463,12 @@ export abstract class BaseFormatter {
         continue;
       }
 
-      const v =
-        getV[
-          matches.groups.prop as
-            | keyof ParseValue['stream']
-            | keyof ParseValue['service']
-            | keyof ParseValue['addon']
-        ];
-
-      if (v === undefined) {
+      // Validate - PropertyName
+      const prop = dataVariable[matches.groups.propertyName as keyof typeof dataVariable];
+      if (!prop) {
         str = this.replaceCharsFromString(
           str,
-          '{unknown_value}',
+          '{unknown_propertyName}',
           index,
           re.lastIndex
         );
@@ -317,16 +476,17 @@ export abstract class BaseFormatter {
         continue;
       }
 
+      // Validate - Modifier(s)
       if (matches.groups.mod) {
         str = this.replaceCharsFromString(
           str,
           this.modifier(
             matches.groups.mod,
-            v,
+            prop as unknown,
             matches.groups.mod_tzlocale ?? undefined,
             matches.groups.mod_check_true ?? undefined,
             matches.groups.mod_check_false ?? undefined,
-            value
+            data
           ),
           index,
           re.lastIndex
@@ -335,7 +495,7 @@ export abstract class BaseFormatter {
         continue;
       }
 
-      str = this.replaceCharsFromString(str, v, index, re.lastIndex);
+      str = this.replaceCharsFromString(str, prop, index, re.lastIndex);
       re.lastIndex = index;
     }
 
@@ -361,10 +521,57 @@ export abstract class BaseFormatter {
     check_true = check_true?.slice(1, -1);
     check_false = check_false?.slice(1, -1);
 
-    if (Array.isArray(value)) {
+    // CONDITIONAL MODIFIERS
+    if (mod in conditionalModifiers.exact || mod in conditionalModifiers.prefix) {
+      if (typeof check_true !== 'string' || typeof check_false !== 'string')
+        return `{unknown_conditional_modifier(${mod})}`;
+
+      // try to coerce true/false value from modifier
+      try {
+        let conditional: boolean | undefined;
+
+        // EXACT
+        if (mod in conditionalModifiers.exact) {
+          const modAsKey = mod as keyof typeof conditionalModifiers.exact;
+          conditional = conditionalModifiers.exact[modAsKey](value);
+        }
+        
+        // PREFIX
+        else if (mod in conditionalModifiers.prefix) {
+          for (let key in Object.keys(conditionalModifiers.prefix)) {
+            if (mod.startsWith(key)) {
+              const checkKey = mod.replace(key, '');
+              conditional = conditionalModifiers.prefix[key as keyof typeof conditionalModifiers.prefix](value, checkKey);
+              break;
+            }
+          }
+        }
+
+        if (conditional === undefined) return `{unknown_conditional_modifier(${mod})}`;
+
+        if (_value) {
+          return conditional
+            ? this.parseString(check_true, _value) || check_true
+            : this.parseString(check_false, _value) || check_false;
+        }
+        return conditional ? check_true : check_false;
+      } catch (error) {
+        return `{unknown_conditional_modifier(${mod})}`;
+      }
+    }
+
+    // --- STRING MODIFIERS ---
+    if (typeof value === 'string') {
+      if (mod in stringModifiers) return stringModifiers[mod as keyof typeof stringModifiers](value);
+      return `{unknown_str_modifier(${mod})}`;
+    }
+
+    // --- ARRAY MODIFIERS ---
+    else if (Array.isArray(value)) {
+      if (mod in arrayModifiers) return arrayModifiers[mod as keyof typeof arrayModifiers](value);
+
+      // handle hardcoded modifiers here
       switch (true) {
-        case mod === 'join':
-          return value.join(', ');
         case mod.startsWith('join(') && mod.endsWith(')'): {
           // Extract the separator from join(separator)
           // e.g. join(' - ')
@@ -373,294 +580,14 @@ export abstract class BaseFormatter {
             .replace(/^['"]|['"]$/g, '');
           return value.join(separator);
         }
-        case mod == 'length':
-          return value.length.toString();
-        case mod == 'first':
-          return value.length > 0 ? String(value[0]) : '';
-        case mod == 'last':
-          return value.length > 0 ? String(value[value.length - 1]) : '';
-        case mod == 'random':
-          return value.length > 0
-            ? String(value[Math.floor(Math.random() * value.length)])
-            : '';
-        case mod == 'sort':
-          return [...value].sort().join(', ');
-        case mod == 'reverse':
-          return [...value].reverse().join(', ');
-        case mod.startsWith('~'): {
-          if (typeof check_true !== 'string' || typeof check_false !== 'string')
-            return `{unknown_array_modifier(${mod})}`;
-
-          const check = mod.replace('~', '').replace('_', ' ');
-
-          if (_value) {
-            return value.some((item) => item.toLowerCase().includes(check))
-              ? this.parseString(check_true, _value) || check_true
-              : this.parseString(check_false, _value) || check_false;
-          }
-
-          return value.some((item) => item.toLowerCase().includes(check))
-            ? check_true
-            : check_false;
-        }
-        case mod == 'exists': {
-          if (typeof check_true !== 'string' || typeof check_false !== 'string')
-            return `{unknown_array_modifier(${mod})}`;
-
-          if (_value) {
-            return value.length > 0
-              ? this.parseString(check_true, _value) || check_true
-              : this.parseString(check_false, _value) || check_false;
-          }
-
-          return value.length > 0 ? check_true : check_false;
-        }
-        default:
-          return `{unknown_array_modifier(${mod})}`;
       }
-    } else if (typeof value === 'string') {
-      switch (true) {
-        case mod == 'upper':
-          return value.toUpperCase();
-        case mod == 'lower':
-          return value.toLowerCase();
-        case mod == 'title': {
-          return value
-            .split(' ')
-            .map((word) => word.toLowerCase())
-            .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
-            .join(' ');
-        }
-        case mod == 'length':
-          return value.length.toString();
-        case mod == 'reverse':
-          return value.split('').reverse().join('');
-        case mod == 'base64':
-          return btoa(value);
-        case mod == 'string':
-          return value;
-        case mod == 'exists': {
-          if (typeof check_true !== 'string' || typeof check_false !== 'string')
-            return `{unknown_str_modifier(${mod})}`;
-
-          if (_value) {
-            return value != 'null' && value
-              ? this.parseString(check_true, _value) || check_true
-              : this.parseString(check_false, _value) || check_false;
-          }
-
-          return value != 'null' && value ? check_true : check_false;
-        }
-        case mod.startsWith('='): {
-          if (typeof check_true !== 'string' || typeof check_false !== 'string')
-            return `{unknown_str_modifier(${mod})}`;
-
-          const check = mod.replace('=', '');
-
-          if (!check) return `{unknown_str_modifier(${mod})}`;
-
-          if (_value) {
-            return value.toLowerCase() == check
-              ? this.parseString(check_true, _value) || check_true
-              : this.parseString(check_false, _value) || check_false;
-          }
-
-          return value.toLowerCase() == check ? check_true : check_false;
-        }
-        case mod.startsWith('$'): {
-          if (typeof check_true !== 'string' || typeof check_false !== 'string')
-            return `{unknown_str_modifier(${mod})}`;
-
-          const check = mod.replace('$', '');
-
-          if (!check) return `{unknown_str_modifier(${mod})}`;
-
-          if (_value) {
-            return value.toLowerCase().startsWith(check)
-              ? this.parseString(check_true, _value) || check_true
-              : this.parseString(check_false, _value) || check_false;
-          }
-
-          return value.toLowerCase().startsWith(check)
-            ? check_true
-            : check_false;
-        }
-        case mod.startsWith('^'): {
-          if (typeof check_true !== 'string' || typeof check_false !== 'string')
-            return `{unknown_str_modifier(${mod})}`;
-
-          const check = mod.replace('^', '');
-
-          if (!check) return `{unknown_str_modifier(${mod})}`;
-
-          if (_value) {
-            return value.toLowerCase().endsWith(check)
-              ? this.parseString(check_true, _value) || check_true
-              : this.parseString(check_false, _value) || check_false;
-          }
-
-          return value.toLowerCase().endsWith(check) ? check_true : check_false;
-        }
-        case mod.startsWith('~'): {
-          if (typeof check_true !== 'string' || typeof check_false !== 'string')
-            return `{unknown_str_modifier(${mod})}`;
-
-          const check = mod.replace('~', '');
-
-          if (!check) return `{unknown_str_modifier(${mod})}`;
-
-          if (_value) {
-            return value.toLowerCase().includes(check)
-              ? this.parseString(check_true, _value) || check_true
-              : this.parseString(check_false, _value) || check_false;
-          }
-
-          return value.toLowerCase().includes(check) ? check_true : check_false;
-        }
-        default:
-          return `{unknown_str_modifier(${mod})}`;
-      }
-    } else if (typeof value === 'number') {
-      switch (true) {
-        case mod == 'comma':
-          return value.toLocaleString();
-        case mod == 'hex':
-          return value.toString(16);
-        case mod == 'octal':
-          return value.toString(8);
-        case mod == 'binary':
-          return value.toString(2);
-        case mod == 'bytes10' || mod == 'bytes':
-          return formatBytes(value, 1000);
-        case mod == 'bytes2':
-          return formatBytes(value, 1024);
-        case mod == 'string':
-          return value.toString();
-        case mod == 'time':
-          return formatDuration(value);
-        case mod.startsWith('>='): {
-          if (typeof check_true !== 'string' || typeof check_false !== 'string')
-            return `{unknown_int_modifier(${mod})}`;
-
-          const check = Number(mod.replace('>=', ''));
-
-          if (Number.isNaN(check)) return `{unknown_int_modifier(${mod})}`;
-
-          if (_value) {
-            return value >= check
-              ? this.parseString(check_true, _value) || check_true
-              : this.parseString(check_false, _value) || check_false;
-          }
-
-          return value >= check ? check_true : check_false;
-        }
-        case mod.startsWith('>'): {
-          if (typeof check_true !== 'string' || typeof check_false !== 'string')
-            return `{unknown_int_modifier(${mod})}`;
-
-          const check = Number(mod.replace('>', ''));
-
-          if (Number.isNaN(check)) return `{unknown_int_modifier(${mod})}`;
-
-          if (_value) {
-            return value > check
-              ? this.parseString(check_true, _value) || check_true
-              : this.parseString(check_false, _value) || check_false;
-          }
-
-          return value > check ? check_true : check_false;
-        }
-        case mod.startsWith('='): {
-          if (typeof check_true !== 'string' || typeof check_false !== 'string')
-            return `{unknown_int_modifier(${mod})}`;
-
-          const check = Number(mod.replace('=', ''));
-
-          if (Number.isNaN(check)) return `{unknown_int_modifier(${mod})}`;
-
-          if (_value) {
-            return value == check
-              ? this.parseString(check_true, _value) || check_true
-              : this.parseString(check_false, _value) || check_false;
-          }
-
-          return value == check ? check_true : check_false;
-        }
-        case mod.startsWith('<='): {
-          if (typeof check_true !== 'string' || typeof check_false !== 'string')
-            return `{unknown_int_modifier(${mod})}`;
-
-          const check = Number(mod.replace('<=', ''));
-
-          if (Number.isNaN(check)) return `{unknown_int_modifier(${mod})}`;
-
-          if (_value) {
-            return value <= check
-              ? this.parseString(check_true, _value) || check_true
-              : this.parseString(check_false, _value) || check_false;
-          }
-
-          return value <= check ? check_true : check_false;
-        }
-        case mod.startsWith('<'): {
-          if (typeof check_true !== 'string' || typeof check_false !== 'string')
-            return `{unknown_int_modifier(${mod})}`;
-
-          const check = Number(mod.replace('<', ''));
-
-          if (Number.isNaN(check)) return `{unknown_int_modifier(${mod})}`;
-
-          if (_value) {
-            return value < check
-              ? this.parseString(check_true, _value) || check_true
-              : this.parseString(check_false, _value) || check_false;
-          }
-
-          return value < check ? check_true : check_false;
-        }
-        default:
-          return `{unknown_int_modifier(${mod})}`;
-      }
-    } else if (typeof value === 'boolean') {
-      switch (true) {
-        case mod == 'istrue': {
-          if (typeof check_true !== 'string' || typeof check_false !== 'string')
-            return `{unknown_bool_modifier(${mod})}`;
-
-          if (_value) {
-            return value
-              ? this.parseString(check_true, _value) || check_true
-              : this.parseString(check_false, _value) || check_false;
-          }
-
-          return value ? check_true : check_false;
-        }
-        case mod == 'isfalse': {
-          if (typeof check_true !== 'string' || typeof check_false !== 'string')
-            return `{unknown_bool_modifier(${mod})}`;
-
-          if (_value) {
-            return !value
-              ? this.parseString(check_true, _value) || check_true
-              : this.parseString(check_false, _value) || check_false;
-          }
-
-          return !value ? check_true : check_false;
-        }
-        default:
-          return `{unknown_bool_modifier(${mod})}`;
-      }
+      return `{unknown_array_modifier(${mod})}`;
     }
 
-    if (
-      typeof check_false == 'string' &&
-      (['>', '>=', '=', '<=', '<', '~', '$', '^'].some((modif) =>
-        mod.startsWith(modif)
-      ) ||
-        ['istrue', 'exists', 'isfalse'].includes(mod))
-    ) {
-      if (_value) return this.parseString(check_false, _value) || check_false;
-      return check_false;
+    // --- NUMBER MODIFIERS ---
+    else if (typeof value === 'number') {
+      if (mod in numberModifiers) return numberModifiers[mod as keyof typeof numberModifiers](value);
+      return `{unknown_int_modifier(${mod})}`;
     }
 
     return `{unknown_modifier(${mod})}`;
