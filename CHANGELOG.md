@@ -1,5 +1,13 @@
 # Changelog
 
+## [2.11.6](https://github.com/Viren070/AIOStreams/compare/v2.11.5...v2.11.6) (2025-08-28)
+
+
+### Bug Fixes
+
+* correctly extract json error for error metas ([5ddab33](https://github.com/Viren070/AIOStreams/commit/5ddab3308219aa17c0f89b3d522d3408f20e2ebf))
+* **presets/aiostreams:** passthrough the proxied attribute ([62bf6de](https://github.com/Viren070/AIOStreams/commit/62bf6de6d9087ee5cd74942585b286fd2eda8296)), closes [#321](https://github.com/Viren070/AIOStreams/issues/321)
+
 ## [2.11.5](https://github.com/Viren070/AIOStreams/compare/v2.11.4...v2.11.5) (2025-08-26)
 
 
