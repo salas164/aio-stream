@@ -533,7 +533,7 @@ export abstract class BaseFormatter {
     const isPrefix = Object.keys(conditionalModifiers.prefix).some(key => mod.startsWith(key));
     if (isExact || isPrefix) {
       if (typeof check_true !== 'string' || typeof check_false !== 'string')
-        return `{unknown_conditional_modifier(${mod})}`;
+        return `{unknown_conditional_modifier_check_true_or_false(${mod})}`;
 
       // try to coerce true/false value from modifier
       try {
@@ -588,9 +588,8 @@ export abstract class BaseFormatter {
         case mod.startsWith('join(') && mod.endsWith(')'): {
           // Extract the separator from join(separator)
           // e.g. join(' - ')
-          const separator = mod
-            .substring(5, mod.length - 1)
-            .replace(/^['"]|['"]$/g, '');
+          const separator = _mod
+            .substring(6, _mod.length - 2)
           return value.join(separator);
         }
       }
