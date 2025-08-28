@@ -261,8 +261,8 @@ export abstract class BaseFormatter {
   public format(stream: ParsedStream): { name: string; description: string } {
     const parseValue = this.convertStreamToParseValue(stream);
     return {
-      name: this.parseString(this.config.name, parseValue, true) || '',
-      description: this.parseString(this.config.description, parseValue, true) || '',
+      name: this.parseString(this.config.name, parseValue) || '',
+      description: this.parseString(this.config.description, parseValue) || '',
     };
   }
 
@@ -435,14 +435,8 @@ export abstract class BaseFormatter {
     return new RegExp(regexPattern, 'gi')
   }
 
-  protected parseString(str: string, value: ParseValue, debug: boolean = false): string | null {
+  protected parseString(str: string, value: ParseValue): string | null {
     if (!str) return null;
-
-    if (debug) {
-      console.log("\n\n\n\n\n");
-      console.log("🔤 FORMATTER DEBUG - Starting parseString");
-      console.log("🔤 Input:", str);
-    }
 
     const replacer = (key: string, value: unknown) => {
       return value;
@@ -460,10 +454,6 @@ export abstract class BaseFormatter {
     let matches: RegExpExecArray | null;
 
     while ((matches = re.exec(str))) {
-      if (debug) {
-        // log the match
-        console.log("\n\n🔤 FORMATTER DEBUG - Match Groups:", matches.groups);
-      }
       if (!matches.groups) continue;
 
       const index = matches.index as number;
@@ -513,17 +503,8 @@ export abstract class BaseFormatter {
         continue;
       }
 
-      if (debug) {
-        console.log("🔤 FORMATTER DEBUG - Replacing chars from string", index, re.lastIndex);
-      }
-
       str = this.replaceCharsFromString(str, prop, index, re.lastIndex);
       re.lastIndex = index;
-    }
-
-    if (debug) {
-      console.log("\n🔤 FORMATTER DEBUG - Ending parseString");
-      console.log("🔤 Output:", str);
     }
 
     return str
@@ -560,16 +541,12 @@ export abstract class BaseFormatter {
 
         // EXACT
         if (isExact) {
-          console.log("🔤 FORMATTER DEBUG - Exact Modifier:", mod);
           const modAsKey = mod as keyof typeof conditionalModifiers.exact;
-          console.log("🔤 FORMATTER DEBUG - modAsKey:", modAsKey);
           conditional = conditionalModifiers.exact[modAsKey](value);
-          console.log("🔤 FORMATTER DEBUG - conditional:", conditional);
         }
         
         // PREFIX
         else if (isPrefix) {
-          console.log("🔤 FORMATTER DEBUG - Prefix Modifier:", mod);
           for (let key of Object.keys(conditionalModifiers.prefix)) {
             if (mod.startsWith(key)) {
               const checkKey = mod.substring(key.length);
@@ -588,7 +565,6 @@ export abstract class BaseFormatter {
         }
         return conditional ? check_true : check_false;
       } catch (error) {
-        console.error("🔤 FORMATTER ERROR - Conditional Modifier:", error);
         return `{unknown_conditional_modifier(${mod})}`;
       }
     }
