@@ -207,7 +207,7 @@ export const conditionalModifiers = {
     'exists': (value: any) => {
       // Handle null, undefined, empty strings, empty arrays
       if (value === undefined || value === null) return false;
-      if (typeof value === 'string') return value.trim().length > 0;
+      if (typeof value === 'string') return (value.trim().length > 0 && value != 'null' && value != 'undefined');
       if (Array.isArray(value)) return value.length > 0;
       // For other types (numbers, booleans, objects), consider them as "existing"
       return true;
