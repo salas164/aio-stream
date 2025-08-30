@@ -1,5 +1,31 @@
 # Changelog
 
+## [2.12.0](https://github.com/Viren070/AIOStreams/compare/v2.11.6...v2.12.0) (2025-08-30)
+
+
+### Features
+
+* add pro/noob mode ([571ea7f](https://github.com/Viren070/AIOStreams/commit/571ea7fbc30f5216cbe439be7333b310eafbb2c1))
+* add search API ([571ea7f](https://github.com/Viren070/AIOStreams/commit/571ea7fbc30f5216cbe439be7333b310eafbb2c1))
+* add stream type as auto play attribute ([571ea7f](https://github.com/Viren070/AIOStreams/commit/571ea7fbc30f5216cbe439be7333b310eafbb2c1))
+* allow specifying multiple URLs for comet and mediafusion in .env ([571ea7f](https://github.com/Viren070/AIOStreams/commit/571ea7fbc30f5216cbe439be7333b310eafbb2c1))
+* **frontend:** move more stuff into pro only mode ([c68bb0e](https://github.com/Viren070/AIOStreams/commit/c68bb0e60ecf421f1f59a7b7edebb52a5cd15266))
+* move more stuff into pro only ([73ccd15](https://github.com/Viren070/AIOStreams/commit/73ccd15f7e11351ae7b13acf15405b7330b10b2b))
+* remove `ALLOW_UNAUTHENTICATED_SEARCH_API` env var ([df97bde](https://github.com/Viren070/AIOStreams/commit/df97bde45cd058e3c6e68645e495bb054ef557a0))
+* use redis store in rate limiter when possible ([571ea7f](https://github.com/Viren070/AIOStreams/commit/571ea7fbc30f5216cbe439be7333b310eafbb2c1))
+
+
+### Bug Fixes
+
+* add rate limit to legacy endpoint ([0702d4f](https://github.com/Viren070/AIOStreams/commit/0702d4fb932a8cd601d8cac329ecef06be0dd76f))
+* allow empty credential value in schema and add min length constraint for config validation ([4962465](https://github.com/Viren070/AIOStreams/commit/49624654b6f5be852e455df23683f6edbdafa336))
+* behaviorHint passthrough in meta response ([571ea7f](https://github.com/Viren070/AIOStreams/commit/571ea7fbc30f5216cbe439be7333b310eafbb2c1))
+* ensure catalog resource has correct types ([9a5339e](https://github.com/Viren070/AIOStreams/commit/9a5339e1385e853daf6432acb7df41a5ee16b2a6))
+* **frontend:** dynamically determine menus based on mode ([5e969ff](https://github.com/Viren070/AIOStreams/commit/5e969ff2dc46d0d0897b86b7df0452e80da84f20))
+* give priority to URL/service over infoHash ([085d394](https://github.com/Viren070/AIOStreams/commit/085d394c03c33cee6b30ba26026a19e5e0fdfd10))
+* remove required attribute from service credential fields, ([571ea7f](https://github.com/Viren070/AIOStreams/commit/571ea7fbc30f5216cbe439be7333b310eafbb2c1))
+* set value of default URL to undefined so updates to env apply for all users when using multiple URLs ([a3007e6](https://github.com/Viren070/AIOStreams/commit/a3007e659f57ea61edfba2e8066f67853d58eeec))
+
 ## [2.11.6](https://github.com/Viren070/AIOStreams/compare/v2.11.5...v2.11.6) (2025-08-28)
 
 
