@@ -540,13 +540,7 @@ export abstract class BaseFormatter {
       // try to coerce true/false value from modifier
       let conditional: boolean | undefined;
       try {
-        // Prevent Exceptions when NULL VALUE is used
-        if (value === null) {
-            conditional = false;
-        }
-        
-        // EXACT
-        else if (isExact) {
+        if (isExact) {
           const modAsKey = mod as keyof typeof conditionalModifiers.exact;
           conditional = conditionalModifiers.exact[modAsKey](value);
         }
@@ -556,7 +550,7 @@ export abstract class BaseFormatter {
           for (let key of Object.keys(conditionalModifiers.prefix)) {
             if (mod.startsWith(key)) {
               var checkKey = mod.substring(key.length);
-              if (typeof value === 'string' && !value.includes(' ')) {
+              if (typeof value !== 'string' || !value.includes(' ')) {
                 checkKey = checkKey.replace(/ /g, '');
               }
               conditional = conditionalModifiers.prefix[key as keyof typeof conditionalModifiers.prefix](value, checkKey);
@@ -565,7 +559,7 @@ export abstract class BaseFormatter {
           }
         }
       } catch (error) {
-        console.error(error);
+        conditional = false;
       }
 
       if (conditional === undefined) return `{unknown_conditional_modifier(${mod})}`;
