@@ -161,6 +161,10 @@ export const hardcodedParseValueKeysForRegexMatching: ParseValue = {
   config: {
     addonName: null,
   },
+  debug: {
+    json: null,
+    jsonf: null,
+  },
 }
 
 export const stringModifiers = {
@@ -230,14 +234,14 @@ export const conditionalModifiers = {
 const hardcodedModifiersForRegexMatching = {
   "join('.*?')": null,
   'join(".*?")': null,
-  "$\\w+": null,
-  "^\\w+": null,
-  "~\\w+": null,
-  "=\\w+": null,
-  ">=\\w+": null,
-  ">\\w+": null,
-  "<=\\w+": null,
-  "<\\w+": null,
+  "$.*?": null,
+  "^.*?": null,
+  "~.*?": null,
+  "=.*?": null,
+  ">=.*?": null,
+  ">.*?": null,
+  "<=.*?": null,
+  "<.*?": null,
 }
 
 const modifiers = {
@@ -442,11 +446,9 @@ export abstract class BaseFormatter {
       return value;
     };
 
-    const data = { ...value, debug: undefined };
-
     value.debug = {
-      json: JSON.stringify(data, replacer),
-      jsonf: JSON.stringify(data, replacer, 2),
+      json: JSON.stringify({ ...value, debug: undefined }, replacer),
+      jsonf: JSON.stringify({ ...value, debug: undefined }, replacer, 2),
     };
 
 
@@ -458,9 +460,9 @@ export abstract class BaseFormatter {
 
       const index = matches.index as number;
 
-      // Validate - VariableName
-      const dataVariable = data[matches.groups.variableName as keyof ParseValue];
-      if (!dataVariable) {
+      // Validate - variableName (exists in value)
+      const variableDict = value[matches.groups.variableName as keyof ParseValue];
+      if (!variableDict) {
         str = this.replaceCharsFromString(
           str,
           '{unknown_variableName}',
@@ -471,9 +473,9 @@ export abstract class BaseFormatter {
         continue;
       }
 
-      // Validate - PropertyName
-      const prop = dataVariable[matches.groups.propertyName as keyof typeof dataVariable];
-      if (prop === undefined) {
+      // Validate - property: variableDict[propertyName]
+      const property = variableDict[matches.groups.propertyName as keyof typeof variableDict];
+      if (property === undefined) {
         str = this.replaceCharsFromString(
           str,
           '{unknown_propertyName}',
@@ -490,11 +492,11 @@ export abstract class BaseFormatter {
           str,
           this.modifier(
             matches.groups.mod,
-            prop as unknown,
-            matches.groups.mod_tzlocale ?? undefined,
-            matches.groups.mod_check_true ?? undefined,
-            matches.groups.mod_check_false ?? undefined,
-            data
+            property as unknown,
+            matches.groups.mod_tzlocale ?? "",
+            matches.groups.mod_check_true ?? "",
+            matches.groups.mod_check_false ?? "",
+            value
           ),
           index,
           re.lastIndex
@@ -503,7 +505,7 @@ export abstract class BaseFormatter {
         continue;
       }
 
-      str = this.replaceCharsFromString(str, prop, index, re.lastIndex);
+      str = this.replaceCharsFromString(str, property, index, re.lastIndex);
       re.lastIndex = index;
     }
 
@@ -536,11 +538,15 @@ export abstract class BaseFormatter {
         return `{unknown_conditional_modifier_check_true_or_false(${mod})}`;
 
       // try to coerce true/false value from modifier
+      let conditional: boolean | undefined;
       try {
-        let conditional: boolean | undefined;
-
+        // Prevent Exceptions when NULL VALUE is used
+        if (value === null) {
+            conditional = false;
+        }
+        
         // EXACT
-        if (isExact) {
+        else if (isExact) {
           const modAsKey = mod as keyof typeof conditionalModifiers.exact;
           conditional = conditionalModifiers.exact[modAsKey](value);
         }
@@ -549,24 +555,27 @@ export abstract class BaseFormatter {
         else if (isPrefix) {
           for (let key of Object.keys(conditionalModifiers.prefix)) {
             if (mod.startsWith(key)) {
-              const checkKey = mod.substring(key.length);
+              var checkKey = mod.substring(key.length);
+              if (typeof value === 'string' && !value.includes(' ')) {
+                checkKey = checkKey.replace(/ /g, '');
+              }
               conditional = conditionalModifiers.prefix[key as keyof typeof conditionalModifiers.prefix](value, checkKey);
               break;
             }
           }
         }
-
-        if (conditional === undefined) return `{unknown_conditional_modifier(${mod})}`;
-
-        if (_value) {
-          return conditional
-            ? this.parseString(check_true, _value) || check_true
-            : this.parseString(check_false, _value) || check_false;
-        }
-        return conditional ? check_true : check_false;
       } catch (error) {
-        return `{unknown_conditional_modifier(${mod})}`;
+        console.error(error);
       }
+
+      if (conditional === undefined) return `{unknown_conditional_modifier(${mod})}`;
+
+      if (_value) {
+        return conditional
+          ? this.parseString(check_true, _value) || check_true
+          : this.parseString(check_false, _value) || check_false;
+      }
+      return conditional ? check_true : check_false;
     }
 
     // --- STRING MODIFIERS ---
