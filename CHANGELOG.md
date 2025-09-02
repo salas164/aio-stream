@@ -1,5 +1,14 @@
 # Changelog
 
+## [2.12.2](https://github.com/Viren070/AIOStreams/compare/v2.12.1...v2.12.2) (2025-09-02)
+
+
+### Bug Fixes
+
+* await regexAllowed check in validateRegexes function ([be1a257](https://github.com/Viren070/AIOStreams/commit/be1a257477f8a8f82a49b06e1cc35dc526c79f6e))
+* **debridio-scraper:** add debrider to supported services ([24d0974](https://github.com/Viren070/AIOStreams/commit/24d097464c3a09f65dec5a16726786cc61d85e66))
+* move cache hit message into debug level ([c515e19](https://github.com/Viren070/AIOStreams/commit/c515e19f196ce3b8c42604bf6c1f0c36f3f615c1))
+
 ## [2.12.1](https://github.com/Viren070/AIOStreams/compare/v2.12.0...v2.12.1) (2025-08-31)
 
 
