@@ -218,7 +218,6 @@ export const conditionalModifiers = {
     },
   },
 
-  // ordering of keys matters here (example: <= should come before < for matching purposes)
   prefix: {
     '$': (value: any, check: any) => value.toLowerCase().startsWith(check.toLowerCase()),
     '^': (value: any, check: any) => value.toLowerCase().endsWith(check.toLowerCase()),
