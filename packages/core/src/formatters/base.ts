@@ -211,7 +211,7 @@ export const conditionalModifiers = {
     'exists': (value: any) => {
       // Handle null, undefined, empty strings, empty arrays
       if (value === undefined || value === null) return false;
-      if (typeof value === 'string') return (value.trim().length > 0 && value != 'null' && value != 'undefined');
+      if (typeof value === 'string') return (value.replace(/ /g, '').length > 0);
       if (Array.isArray(value)) return value.length > 0;
       // For other types (numbers, booleans, objects), consider them as "existing"
       return true;
@@ -539,7 +539,15 @@ export abstract class BaseFormatter {
       // try to coerce true/false value from modifier
       let conditional: boolean | undefined;
       try {
-        if (isExact) {
+
+        // PRE-CHECK(s) -- skip resolving conditional modifier if value DNE, defaulting to false conditional
+        if (!conditionalModifiers.exact.exists(value)) {
+          console.log("FORCING FALSE CONDITIONAL")
+          conditional = false;
+        }
+        
+        // EXACT
+        else if (isExact) {
           const modAsKey = mod as keyof typeof conditionalModifiers.exact;
           conditional = conditionalModifiers.exact[modAsKey](value);
         }
