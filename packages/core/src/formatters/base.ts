@@ -542,7 +542,6 @@ export abstract class BaseFormatter {
 
         // PRE-CHECK(s) -- skip resolving conditional modifier if value DNE, defaulting to false conditional
         if (!conditionalModifiers.exact.exists(value)) {
-          console.log("FORCING FALSE CONDITIONAL")
           conditional = false;
         }
         
