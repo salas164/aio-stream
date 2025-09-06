@@ -7,6 +7,8 @@ import {
 } from '../../../core/src/utils/constants';
 import { useStatus } from './status';
 
+const USER_DATA_KEY = 'aiostreams-user-data';
+
 const DefaultUserData: UserData = {
   services: Object.values(SERVICE_DETAILS).map((service) => ({
     id: service.id,
@@ -68,12 +70,27 @@ const UserDataContext = React.createContext<UserDataContextType | undefined>(
 
 export function UserDataProvider({ children }: { children: React.ReactNode }) {
   const { status } = useStatus();
-  const [userData, setUserData] = React.useState<UserData>(DefaultUserData);
+
+  // Initialize userData from local storage or apply default
+  const [userData, setUserData] = React.useState<UserData>(() => {
+    try {
+      const stored = localStorage.getItem(USER_DATA_KEY);
+      return stored ? JSON.parse(stored) : DefaultUserData;
+    } catch {
+      return DefaultUserData;
+    }
+  });
+
   const [uuid, setUuid] = React.useState<string | null>(null);
   const [password, setPassword] = React.useState<string | null>(null);
   const [encryptedPassword, setEncryptedPassword] = React.useState<
     string | null
   >(null);
+
+  // Effect to persist userData to local storage
+  React.useEffect(() => {
+    localStorage.setItem(USER_DATA_KEY, JSON.stringify(userData));
+  }, [userData]);
 
   // Effect to apply forced and default values from status
   React.useEffect(() => {
