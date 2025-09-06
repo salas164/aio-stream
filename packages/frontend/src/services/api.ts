@@ -75,7 +75,7 @@ export class UserConfigAPI {
   ): Promise<ApiResponse<CreateUserResponse>> {
     try {
       const response = await fetch(`${this.BASE_URL}/user`, {
-        method: 'PUT',
+        method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
@@ -125,7 +125,7 @@ export class UserConfigAPI {
   ): Promise<ApiResponse<void>> {
     try {
       const response = await fetch(`${this.BASE_URL}/user`, {
-        method: 'POST',
+        method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
         },
