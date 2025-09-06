@@ -211,7 +211,7 @@ export const conditionalModifiers = {
     'exists': (value: any) => {
       // Handle null, undefined, empty strings, empty arrays
       if (value === undefined || value === null) return false;
-      if (typeof value === 'string') return (value.replace(/ /g, '').length > 0);
+      if (typeof value === 'string') return value.replace(/ /g, '').length > 0;
       if (Array.isArray(value)) return value.length > 0;
       // For other types (numbers, booleans, objects), consider them as "existing"
       return true;
@@ -219,14 +219,14 @@ export const conditionalModifiers = {
   },
 
   prefix: {
-    '$': (value: any, check: any) => value.toLowerCase().startsWith(check.toLowerCase()),
-    '^': (value: any, check: any) => value.toLowerCase().endsWith(check.toLowerCase()),
-    '~': (value: any, check: any) => value.includes(check),
-    '=': (value: any, check: any) => value == check,
-    '>=': (value: any, check: any) => value >= check,
-    '>': (value: any, check: any) => value > check,
-    '<=': (value: any, check: any) => value <= check,
-    '<': (value: any, check: any) => value < check,
+    '$': (value: string, check: string) => value.startsWith(check),
+    '^': (value: string, check: string) => value.endsWith(check),
+    '~': (value: string, check: string) => value.includes(check),
+    '=': (value: string, check: string) => value == check,
+    '>=': (value: string, check: string) => value >= check,
+    '>': (value: string, check: string) => value > check,
+    '<=': (value: string, check: string) => value <= check,
+    '<': (value: string, check: string) => value < check,
   },
 }
 
@@ -491,7 +491,7 @@ export abstract class BaseFormatter {
           str,
           this.modifier(
             matches.groups.mod,
-            property as unknown,
+            property as any,
             matches.groups.mod_tzlocale ?? "",
             matches.groups.mod_check_true ?? "",
             matches.groups.mod_check_false ?? "",
@@ -520,7 +520,7 @@ export abstract class BaseFormatter {
 
   protected modifier(
     mod: string,
-    value: unknown,
+    value: any,
     tzlocale?: string,
     check_true?: string,
     check_false?: string,
@@ -553,16 +553,14 @@ export abstract class BaseFormatter {
         
         // PREFIX
         else if (isPrefix) {
-          for (let key of Object.keys(conditionalModifiers.prefix)) {
-            if (mod.startsWith(key)) {
-              var checkKey = mod.substring(key.length);
-              if (typeof value !== 'string' || !value.includes(' ')) {
-                checkKey = checkKey.replace(/ /g, '');
-              }
-              conditional = conditionalModifiers.prefix[key as keyof typeof conditionalModifiers.prefix](value, checkKey);
-              break;
-            }
+          const modPrefix = Object.keys(conditionalModifiers.prefix).find(key => mod.startsWith(key))!!;
+          
+          var checkKey = mod.substring(modPrefix.length).toLowerCase();
+          // remove spaces from checkKey if spaces aren't in value
+          if (typeof value !== 'string' || !value.includes(' ')) {
+            checkKey = checkKey.replace(/ /g, '');
           }
+          conditional = conditionalModifiers.prefix[modPrefix as keyof typeof conditionalModifiers.prefix](value.toString().toLowerCase(), checkKey);
         }
       } catch (error) {
         conditional = false;
