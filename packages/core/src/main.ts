@@ -329,8 +329,15 @@ export class AIOStreams {
       catalog = catalog.reverse();
     }
 
-    catalog = await Promise.all(
-      catalog.map(async (item) => this.updatePosterAndLinks(type, id, item))
+    await Promise.all(
+      catalog.map(async (item) =>
+        this.updatePosterAndLinks(item, {
+          id,
+          type,
+          addon,
+          itemType: 'catalog',
+        })
+      )
     );
 
     return { success: true, data: catalog, errors: [] };
@@ -445,7 +452,12 @@ export class AIOStreams {
           );
         }
 
-        await this.updatePosterAndLinks(type, id, meta);
+        await this.updatePosterAndLinks(meta, {
+          id,
+          type,
+          addon: candidate.addon,
+          itemType: 'meta',
+        });
 
         return {
           success: true,
@@ -630,6 +642,7 @@ export class AIOStreams {
               ...a.preset,
               id: preset.instanceId,
             },
+            rpdb: preset.options.rpdb,
             // if no identifier is present, we can assume that the preset can only generate one addon at a time and so no
             // unique identifier is needed as the preset instance id is enough to identify the addon
             instanceId: `${preset.instanceId}${getSimpleTextHash(`${a.identifier ?? ''}`).slice(0, 4)}`,
@@ -1350,26 +1363,39 @@ export class AIOStreams {
   }
 
   private async updatePosterAndLinks(
-    type: string,
-    id: string,
-    item: MetaPreview
-  ) {
-    let modification;
-
-    if (this.userData.catalogModifications) {
-      modification = this.userData.catalogModifications.find(
-        (mod) =>
-          mod.id === id && (mod.type === type || mod.overrideType === type)
-      );
+    item: MetaPreview,
+    options: {
+      addon: Addon;
+      type: string;
+      id: string;
+      itemType: 'meta' | 'catalog';
     }
+  ): Promise<void> {
+    let { addon, type, id, itemType } = options;
+    let shouldGetPosterFromRPDB = false;
 
-    if (modification?.overrideType) {
-      // reset the type from the request (which is the overridden type) to the actual type
-      type = modification.type;
+    if (itemType === 'catalog') {
+      let modification;
+
+      if (this.userData.catalogModifications) {
+        modification = this.userData.catalogModifications.find(
+          (mod) =>
+            mod.id === id && (mod.type === type || mod.overrideType === type)
+        );
+      }
+
+      if (modification?.overrideType) {
+        // reset the type from the request (which is the overridden type) to the actual type
+        type = modification.type;
+      }
+
+      shouldGetPosterFromRPDB = !!modification?.rpdb;
+    } else if (itemType === 'meta') {
+      shouldGetPosterFromRPDB = !!addon.rpdb;
     }
 
     const rpdbApiKey =
-      modification?.rpdb && this.userData.rpdbApiKey
+      shouldGetPosterFromRPDB && this.userData.rpdbApiKey
         ? this.userData.rpdbApiKey
         : undefined;
 
@@ -1416,7 +1442,5 @@ export class AIOStreams {
     if (item.links) {
       item.links = this.convertDiscoverDeepLinks(item.links);
     }
-
-    return item;
   }
 }
