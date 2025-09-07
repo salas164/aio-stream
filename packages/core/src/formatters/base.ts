@@ -551,17 +551,20 @@ export abstract class BaseFormatter {
         
         // PREFIX
         else if (isPrefix) {
+          // get the longest prefix match
           const modPrefix = Object.keys(conditionalModifiers.prefix).sort((a, b) => b.length - a.length).find(key => mod.startsWith(key))!!;
           
+          // Pre-process string value and check to allow for intuitive comparisons
           const stringValue = value.toString().toLowerCase();
           let stringCheck = mod.substring(modPrefix.length).toLowerCase();
-          // remove spaces/tabs/newlines from stringCheck if they aren't in stringValue
+          // remove whitespace from stringCheck if it isn't in stringValue
           stringCheck = !/\s/.test(stringValue) ? stringCheck.replace(/\s/g, '') : stringCheck;
           
-          const [numericValue, numericCheck] = [Number(value), Number(stringCheck)]
-          // use numeric comparison if possible, otherwise use string (value, check) params
-          const [paramValue, paramCheck] = ["<", "<=", ">", ">="].includes(modPrefix) && 
-            !isNaN(numericValue) && !isNaN(numericCheck) ? [numericValue, numericCheck] : [stringValue, stringCheck]
+          const isNumericComparison = ["<", "<=", ">", ">="].includes(modPrefix) && 
+            !Number.isNaN(Number(stringValue)) && !Number.isNaN(Number(stringCheck));
+          const [paramValue, paramCheck] = isNumericComparison 
+            ? [Number(stringValue), Number(stringCheck)] 
+            : [stringValue, stringCheck];
           
           conditional = conditionalModifiers.prefix[modPrefix as keyof typeof conditionalModifiers.prefix](
             paramValue as any, 
