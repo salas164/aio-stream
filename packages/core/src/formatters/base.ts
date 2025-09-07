@@ -560,7 +560,7 @@ export abstract class BaseFormatter {
           // remove whitespace from stringCheck if it isn't in stringValue
           stringCheck = !/\s/.test(stringValue) ? stringCheck.replace(/\s/g, '') : stringCheck;
           
-          const isNumericComparison = ["<", "<=", ">", ">="].includes(modPrefix) && 
+          const isNumericComparison = ["<", "<=", ">", ">=", "="].includes(modPrefix) && 
             !Number.isNaN(Number(stringValue)) && !Number.isNaN(Number(stringCheck));
           const [paramValue, paramCheck] = isNumericComparison 
             ? [Number(stringValue), Number(stringCheck)] 
