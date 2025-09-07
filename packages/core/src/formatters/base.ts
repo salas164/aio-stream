@@ -419,8 +419,7 @@ export abstract class BaseFormatter {
     // Dynamically build the `modifier` regex pattern from modifier keys
     // Sort by length (longest first) to ensure more specific patterns match before shorter ones
     const validModifiers = Object.keys(modifiers)
-      .map(key => key.replace(/[\(\)\'\"\$\^\~\=\>\<]/g, '\\$&'))
-      .sort((a, b) => b.length - a.length); // Sort by length, longest first
+      .map(key => key.replace(/[\(\)\'\"\$\^\~\=\>\<]/g, '\\$&'));
     
     const modifier = `::(?<mod>${validModifiers.join('|')})`;
     
@@ -553,7 +552,7 @@ export abstract class BaseFormatter {
         
         // PREFIX
         else if (isPrefix) {
-          const modPrefix = Object.keys(conditionalModifiers.prefix).find(key => mod.startsWith(key))!!;
+          const modPrefix = Object.keys(conditionalModifiers.prefix).sort((a, b) => b.length - a.length).find(key => mod.startsWith(key))!!;
           
           var checkKey = mod.substring(modPrefix.length).toLowerCase();
           // remove spaces from checkKey if spaces aren't in value
