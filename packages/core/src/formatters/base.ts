@@ -560,15 +560,14 @@ export abstract class BaseFormatter {
           // remove whitespace from stringCheck if it isn't in stringValue
           stringCheck = !/\s/.test(stringValue) ? stringCheck.replace(/\s/g, '') : stringCheck;
           
+          // parse check as if it's a number (123,456 -> 123456)
+          const parsedNumericCheck = Number(stringCheck.replace(/,\s/g, ''));
           const isNumericComparison = ["<", "<=", ">", ">=", "="].includes(modPrefix) && 
-            !Number.isNaN(Number(stringValue)) && !Number.isNaN(Number(stringCheck));
-          const [paramValue, paramCheck] = isNumericComparison 
-            ? [Number(stringValue), Number(stringCheck)] 
-            : [stringValue, stringCheck];
+            !isNaN(Number(stringValue)) && !isNaN(parsedNumericCheck);
           
           conditional = conditionalModifiers.prefix[modPrefix as keyof typeof conditionalModifiers.prefix](
-            paramValue as any, 
-            paramCheck as any
+            isNumericComparison ? Number(stringValue) as any : stringValue, 
+            isNumericComparison ? parsedNumericCheck as any : stringCheck,
           );
         }
       } catch (error) {
