@@ -223,10 +223,10 @@ export const conditionalModifiers = {
     '^': (value: string, check: string) => value.endsWith(check),
     '~': (value: string, check: string) => value.includes(check),
     '=': (value: string, check: string) => value == check,
-    '>=': (value: string, check: string) => value >= check,
-    '>': (value: string, check: string) => value > check,
-    '<=': (value: string, check: string) => value <= check,
-    '<': (value: string, check: string) => value < check,
+    '>=': (value: string | number, check: string | number) => value >= check,
+    '>': (value: string | number, check: string | number) => value > check,
+    '<=': (value: string | number, check: string | number) => value <= check,
+    '<': (value: string | number, check: string | number) => value < check,
   },
 }
 
@@ -554,12 +554,20 @@ export abstract class BaseFormatter {
         else if (isPrefix) {
           const modPrefix = Object.keys(conditionalModifiers.prefix).sort((a, b) => b.length - a.length).find(key => mod.startsWith(key))!!;
           
-          var checkKey = mod.substring(modPrefix.length).toLowerCase();
-          // remove spaces from checkKey if spaces aren't in value
-          if (typeof value !== 'string' || !value.includes(' ')) {
-            checkKey = checkKey.replace(/ /g, '');
-          }
-          conditional = conditionalModifiers.prefix[modPrefix as keyof typeof conditionalModifiers.prefix](value.toString().toLowerCase(), checkKey);
+          const stringValue = value.toString().toLowerCase();
+          let stringCheck = mod.substring(modPrefix.length).toLowerCase();
+          // remove spaces from stringCheck if spaces aren't in stringValue
+          stringCheck = !stringValue.includes(' ') ? stringCheck.replace(/ /g, '') : stringCheck;
+          
+          const [numericValue, numericCheck] = [Number(value), Number(stringCheck)]
+          // use numeric comparison if possible, otherwise use string (value, check) params
+          const [paramValue, paramCheck] = ["<", "<=", ">", ">="].includes(modPrefix) && 
+            !isNaN(numericValue) && !isNaN(numericCheck) ? [numericValue, numericCheck] : [stringValue, stringCheck]
+          
+          conditional = conditionalModifiers.prefix[modPrefix as keyof typeof conditionalModifiers.prefix](
+            paramValue as any, 
+            paramCheck as any
+          );
         }
       } catch (error) {
         conditional = false;
