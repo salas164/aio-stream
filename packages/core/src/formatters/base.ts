@@ -211,7 +211,7 @@ export const conditionalModifiers = {
     'exists': (value: any) => {
       // Handle null, undefined, empty strings, empty arrays
       if (value === undefined || value === null) return false;
-      if (typeof value === 'string') return value.replace(/ /g, '').length > 0;
+      if (typeof value === 'string') return /\S/.test(value);
       if (Array.isArray(value)) return value.length > 0;
       // For other types (numbers, booleans, objects), consider them as "existing"
       return true;
@@ -417,7 +417,6 @@ export abstract class BaseFormatter {
     const variable = `(?<variableName>${validVariables.join('|')})\\.(?<propertyName>${validProperties.join('|')})`;
 
     // Dynamically build the `modifier` regex pattern from modifier keys
-    // Sort by length (longest first) to ensure more specific patterns match before shorter ones
     const validModifiers = Object.keys(modifiers)
       .map(key => key.replace(/[\(\)\'\"\$\^\~\=\>\<]/g, '\\$&'));
     
@@ -556,8 +555,8 @@ export abstract class BaseFormatter {
           
           const stringValue = value.toString().toLowerCase();
           let stringCheck = mod.substring(modPrefix.length).toLowerCase();
-          // remove spaces from stringCheck if spaces aren't in stringValue
-          stringCheck = !stringValue.includes(' ') ? stringCheck.replace(/ /g, '') : stringCheck;
+          // remove spaces/tabs/newlines from stringCheck if they aren't in stringValue
+          stringCheck = !/\s/.test(stringValue) ? stringCheck.replace(/\s/g, '') : stringCheck;
           
           const [numericValue, numericCheck] = [Number(value), Number(stringCheck)]
           // use numeric comparison if possible, otherwise use string (value, check) params
