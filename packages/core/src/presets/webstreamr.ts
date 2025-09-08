@@ -118,15 +118,15 @@ export class WebStreamrPreset extends Preset {
 
     const providers = [
       {
-        label: '🌐 Multi (VixSrc)',
+        label: '🌐 Multi (4KHDHub, VixSrc)',
         value: 'multi',
       },
       {
-        label: '🇺🇸 English (PrimeWire, VidSrc, VixSrc, XPrime)',
+        label: '🇺🇸 English (PrimeWire, Soaper, VidSrc, XPrime)',
         value: 'en',
       },
       {
-        label: '🇩🇪 German (KinoGer, MegaKino, MeineCloud, StreamKiste)',
+        label: '🇩🇪 German (Einschalten, KinoGer, MegaKino, MeineCloud, StreamKiste)',
         value: 'de',
       },
       {
@@ -160,7 +160,7 @@ export class WebStreamrPreset extends Preset {
         description: 'Select the providers to use',
         type: 'multi-select',
         options: providers,
-        default: ['en'],
+        default: ['multi', 'en'],
       },
       {
         id: 'includeExternalUrls',
