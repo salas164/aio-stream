@@ -542,7 +542,7 @@ export abstract class BaseFormatter {
         
         let result = property as any;
         // iterate over modifiers in order of appearance
-        for (const modMatch of [...matches.groups.modifiers.matchAll(singleValidModifierRe)].sort((a, b) => a.index - b.index)) {
+        for (const modMatch of [...matches.groups.modifiers.matchAll(singleValidModifierRe)].sort((a, b) => (a.index ?? 0) - (b.index ?? 0))) {
           result = this.modifier(
             modMatch[1], // First capture group (the modifier name)
             result,
