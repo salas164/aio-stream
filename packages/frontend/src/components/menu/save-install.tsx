@@ -1,13 +1,14 @@
 'use client';
 import React from 'react';
 import { Button } from '@/components/ui/button';
+import { TextInput } from '@/components/ui/text-input';
 import { useUserData } from '@/context/userData';
 import { UserConfigAPI } from '@/services/api';
 import { PageWrapper } from '@/components/shared/page-wrapper';
 import { Alert } from '@/components/ui/alert';
 import { SettingsCard } from '../shared/settings-card';
 import { toast } from 'sonner';
-import { DownloadIcon, UploadIcon, BrushCleaningIcon } from 'lucide-react';
+import { CopyIcon, DownloadIcon, PlusIcon, UploadIcon } from 'lucide-react';
 import { useStatus } from '@/context/status';
 import { BiCopy } from 'react-icons/bi';
 import { PageControls } from '../shared/page-controls';
@@ -42,7 +43,6 @@ function Content() {
   const {
     userData,
     setUserData,
-    clearUserData,
     uuid,
     setUuid,
     password,
@@ -311,19 +311,6 @@ function Content() {
         <div className="hidden lg:block lg:ml-auto">
           <PageControls />
         </div>
-      </div>
-
-      <div className="space-y-4 mt-6">
-        <SettingsCard title="Current Changes">
-          <Button
-            onClick={clearUserData}
-            intent="gray"
-            leftIcon={<BrushCleaningIcon />}
-            type="button"
-          >
-            Reset to Defaults
-          </Button>
-        </SettingsCard>
       </div>
 
       <div className="space-y-4 mt-6">
