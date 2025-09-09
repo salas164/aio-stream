@@ -658,8 +658,9 @@ export abstract class BaseFormatter {
         return numberModifiers[mod as keyof typeof numberModifiers](value);
     }
 
-    if (value === undefined || value === null) return `{unknown_modifier(${mod})}`;
-    return `{unknown_${typeof value}_modifier(${mod})}`;
+    let valueType = typeof value;
+    if (valueType === typeof undefined || valueType === typeof null) return `{unknown_modifier(${mod})}`;
+    return `{unknown_${valueType}_modifier(${mod})}`;
   }
 
   protected replaceCharsFromString(
