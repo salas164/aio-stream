@@ -285,21 +285,21 @@ Boolean: {stream.proxied}
 
 Conditional:
   filename::exists {stream.filename::exists["true"||"false"]}
-  filename::$ {stream.filename::$test["starts with 'test'"||"doesn't start with 'test'"]}
-  filename::^ {stream.filename::^test["ends with 'test'"||"doesn't end with 'test'"]}
-  filename::~ {stream.filename::~test["contains 'test'"||"doesn't contain 'test'"]}
-  filename::= {stream.filename::=test["equals 'test'"||"doesn't equal 'test'"]}
-  filesize::>= {stream.size::>=100["greater than or equal to 100"||"less than 100"]}
-  filesize::> {stream.size::>50["greater than 50"||"less than or equal to 50"]}
-  filesize::<= {stream.size::<=200["less than or equal to 200"||"greater than 200"]}
-  filesize::< {stream.size::<150["less than 150"||"greater than or equal to 150"]}
+  filename::$Movie {stream.filename::$Movie["true"||"false"]}
+  filename::^Title {stream.filename::^Title["true"||"false"]}
+  filename::~test {stream.filename::~test["true"||"false"]}
+  filename::=test {stream.filename::=test["true"||"false"]}
+  filesize::>=100 {stream.size::>=100["true"||"false"]}
+  filesize::>50 {stream.size::>50["true"||"false"]}
+  filesize::<=200 {stream.size::<=200["true"||"false"]}
+  filesize::<150 {stream.size::<150["true"||"false"]}
 {tools.newLine}
 
-Compounding modifiers
-  string::reverse::title::reverse = {config.addonName} -> {config.addonName::reverse::title::reverse}
-  number::string::reverse = {stream.size} -> {stream.size::string::reverse}
-  array::string::reverse = {stream.languages} -> {stream.languages::join("::")::reverse}
-  conditional_array::length::>=2 {stream.languages} -> {stream.languages::length::>=2["true"||"false"]}
+[Advanced] Multiple modifiers
+  <string>::reverse::title::reverse = {config.addonName} -> {config.addonName::reverse::title::reverse}
+  <number>::string::reverse = {stream.size} -> {stream.size::string::reverse}
+  <array>::string::reverse = {stream.languages} -> {stream.languages::join("::")::reverse}
+  <boolean>::length::>=2 {stream.languages} -> {stream.languages::length::>=2["true"||"false"]}
 `;
 
 export abstract class BaseFormatter {
