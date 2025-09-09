@@ -104,6 +104,7 @@ export interface ParseValue {
   debug?: {
     json: string | null;
     jsonf: string | null;
+    modifier: string | null;
   };
 }
 
@@ -164,6 +165,7 @@ const hardcodedParseValueKeysForRegexMatching: ParseValue = {
   debug: {
     json: null,
     jsonf: null,
+    modifier: null,
   },
 }
 
@@ -243,13 +245,47 @@ const hardcodedModifiersForRegexMatching = {
 }
 
 const modifiers = {
+  ...hardcodedModifiersForRegexMatching,
   ...stringModifiers,
   ...numberModifiers,
   ...arrayModifiers,
   ...conditionalModifiers.exact,
   ...conditionalModifiers.prefix,
-  ...hardcodedModifiersForRegexMatching,
 }
+
+const debugModifierToolReplacement = `
+String: {config.addonName}
+  ::upper {config.addonName::upper}
+  ::lower {config.addonName::lower}
+  ::title {config.addonName::title}
+  ::length {config.addonName::length}
+  ::reverse {config.addonName::reverse}
+{tools.newLine}
+
+Number: {stream.size}
+  ::bytes {stream.size::bytes}
+  ::time {stream.size::time}
+  ::hex {stream.size::hex}
+  ::octal {stream.size::octal}
+  ::binary {stream.size::binary}
+{tools.newLine}
+
+Array: {stream.languages}
+  ::join('-separator-') {stream.languages::join("-separator-")}
+  ::length {stream.languages::length}
+  ::first {stream.languages::first}
+  ::last {stream.languages::last}
+{tools.newLine}
+
+Boolean: {stream.proxied}
+{tools.newLine}
+
+New Compounding modifiers
+  string::reverse::title::reverse = {config.addonName} -> {config.addonName::reverse::title::reverse}
+  number::string::reverse = {stream.size} -> {stream.size::string::reverse}
+  array::string::reverse = {stream.languages} -> {stream.languages::join("::")::reverse}
+  conditional_array::length::>=2 {stream.languages} -> {stream.languages::length::>=2["2 or more elements"||"only one element in arr"]}
+`;
 
 export abstract class BaseFormatter {
   protected config: FormatterConfig;
@@ -448,8 +484,8 @@ export abstract class BaseFormatter {
     value.debug = {
       json: JSON.stringify({ ...value, debug: undefined }, replacer),
       jsonf: JSON.stringify({ ...value, debug: undefined }, replacer, 2),
+      modifier: debugModifierToolReplacement,
     };
-
 
     const re = this.buildRegexExpression();
     let matches: RegExpExecArray | null;
@@ -490,15 +526,17 @@ export abstract class BaseFormatter {
          const singleValidModifierRe = new RegExp(this.buildModifierRegexPattern(), 'gi');
         
         let result = property as any;
-        for (const modMatch of matches.groups.modifiers.matchAll(singleValidModifierRe)) {
-           result = this.modifier(
-             modMatch[1], // First capture group (the modifier name)
-             result,
-             matches.groups.mod_tzlocale ?? "",
+        // iterate over modifiers in order of appearance
+        for (const modMatch of [...matches.groups.modifiers.matchAll(singleValidModifierRe)].sort((a, b) => a.index - b.index)) {
+          result = this.modifier(
+            modMatch[1], // First capture group (the modifier name)
+            result,
+            matches.groups.mod_tzlocale ?? "",
             matches.groups.mod_check_true ?? "",
             matches.groups.mod_check_false ?? "",
             value
           );
+          if (result.startsWith('{unknown_')) break;
         }
         
         str = this.replaceCharsFromString(
@@ -607,8 +645,7 @@ export abstract class BaseFormatter {
       // handle hardcoded modifiers here
       switch (true) {
         case mod.startsWith('join(') && mod.endsWith(')'): {
-          // Extract the separator from join(separator)
-          // e.g. join(' - ')
+          // Extract the separator from join('separator') or join("separator")
           const separator = _mod.substring(6, _mod.length - 2)
           return value.join(separator);
         }
