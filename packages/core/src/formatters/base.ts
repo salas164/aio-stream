@@ -284,22 +284,22 @@ Boolean: {stream.proxied}
 {tools.newLine}
 
 Conditional:
-  filename::exists {stream.filename::exists["true"||"false"]}
-  filename::$Movie {stream.filename::$Movie["true"||"false"]}
-  filename::^Title {stream.filename::^Title["true"||"false"]}
-  filename::~test {stream.filename::~test["true"||"false"]}
-  filename::=test {stream.filename::=test["true"||"false"]}
-  filesize::>=100 {stream.size::>=100["true"||"false"]}
-  filesize::>50 {stream.size::>50["true"||"false"]}
-  filesize::<=200 {stream.size::<=200["true"||"false"]}
-  filesize::<150 {stream.size::<150["true"||"false"]}
+  filename::exists    {stream.filename::exists["true"||"false"]}
+  filename::$Movie    {stream.filename::$Movie["true"||"false"]}
+  filename::^Title    {stream.filename::^Title["true"||"false"]}
+  filename::~test     {stream.filename::~test["true"||"false"]}
+  filename::=test     {stream.filename::=test["true"||"false"]}
+  filesize::>=100     {stream.size::>=100["true"||"false"]}
+  filesize::>50       {stream.size::>50["true"||"false"]}
+  filesize::<=200     {stream.size::<=200["true"||"false"]}
+  filesize::<150      {stream.size::<150["true"||"false"]}
 {tools.newLine}
 
 [Advanced] Multiple modifiers
-  <string>::reverse::title::reverse = {config.addonName} -> {config.addonName::reverse::title::reverse}
-  <number>::string::reverse = {stream.size} -> {stream.size::string::reverse}
-  <array>::string::reverse = {stream.languages} -> {stream.languages::join("::")::reverse}
-  <boolean>::length::>=2 {stream.languages} -> {stream.languages::length::>=2["true"||"false"]}
+  <string>::reverse::title::reverse   {config.addonName} -> {config.addonName::reverse::title::reverse}
+  <number>::string::reverse           {stream.size} -> {stream.size::string::reverse}
+  <array>::string::reverse            {stream.languages} -> {stream.languages::join("::")::reverse}
+  <boolean>::length::>=2              {stream.languages} -> {stream.languages::length::>=2["true"||"false"]}
 `;
 
 export abstract class BaseFormatter {
