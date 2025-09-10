@@ -97,76 +97,15 @@ export interface ParseValue {
     cached: boolean | null;
   };
   addon?: {
-    name: string;
-    presetId: string;
-    manifestUrl: string;
+    name: string | null;
+    presetId: string | null;
+    manifestUrl: string | null;
   };
   debug?: {
     json: string | null;
     jsonf: string | null;
     modifier: string | null;
   };
-}
-
-const hardcodedParseValueKeysForRegexMatching: ParseValue = {
-  stream: {
-    filename: null,
-    folderName: null,
-    size: null,
-    folderSize: null,
-    library: null,
-    quality: null,
-    resolution: null,
-    languages: null,
-    uLanguages: null,
-    languageEmojis: null,
-    uLanguageEmojis: null,
-    languageCodes: null,
-    uLanguageCodes: null,
-    smallLanguageCodes: null,
-    uSmallLanguageCodes: null,
-    wedontknowwhatakilometeris: null,
-    uWedontknowwhatakilometeris: null,
-    visualTags: null,
-    audioTags: null,
-    releaseGroup: null,
-    regexMatched: null,
-    encode: null,
-    audioChannels: null,
-    indexer: null,
-    year: null,
-    title: null,
-    season: null,
-    seasons: null,
-    episode: null,
-    seasonEpisode: null,
-    seeders: null,
-    age: null,
-    duration: null,
-    infoHash: null,
-    type: null,
-    message: null,
-    proxied: null,
-  },
-  service: {
-    id: null,
-    shortName: null,
-    name: null,
-    cached: null,
-  },
-  addon: {
-    name: "",
-    presetId: "",
-    manifestUrl: "",
-  },
-  config: {
-    addonName: null,
-  },
-  debug: {
-    json: null,
-    jsonf: null,
-    modifier: null,
-  },
 }
 
 const stringModifiers = {
@@ -251,7 +190,7 @@ const modifiers = {
   ...numberModifiers,
   ...arrayModifiers,
   ...conditionalModifiers.exact,
-  ...conditionalModifiers.prefix,
+  // ...conditionalModifiers.prefix,
 }
 
 const debugModifierToolReplacement = `
@@ -430,9 +369,9 @@ export abstract class BaseFormatter {
         proxied: stream.proxied !== undefined ? stream.proxied : null,
       },
       addon: {
-        name: stream.addon.name,
-        presetId: stream.addon.preset.type,
-        manifestUrl: stream.addon.manifestUrl,
+        name: stream.addon?.name || null,
+        presetId: stream.addon?.preset?.type || null,
+        manifestUrl: stream.addon?.manifestUrl || null,
       },
       service: {
         id: stream.service?.id || null,
@@ -462,6 +401,7 @@ export abstract class BaseFormatter {
   protected buildRegexExpression(): RegExp {
     // Dynamically build the `variable` regex pattern from ParseValue keys
     // Futureproof: if we add new keys to ParseValue interface, we must add them here too
+    const hardcodedParseValueKeysForRegexMatching = this.convertStreamToParseValue({} as ParsedStream);
     const validVariables: (keyof ParseValue)[] = Object.keys(hardcodedParseValueKeysForRegexMatching) as (keyof ParseValue)[];
     // Get all valid properties (subkeys) from ParseValue structure
     const validProperties = validVariables.flatMap(sectionKey => {
@@ -536,22 +476,16 @@ export abstract class BaseFormatter {
         continue;
       }
 
-      // Process - Modifier(s)
+      // Validate and Process - Modifier(s)
       if (matches.groups.modifiers) {
-         const singleValidModifierRe = new RegExp(this.buildModifierRegexPattern(), 'gi');
-        
-        let result = property as any;
-        // iterate over modifiers in order of appearance
-        for (const modMatch of [...matches.groups.modifiers.matchAll(singleValidModifierRe)].sort((a, b) => (a.index ?? 0) - (b.index ?? 0))) {
-          result = this.modifier(
-            modMatch[1], // First capture group (the modifier name)
-            result,
-            matches.groups.mod_tzlocale ?? "",
-            matches.groups.mod_check_true ?? "",
-            matches.groups.mod_check_false ?? "",
-            value
-          );
-          if (result.startsWith('{unknown_')) break;
+        let result = this.applyModifiers(matches.groups, property, value);
+
+        // handle unknown modifier result
+        if (result === undefined) {
+          result = `{unknown_modifier(${matches.groups.modifiers})}`;
+          if (['string', 'number', 'boolean', 'object', 'array'].includes(typeof property)) {
+            result = `{unknown_${typeof property}_modifier(${matches.groups.modifiers})}`;
+          }
         }
         
         str = this.replaceCharsFromString(
@@ -578,14 +512,49 @@ export abstract class BaseFormatter {
       .replace(/\{tools.newLine\}/g, '\n');
   }
 
-  protected modifier(
+  protected applyModifiers(
+    groups: {[key: string]: string},
+    input: any,
+    parseValue: ParseValue,
+  ): string | undefined {
+    const singleModTerminator = '((::)|($))'; // :: if there's multiple modifiers or $ for the end of the string
+    const singleValidModRe = new RegExp(this.buildModifierRegexPattern() + singleModTerminator, 'gi');
+    
+    let result = input as any;
+    // iterate over modifiers in order of appearance
+    for (const modMatch of [...groups.modifiers.matchAll(singleValidModRe)].sort((a, b) => (a.index ?? 0) - (b.index ?? 0))) {
+      if (result === undefined) break;
+      result = this.applySingleModifier(
+        modMatch[1], // First capture group (the modifier name)
+        result,
+        groups.mod_tzlocale ?? "",
+      );
+    }
+
+    // handle unknown modifier result
+    switch (typeof result) {
+      case 'undefined': return undefined;
+      case 'boolean':
+        let check_true = groups.mod_check_true ?? "";
+        let check_false = groups.mod_check_false ?? "";
+        if (typeof check_true !== 'string' || typeof check_false !== 'string')
+          return `{unknown_conditional_modifier_check_true_or_false}`;
+        
+        if (parseValue) {
+          check_true = this.parseString(check_true, parseValue) || check_true;
+          check_false = this.parseString(check_false, parseValue) || check_false;
+        }
+        return result ? check_true : check_false;
+      default:
+        return result;
+    }
+  }
+
+  protected applySingleModifier(
     mod: string,
-    value: any,
+    input: any,
     tzlocale?: string,
-    check_true?: string,
-    check_false?: string,
-    _value?: ParseValue
-  ): string {
+  ): string | boolean | undefined {
     const _mod = mod;
     mod = mod.toLowerCase();
 
@@ -593,22 +562,19 @@ export abstract class BaseFormatter {
     const isExact = Object.keys(conditionalModifiers.exact).includes(mod);
     const isPrefix = Object.keys(conditionalModifiers.prefix).some(key => mod.startsWith(key));
     if (isExact || isPrefix) {
-      if (typeof check_true !== 'string' || typeof check_false !== 'string')
-        return `{unknown_conditional_modifier_check_true_or_false(${mod})}`;
-
       // try to coerce true/false value from modifier
       let conditional: boolean | undefined;
       try {
 
         // PRE-CHECK(s) -- skip resolving conditional modifier if value DNE, defaulting to false conditional
-        if (!conditionalModifiers.exact.exists(value)) {
+        if (!conditionalModifiers.exact.exists(input)) {
           conditional = false;
         }
         
         // EXACT
         else if (isExact) {
           const modAsKey = mod as keyof typeof conditionalModifiers.exact;
-          conditional = conditionalModifiers.exact[modAsKey](value);
+          conditional = conditionalModifiers.exact[modAsKey](input);
         }
         
         // PREFIX
@@ -617,7 +583,7 @@ export abstract class BaseFormatter {
           const modPrefix = Object.keys(conditionalModifiers.prefix).sort((a, b) => b.length - a.length).find(key => mod.startsWith(key))!!;
           
           // Pre-process string value and check to allow for intuitive comparisons
-          const stringValue = value.toString().toLowerCase();
+          const stringValue = input.toString().toLowerCase();
           let stringCheck = mod.substring(modPrefix.length).toLowerCase();
           // remove whitespace from stringCheck if it isn't in stringValue
           stringCheck = !/\s/.test(stringValue) ? stringCheck.replace(/\s/g, '') : stringCheck;
@@ -635,47 +601,37 @@ export abstract class BaseFormatter {
       } catch (error) {
         conditional = false;
       }
-
-      if (conditional === undefined) return `{unknown_conditional_modifier(${mod})}`;
-
-      if (_value) {
-        return conditional
-          ? this.parseString(check_true, _value) || check_true
-          : this.parseString(check_false, _value) || check_false;
-      }
-      return conditional ? check_true : check_false;
+      return conditional;
     }
 
     // --- STRING MODIFIERS ---
-    else if (typeof value === 'string') {
+    else if (typeof input === 'string') {
       if (mod in stringModifiers)
-        return stringModifiers[mod as keyof typeof stringModifiers](value);
+        return stringModifiers[mod as keyof typeof stringModifiers](input);
     }
 
     // --- ARRAY MODIFIERS ---
-    else if (Array.isArray(value)) {
+    else if (Array.isArray(input)) {
       if (mod in arrayModifiers)
-        return arrayModifiers[mod as keyof typeof arrayModifiers](value)?.toString();
+        return arrayModifiers[mod as keyof typeof arrayModifiers](input)?.toString();
 
       // handle hardcoded modifiers here
       switch (true) {
         case mod.startsWith('join(') && mod.endsWith(')'): {
           // Extract the separator from join('separator') or join("separator")
           const separator = _mod.substring(6, _mod.length - 2)
-          return value.join(separator);
+          return input.join(separator);
         }
       }
     }
 
     // --- NUMBER MODIFIERS ---
-    else if (typeof value === 'number') {
+    else if (typeof input === 'number') {
       if (mod in numberModifiers)
-        return numberModifiers[mod as keyof typeof numberModifiers](value);
+        return numberModifiers[mod as keyof typeof numberModifiers](input);
     }
 
-    let valueType = typeof value;
-    if (valueType === typeof undefined || valueType === typeof null) return `{unknown_modifier(${mod})}`;
-    return `{unknown_${valueType}_modifier(${mod})}`;
+    return undefined;
   }
 
   protected replaceCharsFromString(
