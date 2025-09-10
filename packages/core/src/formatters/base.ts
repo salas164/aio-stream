@@ -479,7 +479,6 @@ export abstract class BaseFormatter {
       // Validate and Process - Modifier(s)
       if (matches.groups.modifiers) {
         let result = this.applyModifiers(matches.groups, property, value);
-
         // handle unknown modifier result
         if (result === undefined) {
           result = `{unknown_modifier(${matches.groups.modifiers})}`;
@@ -487,7 +486,6 @@ export abstract class BaseFormatter {
             result = `{unknown_${typeof property}_modifier(${matches.groups.modifiers})}`;
           }
         }
-        
         str = this.replaceCharsFromString(
           str,
           result,
