@@ -576,14 +576,6 @@ export const Env = cleanEnv(process.env, {
     default: 30000,
     desc: 'Timeout for catalog requests',
   }),
-  META_TIMEOUT: num({
-    default: 30000,
-    desc: 'Timeout for meta requests',
-  }),
-  MANIFEST_TIMEOUT: num({
-    default: 3000,
-    desc: 'Timeout for manifest requests',
-  }),
 
   BACKGROUND_RESOURCE_REQUEST_TIMEOUT: num({
     default: undefined,
