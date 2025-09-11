@@ -21,7 +21,6 @@ COPY packages/server ./packages/server
 COPY packages/core ./packages/core
 COPY packages/frontend ./packages/frontend
 COPY scripts ./scripts
-COPY resources ./resources
 
 
 # Build the project.
@@ -47,8 +46,6 @@ COPY --from=builder /build/packages/core/dist ./packages/core/dist
 COPY --from=builder /build/packages/frontend/out ./packages/frontend/out
 COPY --from=builder /build/packages/server/dist ./packages/server/dist
 COPY --from=builder /build/packages/server/src/static ./packages/server/dist/static
-
-COPY --from=builder /build/resources ./resources
 
 COPY --from=builder /build/node_modules ./node_modules
 
