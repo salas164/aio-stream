@@ -415,6 +415,32 @@ export async function validateConfig(
     }
   }
 
+  // Clamp user-defined size limits with forced global maximums
+  if (config.size) {
+    if (Env.FORCE_MAX_MOVIE_SIZE && config.size.global?.movies) {
+      config.size.global.movies[1] = Math.min(
+        config.size.global.movies[1],
+        Env.FORCE_MAX_MOVIE_SIZE
+      );
+    }
+    if (Env.FORCE_MAX_SERIES_SIZE && config.size.global?.series) {
+      config.size.global.series[1] = Math.min(
+        config.size.global.series[1],
+        Env.FORCE_MAX_SERIES_SIZE
+      );
+    }
+    if (config.size.resolution) {
+      for (const res in config.size.resolution) {
+        if (Env.FORCE_MAX_MOVIE_SIZE && config.size.resolution[res]?.movies) {
+          config.size.resolution[res]!.movies![1] = Math.min(config.size.resolution[res]!.movies![1], Env.FORCE_MAX_MOVIE_SIZE!);
+        }
+        if (Env.FORCE_MAX_SERIES_SIZE && config.size.resolution[res]?.series) {
+          config.size.resolution[res]!.series![1] = Math.min(config.size.resolution[res]!.series![1], Env.FORCE_MAX_SERIES_SIZE!);
+        }
+      }
+    }
+  }
+
   await validateRegexes(config);
 
   await new AIOStreams(ensureDecrypted(config), {

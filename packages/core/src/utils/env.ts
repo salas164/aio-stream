@@ -12,6 +12,7 @@ import {
   EnvError,
   port,
   EnvMissingError,
+  num,
 } from 'envalid';
 import { ResourceManager } from './resources';
 import * as constants from './constants';
@@ -28,6 +29,7 @@ try {
   console.error('Error loading metadata.json file', error);
 }
 
+const bytes = require('bytes');
 const secretKey = makeValidator((x) => {
   if (!/^[0-9a-fA-F]{64}$/.test(x)) {
     throw new EnvError('Secret key must be a 64-character hex string');
@@ -226,6 +228,18 @@ const urlMappings = makeValidator<Record<string, string>>((x) => {
     }
   }
   return mappings;
+});
+
+const bytesSize = makeValidator<number>((x) => {
+  try {
+    const parsed = bytes.parse(x);
+    if (typeof parsed !== 'number' || parsed < 0) {
+      throw new Error('Must be a non-negative number.');
+    }
+    return parsed;
+  } catch (e: any) {
+    throw new EnvError(`Invalid size format: "${x}". ${e.message}`);
+  }
 });
 
 export const Env = cleanEnv(process.env, {
@@ -559,6 +573,14 @@ export const Env = cleanEnv(process.env, {
     desc: 'Timeout for meta requests',
   }),
   MANIFEST_TIMEOUT: num({
+    default: 30000,
+    desc: 'Timeout for catalog requests',
+  }),
+  META_TIMEOUT: num({
+    default: 30000,
+    desc: 'Timeout for meta requests',
+  }),
+  MANIFEST_TIMEOUT: num({
     default: 3000,
     desc: 'Timeout for manifest requests',
   }),
@@ -566,6 +588,16 @@ export const Env = cleanEnv(process.env, {
   BACKGROUND_RESOURCE_REQUEST_TIMEOUT: num({
     default: undefined,
     desc: 'Timeout for background resource requests, uses your maximum timeout if not set',
+  }),
+
+  FORCE_MAX_MOVIE_SIZE: bytesSize({
+    default: undefined,
+    desc: 'Force max movie size',
+  }),
+
+  FORCE_MAX_SERIES_SIZE: bytesSize({
+    default: undefined,
+    desc: 'Force max series size',
   }),
 
   FORCE_PUBLIC_PROXY_HOST: host({
