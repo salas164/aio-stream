@@ -417,30 +417,47 @@ export async function validateConfig(
 
   // Clamp user-defined size limits with forced global maximums
   if (config.size) {
-    if (Env.FORCE_MAX_MOVIE_SIZE && config.size.global?.movies) {
-      config.size.global.movies[1] = Math.min(
-        config.size.global.movies[1],
-        Env.FORCE_MAX_MOVIE_SIZE
-      );
+    const envMaxMovie = Env.FORCE_MAX_MOVIE_SIZE;
+    const envMaxSeries = Env.FORCE_MAX_SERIES_SIZE;
+
+    if (
+      typeof envMaxMovie === 'number' &&
+      Number.isFinite(envMaxMovie) &&
+      typeof config.size.global?.movies?.[1] === 'number' &&
+      Number.isFinite(config.size.global.movies[1] as number)
+    ) {
+      config.size.global.movies[1] = Math.min(config.size.global.movies[1] as number, envMaxMovie);
     }
-    if (Env.FORCE_MAX_SERIES_SIZE && config.size.global?.series) {
-      config.size.global.series[1] = Math.min(
-        config.size.global.series[1],
-        Env.FORCE_MAX_SERIES_SIZE
-      );
+    if (
+      typeof envMaxSeries === 'number' &&
+      Number.isFinite(envMaxSeries) &&
+      typeof config.size.global?.series?.[1] === 'number' &&
+      Number.isFinite(config.size.global.series[1] as number)
+    ) {
+      config.size.global.series[1] = Math.min(config.size.global.series[1] as number, envMaxSeries);
     }
-    if (config.size.resolution) {
-      for (const res in config.size.resolution) {
-        if (Env.FORCE_MAX_MOVIE_SIZE && config.size.resolution[res]?.movies) {
-          config.size.resolution[res]!.movies![1] = Math.min(config.size.resolution[res]!.movies![1], Env.FORCE_MAX_MOVIE_SIZE!);
-        }
-        if (Env.FORCE_MAX_SERIES_SIZE && config.size.resolution[res]?.series) {
-          config.size.resolution[res]!.series![1] = Math.min(config.size.resolution[res]!.series![1], Env.FORCE_MAX_SERIES_SIZE!);
-        }
+    const resMap = config.size.resolution ?? {};
+    for (const key of Object.keys(resMap)) {
+      const r = resMap[key];
+      if (!r) continue;
+      if (
+        typeof envMaxMovie === 'number' &&
+        Number.isFinite(envMaxMovie) &&
+        typeof r.movies?.[1] === 'number' &&
+        Number.isFinite(r.movies[1] as number)
+      ) {
+        r.movies[1] = Math.min(r.movies[1] as number, envMaxMovie);
+      }
+      if (
+        typeof envMaxSeries === 'number' &&
+        Number.isFinite(envMaxSeries) &&
+        typeof r.series?.[1] === 'number' &&
+        Number.isFinite(r.series[1] as number)
+      ) {
+        r.series[1] = Math.min(r.series[1] as number, envMaxSeries);
       }
     }
   }
-
   await validateRegexes(config);
 
   await new AIOStreams(ensureDecrypted(config), {
