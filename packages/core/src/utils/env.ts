@@ -232,16 +232,20 @@ const urlMappings = makeValidator<Record<string, string>>((x) => {
 
 const bytesSize = makeValidator<number>((x) => {
   try {
-    const parsed = bytes.parse(x);
-    if (typeof parsed !== 'number' || parsed < 0) {
-      throw new Error('Must be a non-negative number.');
+    if (typeof x === 'number') {
+      if (!Number.isFinite(x) || x < 0) throw new Error('Must be a non‑negative finite number.');
+      return x;
+    }
+    const input = typeof x === 'string' ? x.trim() : x;
+    const parsed = bytes.parse(input);
+    if (typeof parsed !== 'number' || !Number.isFinite(parsed) || parsed < 0) {
+      throw new Error('Must be a non‑negative finite number.');
     }
     return parsed;
   } catch (e: any) {
-    throw new EnvError(`Invalid size format: "${x}". ${e.message}`);
+    throw new EnvError(`Invalid size format: "${x}". ${e?.message ?? e}`);
   }
 });
-
 export const Env = cleanEnv(process.env, {
   VERSION: readonly({
     default: metadata?.version || 'unknown',
