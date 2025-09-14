@@ -110,10 +110,10 @@ export interface ParseValue {
 }
 
 /**
- * Used to store the result of a parsed, and potentially modified, variable
+ * Used to store the actual value of a parsed, and potentially modified, variable
  * or an error message if the parsed/modified result becomes invalid for any reason
  */
-type ParsedResult = {
+type ResolvedVariable = {
   result?: any,
   error?: string | undefined;
 };
@@ -237,21 +237,21 @@ Array: {stream.languages}
   ::last {stream.languages::last}
 {tools.newLine}
 
-Boolean: {stream.proxied}
-  ::istrue {stream.proxied::istrue["true"||"false"]}
-  ::isfalse {stream.proxied::isfalse["true"||"false"]}
-{tools.newLine}
-
 Conditional:
-  filename::exists    {stream.filename::exists["true"||"false"]}
-  filename::$Movie    {stream.filename::$Movie["true"||"false"]}
-  filename::^Title    {stream.filename::^Title["true"||"false"]}
-  filename::~test     {stream.filename::~test["true"||"false"]}
-  filename::=test     {stream.filename::=test["true"||"false"]}
-  filesize::>=100     {stream.size::>=100["true"||"false"]}
-  filesize::>50       {stream.size::>50["true"||"false"]}
-  filesize::<=200     {stream.size::<=200["true"||"false"]}
-  filesize::<150      {stream.size::<150["true"||"false"]}
+  String: {stream.filename}
+    filename::exists    {stream.filename::exists["true"||"false"]}
+    filename::$Movie    {stream.filename::$Movie["true"||"false"]}
+    filename::^mkv    {stream.filename::^mkv["true"||"false"]}
+    filename::~Title     {stream.filename::~Title["true"||"false"]}
+    filename::=test     {stream.filename::=test["true"||"false"]}
+  Number: {stream.size}
+    filesize::>=100     {stream.size::>=100["true"||"false"]}
+    filesize::>50       {stream.size::>50["true"||"false"]}
+    filesize::<=200     {stream.size::<=200["true"||"false"]}
+    filesize::<150      {stream.size::<150["true"||"false"]}
+  Boolean: {stream.proxied}
+    ::istrue {stream.proxied::istrue["true"||"false"]}
+    ::isfalse {stream.proxied::isfalse["true"||"false"]}
 {tools.newLine}
 
 [Advanced] Multiple modifiers
@@ -261,7 +261,7 @@ Conditional:
   <boolean>::length::>=2              {stream.languages} -> {stream.languages::length::>=2["true"||"false"]}
 `;
 const debugComparatorToolReplacement = `
-Comparators: <stream.library>::comparator::<stream.proxied>
+Comparators: <stream.library({stream.library})>::comparator::<stream.proxied({stream.proxied})>
   ::and:: {stream.library::and::stream.proxied["true"||"false"]}
   ::or:: {stream.library::or::stream.proxied["true"||"false"]}
   ::xor:: {stream.library::xor::stream.proxied["true"||"false"]}
@@ -273,9 +273,9 @@ Comparators: <stream.library>::comparator::<stream.proxied>
 
 [Advanced] Multiple Comparators
   Is English
-    stream.languages::~English::or::stream.languages::~dub::and::stream.languages::length::>0["Probably"||"Unknown"]  ->  {stream.languages::~English::or::stream.languages::~dub::and::stream.languages::length::>0["Probably"||"Unknown"]}
-  Proxied, In Library, and Cached
-    stream.proxied::and::stream.library::and::service.cached["true"||"false"]  ->  {stream.proxied::and::stream.library::and::service.cached["true"||"false"]}
+    stream.languages::~English::or::stream.languages::~dub::and::stream.languages::length::>0["Yes"||"Unknown"]  ->  {stream.languages::~English::or::stream.languages::~dub::and::stream.languages::length::>0["Yes"||"Unknown"]}
+  Is Fast Enough Link
+    service.cached::or::stream.library::or::stream.seeders::>10["true"||"false"]  ->  {service.cached::istrue::or::stream.library::or::stream.seeders::>10["true"||"false"]}
 `
 
 export abstract class BaseFormatter {
@@ -538,7 +538,7 @@ export abstract class BaseFormatter {
       let unhandledStr = matches[0].substring(1, matches[0].length - 1 - properlyHandledSuffix.length);
 
       const splitOnComparators = unhandledStr.split(RegExp(this.buildComparatorRegexPattern(), 'gi'));
-      let results: ParsedResult[] = splitOnComparators.filter((_, i) => i % 2 == 0)
+      let results: ResolvedVariable[] = splitOnComparators.filter((_, i) => i % 2 == 0)
         .map(baseString => // baseString looks like variableName.propertyName(::<modifier>)*
           this.parseModifiedVariable(baseString, value, {
             mod_tzlocale: matches?.groups?.suffix_tzlocale ?? undefined
@@ -547,22 +547,21 @@ export abstract class BaseFormatter {
       let foundComparators: (keyof typeof comparatorKeyToFuncs)[] = splitOnComparators.filter((_, i) => i % 2 != 0)
         .map(c => c as keyof typeof comparatorKeyToFuncs);
       
-      // add initial comparator for reduce to work even without a user-specified comparator
-      foundComparators = ["left", ...foundComparators];
-      results = [results[0], ...results];
-      let result = results.reduce((prev, cur, i) => {
-        if (prev.error !== undefined) return prev
-        if (cur.error !== undefined) return cur
+      // skip reducing if there's no comparators
+      let result = results.length == 1 ? results[0]
+        : results.reduce((prev, cur, i) => {
+          if (prev.error !== undefined) return prev
+          if (cur.error !== undefined) return cur
 
-        // the comparator key between prev and cur
-        const compareKey = foundComparators[i - 1] as keyof typeof comparatorKeyToFuncs;
-        const comparatorFn = comparatorKeyToFuncs[compareKey];
-        try {
-          return { result: comparatorFn(prev.result, cur.result) };
-        } catch (e) {
-          return { error: `{unable_to_compare(<${prev.result}>::${compareKey}::<${cur.result}>, ${e})}` };
-        }
-      });
+          // the comparator key between prev and cur (from splitOnComparators)
+          const compareKey = foundComparators[i - 1] as keyof typeof comparatorKeyToFuncs;
+          const comparatorFn = comparatorKeyToFuncs[compareKey];
+          try {
+            return { result: comparatorFn(prev.result, cur.result) };
+          } catch (e) {
+            return { error: `{unable_to_compare(<${prev.result}>::${compareKey}::<${cur.result}>, ${e})}` };
+          }
+        });
 
       // Handle conditional modifier results
       if ([true, false].includes(result.result)) {
@@ -571,9 +570,8 @@ export abstract class BaseFormatter {
           check_true = this.parseString(check_true, value) || check_true;
           check_false = this.parseString(check_false, value) || check_false;
         }
-        result = matches.groups.mod_check === undefined
-          ? { error: `{missing_TF_case_after_conditional_modifier(["true_case"||"false_case"])}` }
-          : { result: (result.result ? check_true : check_false) };
+        if (matches.groups.mod_check !== undefined)
+          result = { result: (result.result ? check_true : check_false) };
       }
 
       str = this.replaceCharsFromString(str, result.error ?? result.result?.toString(), index, re.lastIndex);
@@ -602,7 +600,7 @@ export abstract class BaseFormatter {
     fullStringModifiers: {
       mod_tzlocale: string | undefined,
     },
-  ): ParsedResult {
+  ): ResolvedVariable {
     const variable = this.buildVariableRegexPattern();
     const singleValidModifier = this.buildModifierRegexPattern();
     const baseRegexEx = new RegExp(`^${variable}(${singleValidModifier})*$`);
@@ -622,16 +620,13 @@ export abstract class BaseFormatter {
     let result = property as any;
     // Validate and Process - Modifier(s)
     const allModifiers = baseString.substring((`${variableName}.${propertyName}`).length);
-    console.log("baseString", baseString, "allModifiers", allModifiers);
     if (allModifiers.length) {
-      const singleModTerminator = '((::)|($))'; // :: if there's multiple modifiers or $ for the end of the string
+      const singleModTerminator = '(?=::|$)'; // :: if there's multiple modifiers or $ for the end of the string
       const singleValidModRe = new RegExp(`${this.buildModifierRegexPattern()}${singleModTerminator}`, 'g');
       
-      const sortedModMatches = [...allModifiers.matchAll(singleValidModRe)].sort((a, b) => (a.index ?? 0) - (b.index ?? 0)).map(regExpExecArray => regExpExecArray[1] /* First capture group, aka the modifier name */ );
+      const sortedModMatches = [...allModifiers.matchAll(singleValidModRe)].sort((a, b) => (a.index ?? 0) - (b.index ?? 0)).map(regExpExecArray => regExpExecArray[1] /* First capture group, aka the modifier name */);
       for (const lastModMatched of sortedModMatches) {
-        console.log("lastModMatched", lastModMatched, "result", result);
         result = this.applySingleModifier(result, lastModMatched, fullStringModifiers);
-        console.log("after applySingleModifier; result", result);
         if (result === undefined) {
           const errorStringInternal = (["string", "number", "boolean", "object"].includes(typeof result) ? `unknown_${typeof result}_modifier` : `unknown_modifier`);
           return { error: `{${errorStringInternal}(${lastModMatched!!})}` };
