@@ -627,8 +627,8 @@ export abstract class BaseFormatter {
       for (const lastModMatched of sortedModMatches) {
         result = this.applySingleModifier(result, lastModMatched, fullStringModifiers);
         if (result === undefined) {
-          switch (typeof result) {
-            case "string": case "number": case "boolean": return { error: `{unknown_${typeof result}_modifier(${lastModMatched})}` };
+          switch (typeof property) {
+            case "string": case "number": case "boolean": return { error: `{unknown_${typeof property}_modifier(${lastModMatched})}` };
             case "object": return { error: `{unknown_array_modifier(${lastModMatched})}` };
             default: return { error: `{unknown_modifier(${lastModMatched})}` };
           }
