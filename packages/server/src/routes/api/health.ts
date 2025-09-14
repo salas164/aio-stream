@@ -6,7 +6,7 @@ import {
   createLogger,
   UserRepository,
 } from '@aiostreams/core';
-const router = Router();
+const router: Router = Router();
 const logger = createLogger('server');
 
 router.get('/', async (req: Request, res: Response, next: NextFunction) => {

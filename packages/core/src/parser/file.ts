@@ -1,5 +1,5 @@
 import { PARSE_REGEX } from './regex';
-import { ParsedFile } from '../db';
+import { ParsedFile } from '../db/schemas';
 import ptt from './ptt';
 
 function matchPattern(

@@ -6,7 +6,7 @@ import { StremioTransformer } from '@aiostreams/core';
 import { createLogger } from '@aiostreams/core';
 
 const logger = createLogger('server');
-const router = Router();
+const router: Router = Router();
 
 router.use(stremioCatalogRateLimiter);
 

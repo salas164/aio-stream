@@ -5,7 +5,7 @@ import { StremioTransformer } from '@aiostreams/core';
 import { stremioSubtitleRateLimiter } from '../../middlewares/ratelimit';
 
 const logger = createLogger('server');
-const router = Router();
+const router: Router = Router();
 
 router.use(stremioSubtitleRateLimiter);
 

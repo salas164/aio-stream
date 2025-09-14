@@ -27,7 +27,10 @@ import { ModeProvider } from '@/context/mode';
 function ErrorOverlay({ error }: { error: string | null }) {
   return (
     <LoadingOverlay showSpinner={false}>
-      <LuffyError title="Something went wrong!" showRefreshButton>
+      <LuffyError
+        title="Something went wrong!"
+        reset={() => window.location.reload()}
+      >
         <p>{error}</p>
       </LuffyError>
     </LoadingOverlay>

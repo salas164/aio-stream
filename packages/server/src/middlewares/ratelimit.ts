@@ -81,6 +81,12 @@ const catalogApiRateLimiter = createRateLimiter(
   'catalog-api'
 );
 
+const animeApiRateLimiter = createRateLimiter(
+  Env.ANIME_API_RATE_LIMIT_WINDOW * 1000,
+  Env.ANIME_API_RATE_LIMIT_MAX_REQUESTS,
+  'anime-api'
+);
+
 const stremioStreamRateLimiter = createRateLimiter(
   Env.STREMIO_STREAM_RATE_LIMIT_WINDOW * 1000,
   Env.STREMIO_STREAM_RATE_LIMIT_MAX_REQUESTS,
@@ -122,6 +128,7 @@ export {
   streamApiRateLimiter,
   formatApiRateLimiter,
   catalogApiRateLimiter,
+  animeApiRateLimiter,
   stremioStreamRateLimiter,
   stremioCatalogRateLimiter,
   stremioManifestRateLimiter,

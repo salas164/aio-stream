@@ -5,7 +5,7 @@ import { createResponse } from '../../utils/responses';
 import { StremioTransformer } from '@aiostreams/core';
 
 const logger = createLogger('server');
-const router = Router();
+const router: Router = Router();
 
 router.get(
   '/:type/:id.json',

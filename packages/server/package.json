@@ -10,10 +10,11 @@
   },
   "description": "Combine all your streams into one addon and display them with consistent formatting, sorting, and filtering.",
   "dependencies": {
-    "@aiostreams/core": "^0.0.0",
+    "@aiostreams/core": "workspace:*",
     "express": "^5.1.0",
     "express-rate-limit": "^8.0.1",
-    "rate-limit-redis": "^4.2.2"
+    "rate-limit-redis": "^4.2.2",
+    "zod": "^4.1.5"
   },
   "devDependencies": {
     "@types/express": "^5.0.1",

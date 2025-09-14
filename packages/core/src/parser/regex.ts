@@ -55,7 +55,7 @@ export const PARSE_REGEX: PARSE_REGEX = {
     WEBRip: createRegex('web[ .\\-_]?rip'),
     HDRip: createRegex('hd[ .\\-_]?rip|web[ .\\-_]?dl[ .\\-_]?rip'),
     'HC HD-Rip': createRegex('hc|hd[ .\\-_]?rip'),
-    DVDRip: createRegex('dvd[ .\\-_]?(rip|mux|r|full|5|9)'),
+    DVDRip: createRegex('dvd[ .\\-_]?(rip|mux|r|full|5|9)?'),
     HDTV: createRegex(
       '(hd|pd)tv|tv[ .\\-_]?rip|hdtv[ .\\-_]?rip|dsr(ip)?|sat[ .\\-_]?rip'
     ),
@@ -81,7 +81,7 @@ export const PARSE_REGEX: PARSE_REGEX = {
       '(d(olby)?[ .\\-_]?d(igital)?[ .\\-_]?(p(lus)?|\\+)(?:[ .\\-_]?(5[ .\\-_]?1|7[ .\\-_]?1))?)|e[ .\\-_]?ac[ .\\-_]?3'
     ),
     DD: createRegex(
-      '(d(olby)?[ .\\-_]?d(igital)?(?:[ .\\-_]?(5[ .\\-_]?1|7[ .\\-_]?1))?)|(?<!e[ .\\-_]?)ac[ .\\-_]?3'
+      '(d(olby)?[ .\\-_]?d(igital)?(?:[ .\\-_]?(5[ .\\-_]?1|7[ .\\-_]?1|2[ .\\-_]?0?))?)|(?<!e[ .\\-_]?)ac[ .\\-_]?3'
     ),
     'DTS-HD MA': createRegex('dts[ .\\-_]?hd[ .\\-_]?ma'),
     'DTS-HD': createRegex('dts[ .\\-_]?hd(?![ .\\-_]?ma)'),
@@ -93,7 +93,7 @@ export const PARSE_REGEX: PARSE_REGEX = {
     FLAC: createRegex('flac(?:[ .\\-_]?(lossless|2\\.0|x[2-4]))?'),
   },
   audioChannels: {
-    '2.0': createRegex('(2[ .\\-_]?0)(ch)?'),
+    '2.0': createRegex('(d(olby)?[ .\\-_]?d(igital)?)?2[ .\\-_]?0?(ch)?'),
     '5.1': createRegex(
       '(d(olby)?[ .\\-_]?d(igital)?[ .\\-_]?(p(lus)?|\\+)?)?5[ .\\-_]?1(ch)?'
     ),

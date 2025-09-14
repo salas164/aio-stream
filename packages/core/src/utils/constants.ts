@@ -1,4 +1,4 @@
-import { Option } from '../db';
+import { Option } from '../db/schemas';
 
 export enum ErrorCode {
   // User API
@@ -207,7 +207,20 @@ const SERVICES = [
   EASYNEWS_SERVICE,
 ] as const;
 
+export const BUILTIN_SUPPORTED_SERVICES = [
+  REALDEBRID_SERVICE,
+  DEBRIDLINK_SERVICE,
+  PREMIUMIZE_SERVICE,
+  ALLDEBRID_SERVICE,
+  TORBOX_SERVICE,
+  EASYDEBRID_SERVICE,
+  DEBRIDER_SERVICE,
+  PIKPAK_SERVICE,
+  OFFCLOUD_SERVICE,
+] as const;
+
 export type ServiceId = (typeof SERVICES)[number];
+export type BuiltinServiceId = (typeof BUILTIN_SUPPORTED_SERVICES)[number];
 
 export const MEDIAFLOW_SERVICE = 'mediaflow' as const;
 export const STREMTHRU_SERVICE = 'stremthru' as const;

@@ -1,100 +1,247 @@
-import { ParsedFile } from '../db/schemas';
-import { createLogger } from '../utils';
+import { z } from 'zod';
+import { constants, createLogger } from '../utils';
+
+import { BuiltinServiceId } from '../utils';
+import { DebridFile, DebridDownload } from './base';
+import { PTT } from '../parser';
+import { normaliseTitle, titleMatch } from '../parser/utils';
 
 const logger = createLogger('debrid');
 
-interface FileWithParsedInfo {
-  name: string;
+export const BuiltinDebridServices = z.array(
+  z.object({
+    id: z.enum(constants.BUILTIN_SUPPORTED_SERVICES),
+    credential: z.string(),
+  })
+);
+
+export type BuiltinDebridServices = z.infer<typeof BuiltinDebridServices>;
+
+interface BaseFile {
+  title?: string;
   size: number;
-  index: number;
-  parsed: ParsedFile;
-  isVideo: boolean;
-  path?: string;
-  link?: string;
+  index?: number;
+  indexer?: string;
+  seeders?: number;
+  age?: string;
 }
 
-export function findMatchingFileInTorrent(
-  files: FileWithParsedInfo[],
-  chosenIndex?: number,
-  requestedFilename?: string,
-  requestedTitles?: string[],
-  season?: string,
-  episode?: string,
-  absoluteEpisode?: string,
-  expectLinks?: boolean
-): FileWithParsedInfo | null {
-  let chosenFile = null;
+export interface Torrent extends BaseFile {
+  type: 'torrent';
+  downloadUrl?: string;
+  sources: string[];
+  hash: string;
+  files?: DebridFile[];
+  // magnet?: string;
+}
 
-  for (const file of files) {
-    if (!file.isVideo || file.name?.includes('sample')) {
-      continue;
+export interface UnprocessedTorrent extends BaseFile {
+  type: 'torrent';
+  hash?: string;
+  downloadUrl?: string;
+  sources: string[];
+}
+
+export interface NZB extends BaseFile {
+  type: 'usenet';
+  hash: string;
+  nzb: string;
+}
+
+export interface TorrentWithSelectedFile extends Torrent {
+  file: DebridFile;
+  service?: {
+    id: BuiltinServiceId;
+    cached: boolean;
+    owned: boolean;
+  };
+}
+
+export interface NZBWithSelectedFile extends NZB {
+  file: DebridFile;
+  service?: {
+    id: BuiltinServiceId;
+    cached: boolean;
+    owned: boolean;
+  };
+}
+
+// helpers
+export const isSeasonWrong = (
+  parsed: { seasons?: number[] },
+  metadata?: { season?: number }
+) => {
+  if (
+    parsed.seasons?.length &&
+    metadata?.season &&
+    !parsed.seasons.includes(metadata.season)
+  ) {
+    return true;
+  }
+  return false;
+};
+export const isEpisodeWrong = (
+  parsed: { episodes?: number[] },
+  metadata?: { episode?: number; absoluteEpisode?: number }
+) => {
+  if (
+    parsed.episodes?.length &&
+    metadata?.episode &&
+    !(
+      parsed.episodes.includes(metadata.episode) ||
+      (metadata.absoluteEpisode &&
+        parsed.episodes.includes(metadata.absoluteEpisode))
+    )
+  ) {
+    return true;
+  }
+  return false;
+};
+export const isTitleWrong = (
+  parsed: { title?: string },
+  metadata?: { titles?: string[] }
+) => {
+  if (
+    parsed.title &&
+    metadata?.titles &&
+    !titleMatch(
+      normaliseTitle(parsed.title),
+      metadata.titles.map(normaliseTitle),
+      { threshold: 0.8 }
+    )
+  ) {
+    return true;
+  }
+  return false;
+};
+
+export async function selectFileInTorrentOrNZB(
+  torrentOrNZB: Torrent | NZB,
+  debridDownload: DebridDownload,
+  parsedFiles: Map<
+    string,
+    {
+      title?: string;
+      seasons?: number[];
+      episodes?: number[];
+    }
+  >,
+
+  metadata?: {
+    titles: string[];
+    season?: number;
+    episode?: number;
+    absoluteEpisode?: number;
+  },
+  options?: {
+    chosenFilename?: string;
+    chosenIndex?: number;
+  }
+): Promise<DebridFile | undefined> {
+  if (!debridDownload.files?.length) {
+    return {
+      name: torrentOrNZB.title,
+      size: torrentOrNZB.size,
+      index: -1,
+    };
+  }
+
+  const isVideo = debridDownload.files.map((file) => isVideoFile(file));
+
+  // Create a scoring system for each file
+  const fileScores = debridDownload.files.map((file, index) => {
+    let score = 0;
+    const parsed = parsedFiles.get(file.name ?? '');
+
+    if (!parsed) {
+      logger.warn(`Parsed file not found for ${file.name}`);
     }
 
-    if (season || episode || absoluteEpisode) {
-      if (
-        (requestedTitles && file.parsed.title
-          ? requestedTitles.some(
-              (title) =>
-                file.parsed.title!.toLowerCase() === title.toLowerCase()
-            )
-          : true) &&
-        ((absoluteEpisode &&
-          !file.parsed.season &&
-          file.parsed.episode === Number(absoluteEpisode)) ||
-          (season && !episode && file.parsed.season === Number(season)) ||
-          (episode && !season && file.parsed.episode === Number(episode)) ||
-          (season &&
-            episode &&
-            file.parsed.season === Number(season) &&
-            file.parsed.episode === Number(episode)))
-      ) {
-        chosenFile = file;
-        break;
-      }
-    } else {
-      if (requestedTitles) {
-        if (
-          requestedTitles.some(
-            (title) => file.parsed.title?.toLowerCase() === title.toLowerCase()
-          )
-        ) {
-          chosenFile = file;
-          break;
-        }
-      }
+    // Base score from video file status (highest priority)
+    if (isVideo[index]) {
+      score += 1000;
     }
-  }
 
-  if (chosenFile) {
-    return chosenFile;
-  }
-
-  if (requestedFilename) {
-    const requestedFile = files.find(
-      (file) => file.name.toLowerCase() === requestedFilename.toLowerCase()
-    );
-    if (requestedFile) {
-      return requestedFile;
+    // Season/Episode matching (second highest priority)
+    if (parsed && !isSeasonWrong(parsed, metadata)) {
+      score += 500;
     }
-  }
+    if (parsed && !isEpisodeWrong(parsed, metadata)) {
+      score += 500;
+    }
 
-  if (chosenIndex) {
-    const fileIdx = files.find((file) => file.index === chosenIndex);
-    if (fileIdx) return fileIdx;
-  }
+    // Title matching (third priority)
+    if (parsed && !isTitleWrong(parsed, metadata)) {
+      score += 100;
+    }
 
-  if (files.length > 0 && (!expectLinks || files.some((file) => file.link))) {
-    return files
-      .filter((file) => !expectLinks || file.link)
-      .reduce((largest, current) =>
-        current.size > largest.size ? current : largest
+    // Size based score (lowest priority but still relevant)
+    // We normalize the size to be between 0 and 50 points
+    const files = debridDownload.files || [];
+    const maxSize =
+      torrentOrNZB.size || files.reduce((max, f) => Math.max(max, f.size), 0);
+    score += maxSize > 0 ? (file.size / maxSize) * 50 : 0;
+
+    // Small boost for chosen index/filename if provided
+    if (options?.chosenIndex === index) {
+      score += 25;
+    }
+    if (
+      options?.chosenFilename &&
+      torrentOrNZB.title?.includes(options.chosenFilename)
+    ) {
+      score += 25;
+    }
+    return {
+      file,
+      score,
+      index,
+    };
+  });
+
+  // Sort by score descending
+  fileScores.sort((a, b) => b.score - a.score);
+
+  // Select the best matching file
+  const bestMatch = fileScores[0];
+  // return bestMatch.file;
+  const parsedFile = parsedFiles.get(bestMatch.file.name ?? '');
+  const parsedTitle = parsedFiles.get(torrentOrNZB.title ?? '');
+
+  if (metadata && parsedFile && parsedTitle) {
+    // if (
+    //   !isSeasonWrong(parsed, metadata) &&
+    //   !isSeasonWrong(parsedTorrentOrNZB, metadata)
+    // ) {
+    //   logger.debug(
+    //     `Season ${metadata.season} not found in ${torrentOrNZB.title} and ${bestMatch.file.name}, skipping...`
+    //   );
+    //   return undefined;
+    // }
+    if (
+      isEpisodeWrong(parsedFile, metadata) ||
+      isEpisodeWrong(parsedTitle, metadata)
+    ) {
+      logger.debug(
+        `Episode ${metadata.episode} or ${metadata.absoluteEpisode} not found in ${torrentOrNZB.title} and ${bestMatch.file.name}, skipping...`
       );
+      return undefined;
+    }
+    // if (
+    //   !titleMatchHelper(parsed, metadata) &&
+    //   !titleMatchHelper(parsedTorrentOrNZB, metadata)
+    // ) {
+    //   logger.debug(
+    //     `Title ${torrentOrNZB.title} and ${bestMatch.file.name} does not match ${metadata.titles.join(', ')}, skipping...`
+    //   );
+    //   return undefined;
+    // }
   }
 
-  return null;
+  return bestMatch.file;
 }
 
-export function isVideoFile(filename: string): boolean {
+export function isVideoFile(file: DebridFile): boolean {
   const videoExtensions = [
     '.3g2',
     '.3gp',
@@ -136,5 +283,9 @@ export function isVideoFile(filename: string): boolean {
     '.m3u8',
     '.m2ts',
   ];
-  return videoExtensions.some((ext) => filename.endsWith(ext));
+
+  return (
+    file.mimeType?.includes('video') ||
+    videoExtensions.some((ext) => file.name?.endsWith(ext) ?? false)
+  );
 }

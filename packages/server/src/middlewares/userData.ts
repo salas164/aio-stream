@@ -104,7 +104,10 @@ export const userDataMiddleware = async (
 
     if (resource !== 'configure') {
       try {
-        userData = await validateConfig(userData, true, true);
+        userData = await validateConfig(userData, {
+          skipErrorsFromAddonsOrProxies: true,
+          decryptValues: true,
+        });
       } catch (error: any) {
         if (constants.RESOURCES.includes(resource as Resource)) {
           res.status(200).json(

@@ -1,6 +1,7 @@
 import { z } from 'zod';
 import { Manifest, Stream } from '../../db';
 import {
+  AnimeDatabase,
   createLogger,
   formatZodError,
   getTimeTakenSincePoint,
@@ -8,11 +9,10 @@ import {
 import { TorBoxSearchAddonUserDataSchema } from './schemas';
 import { TorboxApi } from '@torbox/torbox-api';
 import TorboxSearchApi from './search-api';
-import { IdParser } from '../utils/id-parser';
+import { IdParser } from '../../utils/id-parser';
 import { TorrentSourceHandler, UsenetSourceHandler } from './source-handlers';
 import { TorBoxSearchAddonError } from './errors';
 import { supportedIdTypes } from './search-api';
-import { KitsuMetadata } from '../../metadata/kitsu';
 
 const logger = createLogger('torbox-search');
 
@@ -20,7 +20,6 @@ export class TorBoxSearchAddon {
   private readonly userData: z.infer<typeof TorBoxSearchAddonUserDataSchema>;
   private readonly searchApi: TorboxSearchApi;
   private readonly torboxApi: TorboxApi;
-  private static readonly idParser: IdParser = new IdParser(supportedIdTypes);
   private readonly sourceHandlers: (
     | TorrentSourceHandler
     | UsenetSourceHandler
@@ -71,7 +70,7 @@ export class TorBoxSearchAddon {
         {
           name: 'stream',
           types: ['movie', 'series', 'anime'],
-          idPrefixes: TorBoxSearchAddon.idParser.supportedPrefixes,
+          idPrefixes: IdParser.getPrefixes(supportedIdTypes),
         },
       ],
       catalogs: [],
@@ -98,7 +97,9 @@ export class TorBoxSearchAddon {
         new UsenetSourceHandler(
           this.searchApi,
           this.torboxApi,
-          this.userData.searchUserEngines
+          this.userData.searchUserEngines,
+          this.userData.services,
+          this.clientIp
         )
       );
     }
@@ -110,39 +111,29 @@ export class TorBoxSearchAddon {
   }
 
   public async getStreams(type: string, id: string): Promise<Stream[]> {
-    const parsedId = TorBoxSearchAddon.idParser.parse(id);
-    if (!parsedId) {
+    const parsedId = IdParser.parse(id, type);
+    if (!parsedId || !supportedIdTypes.includes(parsedId.type)) {
       throw new TorBoxSearchAddonError(`Unsupported ID: ${id}`, 400);
     }
 
-    const metadataStart = Date.now();
-    if (
-      ['mal_id', 'kitsu_id', 'anilist_id', 'anidb_id'].includes(parsedId.type)
-    ) {
-      try {
-        const kitsuMetadata = new KitsuMetadata();
-        const metadata = await kitsuMetadata.getMetadata(parsedId, type);
-        parsedId.season = metadata.seasons?.[0]?.season_number
-          ? metadata.seasons[0].season_number.toString()
-          : undefined;
-        logger.debug(
-          `Fetched season metadata for ${id} in ${getTimeTakenSincePoint(metadataStart)}:`,
-          {
-            season: parsedId.season,
-          }
-        );
-      } catch (error) {
-        logger.error(`Error fetching anime metadata for ${id}:`, error);
-      }
+    const animeEntry = AnimeDatabase.getInstance().getEntryById(
+      parsedId.type,
+      parsedId.value
+    );
+    if (animeEntry && !parsedId.season) {
+      parsedId.season =
+        animeEntry.imdb?.fromImdbSeason?.toString() ??
+        animeEntry.trakt?.season?.toString();
+      logger.debug(`Updated season for ${id} to ${parsedId.season}`);
     }
 
-    logger.info(`Getting streams for ${id}`, {
+    logger.info(`Handling stream request`, {
       type,
       id,
       idType: parsedId.type,
+      idValue: parsedId.value,
       season: parsedId.season,
       episode: parsedId.episode,
-      titleId: parsedId.id,
       sources: this.userData.sources,
     });
 

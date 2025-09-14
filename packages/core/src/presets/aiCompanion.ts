@@ -325,7 +325,7 @@ export class AICompanionPreset extends Preset {
       return result.manifest_url;
     } catch (error) {
       throw new Error(
-        `Failed to generate manifest URL for AI Search: ${error}`
+        `Failed to generate manifest URL for AI Companion: ${error}`
       );
     }
   }

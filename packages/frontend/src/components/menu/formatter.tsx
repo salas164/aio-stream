@@ -10,7 +10,7 @@ import { Textarea } from '../ui/textarea';
 import { Select } from '../ui/select';
 import { Switch } from '../ui/switch';
 import { TextInput } from '../ui/text-input';
-import FileParser from '@aiostreams/core/src/parser/file';
+import FileParser from '../../../../core/src/parser/file';
 import { UserConfigAPI } from '@/services/api';
 import { SNIPPETS } from '../../../../core/src/utils/constants';
 import { Modal } from '@/components/ui/modal';

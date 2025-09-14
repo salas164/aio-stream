@@ -13,3 +13,6 @@ export * from './dsu';
 export * from './startup';
 export * from './extras';
 export * from './rpdb';
+export * from './distributed-lock';
+export * from './id-parser';
+export * from './anime-database';

@@ -6,13 +6,12 @@ import {
   formatZodError,
 } from '@aiostreams/core';
 import {
-  DebridInterface,
   DebridError,
   PlaybackInfoSchema,
-  StoreAuthSchema,
+  getDebridService,
+  ServiceAuthSchema,
 } from '@aiostreams/core';
 import { ZodError } from 'zod';
-import { StremThruError } from 'stremthru';
 import {
   STATIC_DOWNLOAD_FAILED,
   STATIC_DOWNLOADING,
@@ -23,7 +22,7 @@ import {
   STATIC_UNAUTHORIZED,
   STATIC_NO_MATCHING_FILE,
 } from '../../app';
-const router = Router();
+const router: Router = Router();
 const logger = createLogger('server');
 
 // block HEAD requests
@@ -36,7 +35,7 @@ router.use((req: Request, res: Response, next: NextFunction) => {
 });
 
 router.get(
-  '/resolve/:encodedStoreAuth/:encodedPlaybackInfo/:filename',
+  '/playback/:encodedStoreAuth/:encodedPlaybackInfo/:filename',
   async (req: Request, res: Response, next: NextFunction) => {
     try {
       const { encodedStoreAuth, encodedPlaybackInfo, filename } = req.params;
@@ -51,22 +50,25 @@ router.get(
         JSON.parse(Buffer.from(encodedPlaybackInfo, 'base64').toString('utf-8'))
       );
 
-      const storeAuth = StoreAuthSchema.parse(
+      const storeAuth = ServiceAuthSchema.parse(
         JSON.parse(Buffer.from(encodedStoreAuth, 'base64').toString('utf-8'))
       );
 
-      const debridInterface = new DebridInterface(storeAuth, req.userIp);
+      const debridInterface = getDebridService(
+        storeAuth.id,
+        storeAuth.credential,
+        req.userIp
+      );
 
       let streamUrl: string | undefined;
       try {
         streamUrl = await debridInterface.resolve(playbackInfo, filename);
       } catch (error: any) {
         let staticFile: string = STATIC_INTERNAL_SERVER_ERROR;
-        if (error instanceof StremThruError) {
+        if (error instanceof DebridError) {
           logger.error(
-            `Got StremThru error during debrid resolve: ${error.code}: ${error.message}`
+            `Got Debrid error during debrid resolve: ${error.code}: ${error.message}`
           );
-
           switch (error.code) {
             case 'UNAVAILABLE_FOR_LEGAL_REASONS':
               staticFile = STATIC_UNAVAILABLE_FOR_LEGAL_REASONS;
@@ -85,14 +87,6 @@ router.get(
             case 'STORE_MAGNET_INVALID':
               staticFile = STATIC_DOWNLOAD_FAILED;
               break;
-            default:
-              break;
-          }
-        } else if (error instanceof DebridError) {
-          logger.error(
-            `Got Debrid error during debrid resolve: ${error.code}: ${error.message}`
-          );
-          switch (error.code) {
             case 'NO_MATCHING_FILE':
               staticFile = STATIC_NO_MATCHING_FILE;
               break;
@@ -116,9 +110,6 @@ router.get(
 
       res.status(307).redirect(streamUrl);
     } catch (error: any) {
-      logger.error(
-        `Got unexpected error during debrid resolve: ${error.message}`
-      );
       if (error instanceof APIError) {
         next(error);
       } else if (error instanceof ZodError) {
@@ -130,6 +121,9 @@ router.get(
           )
         );
       } else {
+        logger.error(
+          `Got unexpected error during debrid resolve: ${error.message}`
+        );
         next(
           new APIError(
             constants.ErrorCode.INTERNAL_SERVER_ERROR,

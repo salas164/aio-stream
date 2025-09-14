@@ -1,6 +1,5 @@
 import { z } from 'zod';
-import { StremThruPreset } from '../../presets/stremthru';
-import { ServiceId } from '../../utils';
+import { BuiltinDebridServices } from '../../debrid/utils';
 
 const TorBoxApiErrorResponseSchema = z.object({
   success: z.literal(false),
@@ -32,7 +31,7 @@ const TorBoxSearchApiMetadataSchema = z.object({
   tmdb_id: z.number().nullable(),
 });
 
-const TorBoxSearchApiTorrentSchema = z.object({
+const TorBoxSearchApiResultSchema = z.object({
   hash: z.string(),
   raw_title: z.string(),
   title: z.string(),
@@ -67,11 +66,9 @@ const TorBoxSearchApiTorrentSchema = z.object({
 });
 
 export const TorBoxSearchApiDataSchema = z.object({
-  metadata: z.union([TorBoxSearchApiMetadataSchema, z.null()]).optional(),
-  torrents: z
-    .union([z.array(TorBoxSearchApiTorrentSchema), z.null()])
-    .optional(),
-  nzbs: z.union([z.array(TorBoxSearchApiTorrentSchema), z.null()]).optional(),
+  metadata: TorBoxSearchApiMetadataSchema.nullable().optional(),
+  torrents: z.array(TorBoxSearchApiResultSchema).nullable().optional(),
+  nzbs: z.array(TorBoxSearchApiResultSchema).nullable().optional(),
 });
 
 export const TorBoxApiUsenetDownloadSchema = z.object({
@@ -90,14 +87,8 @@ export const TorBoxSearchAddonUserDataSchema = z.object({
   sources: z
     .array(z.enum(['torrent', 'usenet']))
     .min(1, 'At least one source must be configured'),
-  services: z
-    .array(
-      z.object({
-        id: z.enum(
-          StremThruPreset.supportedServices as [ServiceId, ...ServiceId[]]
-        ),
-        credential: z.string(),
-      })
-    )
-    .min(1, 'At least one service must be configured'),
+  services: BuiltinDebridServices.min(
+    1,
+    'At least one service must be configured'
+  ),
 });

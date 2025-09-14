@@ -8,7 +8,7 @@ import {
 } from '@aiostreams/core';
 import { userApiRateLimiter } from '../../middlewares/ratelimit';
 import { createResponse } from '../../utils/responses';
-const router = Router();
+const router: Router = Router();
 
 const logger = createLogger('server');
 

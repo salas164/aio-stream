@@ -6,8 +6,11 @@ import {
   DB,
   UserRepository,
   logStartupInfo,
+  logStartupFooter,
   Cache,
   FeatureControl,
+  PTT,
+  AnimeDatabase,
 } from '@aiostreams/core';
 
 const logger = createLogger('server');
@@ -17,6 +20,15 @@ async function initialiseDatabase() {
     await DB.getInstance().initialise(Env.DATABASE_URI, []);
   } catch (error) {
     logger.error('Failed to initialise database:', error);
+    throw error;
+  }
+}
+
+async function initialisePTT() {
+  try {
+    await PTT.initialise();
+  } catch (error) {
+    logger.error('Failed to initialise PTT Server:', error);
     throw error;
   }
 }
@@ -37,15 +49,25 @@ async function initialiseRedis() {
   }
 }
 
+async function initialiseAnimeDatabase() {
+  try {
+    await AnimeDatabase.getInstance().initialise();
+  } catch (error) {
+    logger.error('Failed to initialise AnimeDatabase:', error);
+  }
+}
+
 async function start() {
   try {
+    logStartupInfo();
     await initialiseDatabase();
     await initialiseRedis();
+    await initialisePTT();
+    initialiseAnimeDatabase();
     FeatureControl.initialise();
     if (Env.PRUNE_MAX_DAYS >= 0) {
       startAutoPrune();
     }
-    logStartupInfo();
     const server = app.listen(Env.PORT, (error) => {
       if (error) {
         logger.error('Failed to start server:', error);
@@ -54,6 +76,7 @@ async function start() {
       logger.info(
         `Server running on port ${Env.PORT}: ${JSON.stringify(server.address())}`
       );
+      logStartupFooter();
     });
   } catch (error) {
     logger.error('Failed to start server:', error);
@@ -63,6 +86,7 @@ async function start() {
 
 async function shutdown() {
   await Cache.close();
+  await PTT.cleanup();
   FeatureControl.cleanup();
   await DB.getInstance().close();
 }

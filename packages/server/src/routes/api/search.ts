@@ -9,13 +9,15 @@ import {
   constants,
   formatZodError,
   validateConfig,
+  isEncrypted,
+  decryptString,
 } from '@aiostreams/core';
 import { streamApiRateLimiter } from '../../middlewares/ratelimit';
 import { createLogger } from '@aiostreams/core';
 import { ApiTransformer, ApiSearchResponseData } from '@aiostreams/core';
 import { ApiResponse, createResponse } from '../../utils/responses';
 import { z, ZodError } from 'zod';
-const router = Router();
+const router: Router = Router();
 
 const logger = createLogger('server');
 
@@ -102,6 +104,24 @@ router.get(
               `Missing username or password in basic auth`
             );
           }
+          if (isEncrypted(password)) {
+            const {
+              success: successfulDecryption,
+              data: decryptedPassword,
+              error,
+            } = decryptString(password);
+            if (!successfulDecryption) {
+              next(
+                new APIError(
+                  constants.ErrorCode.ENCRYPTION_ERROR,
+                  undefined,
+                  error
+                )
+              );
+              return;
+            }
+            password = decryptedPassword;
+          }
           logger.debug(`Using basic auth for Search API request: ${uuid}`);
         } catch (error: any) {
           throw new APIError(
@@ -126,7 +146,10 @@ router.get(
       }
       userData.ip = req.userIp;
       try {
-        userData = await validateConfig(userData, true, true);
+        userData = await validateConfig(userData, {
+          skipErrorsFromAddonsOrProxies: true,
+          decryptValues: true,
+        });
       } catch (error: any) {
         throw new APIError(
           constants.ErrorCode.USER_INVALID_CONFIG,

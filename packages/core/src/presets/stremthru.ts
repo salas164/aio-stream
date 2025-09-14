@@ -3,6 +3,15 @@ import { StreamParser } from '../parser';
 import { constants, ServiceId } from '../utils';
 import { Preset } from './preset';
 
+export const stremthruSpecialCases: Partial<
+  Record<ServiceId, (credentials: any) => any>
+> = {
+  [constants.OFFCLOUD_SERVICE]: (credentials: any) =>
+    `${credentials.email}:${credentials.password}`,
+  [constants.PIKPAK_SERVICE]: (credentials: any) =>
+    `${credentials.email}:${credentials.password}`,
+};
+
 export class StremThruStreamParser extends StreamParser {
   protected override getIndexer(
     stream: Stream,
@@ -59,11 +68,11 @@ export class StremThruPreset extends Preset {
     specialCases?: Partial<Record<ServiceId, (credentials: any) => any>>
   ) {
     return super.getServiceCredential(serviceId, userData, {
-      [constants.OFFCLOUD_SERVICE]: (credentials: any) =>
-        `${credentials.email}:${credentials.password}`,
-      [constants.PIKPAK_SERVICE]: (credentials: any) =>
-        `${credentials.email}:${credentials.password}`,
+      ...stremthruSpecialCases,
       ...specialCases,
     });
   }
 }
+
+export type StremThruServiceId =
+  (typeof StremThruPreset.supportedServices)[number];

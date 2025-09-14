@@ -39,6 +39,12 @@ const moduleMap: { [key: string]: string } = {
   gdrive: '☁️  GDRIVE',
   'torbox-search': '🔍  TORBOX SEARCH',
   debrid: '🔗  DEBRID',
+  'distributed-lock': '🔒  DISTRIBUTED LOCK',
+  'anime-database': '🔍  ANIME DATABASE',
+  torznab: '🔍  TORZNAB',
+  newznab: '🔍  NEWZNAB',
+  'metadata-service': '🔍  METADATA',
+  torrent: '👤  TORRENT',
 };
 
 // Define colors for each log level using full names

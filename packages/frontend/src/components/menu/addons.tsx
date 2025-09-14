@@ -74,6 +74,7 @@ import { IoExtensionPuzzle } from 'react-icons/io5';
 import { NumberInput } from '../ui/number-input';
 import { useDisclosure } from '@/hooks/disclosure';
 import { useMode } from '@/context/mode';
+import { Select } from '../ui/select';
 
 interface CatalogModification {
   id: string;
@@ -1191,7 +1192,7 @@ function AddonGroupCard() {
   // Helper function to get presets that are not in any group except the current one
   const getAvailablePresets = (currentGroupIndex: number) => {
     const presetsInOtherGroups = new Set(
-      userData.groups?.flatMap((group, idx) =>
+      userData.groups?.groupings?.flatMap((group, idx) =>
         idx !== currentGroupIndex ? group.addons : []
       ) || []
     );
@@ -1213,7 +1214,7 @@ function AddonGroupCard() {
   ) => {
     setUserData((prev) => {
       // Initialize groups array if it doesn't exist
-      const currentGroups = prev.groups || [];
+      const currentGroups = prev.groups?.groupings || [];
 
       // Create a new array with all existing groups
       const newGroups = [...currentGroups];
@@ -1231,7 +1232,10 @@ function AddonGroupCard() {
 
       return {
         ...prev,
-        groups: newGroups,
+        groups: {
+          ...prev.groups,
+          groupings: newGroups,
+        },
       };
     });
   };
@@ -1259,21 +1263,46 @@ function AddonGroupCard() {
         for a detailed guide to using groups.
       </div>
       <Switch
-        label="Disable Groups"
-        value={userData.disableGroups ?? false}
+        label="Enable"
+        value={userData.groups?.enabled ?? false}
         onValueChange={(value) => {
-          setUserData((prev) => ({ ...prev, disableGroups: value }));
+          setUserData((prev) => ({
+            ...prev,
+            groups: { ...prev.groups, enabled: value },
+          }));
         }}
         side="right"
-        help="If enabled, groups will be ignored and all addons will be used."
       />
-      {(userData.groups || []).map((group, index) => (
+      <Select
+        label="Behaviour"
+        value={userData.groups?.behaviour ?? 'parallel'}
+        onValueChange={(value) => {
+          setUserData((prev) => ({
+            ...prev,
+            groups: {
+              ...prev.groups,
+              behaviour: value as 'sequential' | 'parallel',
+            },
+          }));
+        }}
+        options={[
+          { label: 'Parallel', value: 'parallel' },
+          { label: 'Sequential', value: 'sequential' },
+        ]}
+        disabled={userData.groups?.enabled === false}
+        help={
+          userData.groups?.behaviour === 'sequential'
+            ? 'Streams are fetched from the first group only to begin with. If the condition for the next group is met, streams are fetched from the next group, and so on.'
+            : 'Streams are fetched from all groups at the same time. When a condition is not met, results from its group onwards are simply not shown.'
+        }
+      />
+      {(userData.groups?.groupings || []).map((group, index) => (
         <div key={index} className="flex gap-2">
           <div className="flex-1 flex gap-2">
             <div className="flex-1">
               <Combobox
                 multiple
-                disabled={userData.disableGroups}
+                disabled={userData.groups?.enabled === false}
                 value={group.addons}
                 options={getAvailablePresets(index)}
                 emptyMessage="You haven't installed any addons yet or they are already in a group"
@@ -1287,7 +1316,7 @@ function AddonGroupCard() {
             <div className="flex-1">
               <TextInput
                 value={index === 0 ? 'true' : group.condition}
-                disabled={index === 0 || userData.disableGroups}
+                disabled={index === 0 || userData.groups?.enabled === false}
                 label="Condition"
                 placeholder="Enter condition"
                 onValueChange={(value) => {
@@ -1299,16 +1328,16 @@ function AddonGroupCard() {
           <IconButton
             size="sm"
             rounded
-            disabled={userData.disableGroups}
+            disabled={userData.groups?.enabled === false}
             icon={<FaRegTrashAlt />}
             intent="alert-subtle"
             onClick={() => {
               setUserData((prev) => {
-                const newGroups = [...(prev.groups || [])];
+                const newGroups = [...(prev.groups?.groupings || [])];
                 newGroups.splice(index, 1);
                 return {
                   ...prev,
-                  groups: newGroups,
+                  groups: { ...prev.groups, groupings: newGroups },
                 };
               });
             }}
@@ -1321,13 +1350,16 @@ function AddonGroupCard() {
           size="sm"
           intent="primary-subtle"
           icon={<FaPlus />}
-          disabled={userData.disableGroups}
+          disabled={userData.groups?.enabled === false}
           onClick={() => {
             setUserData((prev) => {
-              const currentGroups = prev.groups || [];
+              const currentGroups = prev.groups?.groupings || [];
               return {
                 ...prev,
-                groups: [...currentGroups, { addons: [], condition: '' }],
+                groups: {
+                  ...prev.groups,
+                  groupings: [...currentGroups, { addons: [], condition: '' }],
+                },
               };
             });
           }}

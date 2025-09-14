@@ -1,5 +1,8 @@
 import { Headers } from 'undici';
 import { Env, Cache, TYPES, makeRequest } from '../utils';
+import { Metadata } from './utils';
+import { z } from 'zod';
+
 export type ExternalIdType = 'imdb' | 'tmdb' | 'tvdb';
 
 interface ExternalId {
@@ -18,14 +21,56 @@ const ID_CACHE_TTL = 30 * 24 * 60 * 60; // 30 days
 const TITLE_CACHE_TTL = 7 * 24 * 60 * 60; // 7 days
 const AUTHORISATION_CACHE_TTL = 2 * 24 * 60 * 60; // 2 days
 
-export interface TMDBMetadataResponse {
-  titles: string[];
-  year: string;
-  seasons?: {
-    season_number: number;
-    episode_count: number;
-  }[];
-}
+// Zod schemas for API responses
+const MovieDetailsSchema = z.object({
+  id: z.number(),
+  title: z.string(),
+  release_date: z.string().optional(),
+  status: z.string(),
+});
+
+const TVDetailsSchema = z.object({
+  id: z.number(),
+  name: z.string(),
+  first_air_date: z.string().optional(),
+  last_air_date: z.string().optional(),
+  status: z.string(),
+  seasons: z.array(
+    z.object({
+      season_number: z.number(),
+      episode_count: z.number(),
+    })
+  ),
+});
+
+const MovieAlternativeTitlesSchema = z.object({
+  titles: z.array(
+    z.object({
+      title: z.string(),
+    })
+  ),
+});
+
+const TVAlternativeTitlesSchema = z.object({
+  results: z.array(
+    z.object({
+      title: z.string(),
+    })
+  ),
+});
+
+const FindResultsSchema = z.object({
+  movie_results: z.array(
+    z.object({
+      id: z.number(),
+    })
+  ),
+  tv_results: z.array(
+    z.object({
+      id: z.number(),
+    })
+  ),
+});
 
 export class TMDBMetadata {
   private readonly TMDB_ID_REGEX = /^(?:tmdb)[-:](\d+)(?::\d+:\d+)?$/;
@@ -35,8 +80,8 @@ export class TMDBMetadata {
     string,
     string
   >('tmdb_id_conversion');
-  private static readonly metadataCache: Cache<string, TMDBMetadataResponse> =
-    Cache.getInstance<string, TMDBMetadataResponse>('tmdb_metadata');
+  private static readonly metadataCache: Cache<string, Metadata> =
+    Cache.getInstance<string, Metadata>('tmdb_metadata');
   private readonly accessToken: string | undefined;
   private readonly apiKey: string | undefined;
   private static readonly validationCache: Cache<string, boolean> =
@@ -109,9 +154,9 @@ export class TMDBMetadata {
       throw new Error(`${response.status} - ${response.statusText}`);
     }
 
-    const data: any = await response.json();
+    const data = FindResultsSchema.parse(await response.json());
     const results = type === 'movie' ? data.movie_results : data.tv_results;
-    const meta = results?.[0];
+    const meta = results[0];
 
     if (!meta) {
       throw new Error(`No ${type} metadata found for ID: ${id.value}`);
@@ -123,7 +168,8 @@ export class TMDBMetadata {
     return tmdbId;
   }
 
-  private parseReleaseDate(releaseDate: string): string {
+  private parseReleaseDate(releaseDate: string | undefined): string {
+    if (!releaseDate) return '0';
     const date = new Date(releaseDate);
     return date.getFullYear().toString();
   }
@@ -131,7 +177,7 @@ export class TMDBMetadata {
   public async getMetadata(
     id: string,
     type: (typeof TYPES)[number]
-  ): Promise<TMDBMetadataResponse> {
+  ): Promise<Metadata> {
     if (!['movie', 'series', 'anime'].includes(type)) {
       throw new Error(`Invalid type: ${type}`);
     }
@@ -168,18 +214,32 @@ export class TMDBMetadata {
       throw new Error(`Failed to fetch details: ${detailsResponse.statusText}`);
     }
 
-    const detailsData: any = await detailsResponse.json();
+    const detailsJson = await detailsResponse.json();
+    const detailsData =
+      type === 'movie'
+        ? MovieDetailsSchema.parse(detailsJson)
+        : TVDetailsSchema.parse(detailsJson);
+
     const primaryTitle =
-      type === 'movie' ? detailsData.title : detailsData.name;
+      type === 'movie'
+        ? (detailsData as z.infer<typeof MovieDetailsSchema>).title
+        : (detailsData as z.infer<typeof TVDetailsSchema>).name;
     const year = this.parseReleaseDate(
-      type === 'movie' ? detailsData.release_date : detailsData.first_air_date
+      type === 'movie'
+        ? (detailsData as z.infer<typeof MovieDetailsSchema>).release_date
+        : (detailsData as z.infer<typeof TVDetailsSchema>).first_air_date
     );
+    const yearEnd =
+      type === 'series'
+        ? (detailsData as z.infer<typeof TVDetailsSchema>).last_air_date
+          ? this.parseReleaseDate(
+              (detailsData as z.infer<typeof TVDetailsSchema>).last_air_date
+            )
+          : undefined
+        : undefined;
     const seasons =
       type === 'series'
-        ? detailsData.seasons.map((season: any) => ({
-            season_number: season.season_number,
-            episode_count: season.episode_count,
-          }))
+        ? (detailsData as z.infer<typeof TVDetailsSchema>).seasons
         : undefined;
 
     // Fetch alternative titles
@@ -201,18 +261,28 @@ export class TMDBMetadata {
       );
     }
 
-    const altTitlesData: any = await altTitlesResponse.json();
+    const altTitlesJson = await altTitlesResponse.json();
+    const altTitlesData =
+      type === 'movie'
+        ? MovieAlternativeTitlesSchema.parse(altTitlesJson)
+        : TVAlternativeTitlesSchema.parse(altTitlesJson);
     const alternativeTitles =
       type === 'movie'
-        ? altTitlesData.titles.map((title: any) => title.title)
-        : altTitlesData.results.map((title: any) => title.title);
+        ? (
+            altTitlesData as z.infer<typeof MovieAlternativeTitlesSchema>
+          ).titles.map((title) => title.title)
+        : (
+            altTitlesData as z.infer<typeof TVAlternativeTitlesSchema>
+          ).results.map((title) => title.title);
 
     // Combine primary title with alternative titles, ensuring no duplicates
     const allTitles = [primaryTitle, ...alternativeTitles];
     const uniqueTitles = [...new Set(allTitles)];
-    const metadata: TMDBMetadataResponse = {
+    const metadata: Metadata = {
+      title: primaryTitle,
       titles: uniqueTitles,
-      year,
+      year: Number(year),
+      yearEnd: yearEnd ? Number(yearEnd) : undefined,
       seasons,
     };
     // Cache the result

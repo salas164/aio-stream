@@ -29,6 +29,45 @@ import {
 } from '../shared/confirmation-dialog';
 import { UserData } from '@aiostreams/core';
 
+function applyMigrations(config: any): UserData {
+  if (
+    config.deduplicator &&
+    typeof config.deduplicator.multiGroupBehaviour === 'string'
+  ) {
+    switch (config.deduplicator.multiGroupBehaviour as string) {
+      case 'remove_uncached':
+        config.deduplicator.multiGroupBehaviour = 'aggressive';
+        break;
+      case 'remove_uncached_same_service':
+        config.deduplicator.multiGroupBehaviour = 'conservative';
+        break;
+      case 'remove_nothing':
+        config.deduplicator.multiGroupBehaviour = 'keep_all';
+        break;
+    }
+  }
+  if (config.titleMatching?.matchYear) {
+    config.yearMatching = {
+      enabled: true,
+      tolerance: config.titleMatching.yearTolerance
+        ? config.titleMatching.yearTolerance
+        : 1,
+      requestTypes: config.titleMatching.requestTypes ?? [],
+      addons: config.titleMatching.addons ?? [],
+    };
+    delete config.titleMatching.matchYear;
+  }
+
+  if (Array.isArray(config.groups)) {
+    config.groups = {
+      enabled: config.disableGroups ? false : true,
+      groupings: config.groups,
+      behaviour: 'parallel',
+    };
+  }
+  return config;
+}
+
 export function SaveInstallMenu() {
   return (
     <>
@@ -164,7 +203,9 @@ function Content() {
     const reader = new FileReader();
     reader.onload = (event) => {
       try {
-        const json = JSON.parse(event.target?.result as string);
+        const json = applyMigrations(
+          JSON.parse(event.target?.result as string)
+        );
         // const validate = UserDataSchema.safeParse(json);
         // if (!validate.success) {
         //   toast.error('Failed to import configuration: Invalid JSON file');

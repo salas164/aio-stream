@@ -6,7 +6,7 @@ import {
   TorBoxSearchAddonError,
 } from '@aiostreams/core';
 import { createResponse } from '../../utils/responses';
-const router = Router();
+const router: Router = Router();
 
 const logger = createLogger('builtins:torbox-search');
 

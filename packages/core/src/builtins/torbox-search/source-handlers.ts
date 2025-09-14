@@ -1,43 +1,47 @@
 import { number, z } from 'zod';
 import { Stream } from '../../db';
 import {
+  AnimeDatabase,
   Cache,
   Env,
   SERVICE_DETAILS,
   createLogger,
   getTimeTakenSincePoint,
 } from '../../utils';
-import { DebridService, DebridFile } from './debrid-service';
-import { ParsedId } from '../utils/id-parser';
+// import { DebridService, DebridFile } from './debrid-service';
+import { ParsedId } from '../../utils/id-parser';
 import { TorBoxSearchAddonUserDataSchema } from './schemas';
 import TorboxSearchApi, {
-  TorboxApiError,
+  TorboxSearchApiError,
   TorboxSearchApiIdType,
 } from './search-api';
 import { Torrent, convertDataToTorrents } from './torrent';
 import { TMDBMetadata } from '../../metadata/tmdb';
 import { calculateAbsoluteEpisode } from '../utils/general';
 import { TorboxApi } from '@torbox/torbox-api';
+import { processNZBs, processTorrents } from '../utils/debrid';
+import {
+  NZBWithSelectedFile,
+  TorrentWithSelectedFile,
+} from '../../debrid/utils';
+import { DebridFile, PlaybackInfo } from '../../debrid';
+import { getTraktAliases } from '../../metadata/trakt';
 
 const logger = createLogger('torbox-search');
 
 export interface TitleMetadata {
   titles: string[];
-  seasons?: {
-    number: string;
-    episodes: number;
-  }[];
+  season?: number;
+  episode?: number;
+  absoluteEpisode?: number;
 }
 
 abstract class SourceHandler {
   protected searchCache = Cache.getInstance<string, Torrent[]>(
-    'torbox-search-torrents'
+    'tb-search:torrents'
   );
   protected metadataCache = Cache.getInstance<string, TitleMetadata>(
-    'torbox-search-metadata'
-  );
-  protected instantAvailabilityCache = Cache.getInstance<string, boolean>(
-    'tb-search-usenet-instant'
+    'tb-search:metadata'
   );
 
   protected errorStreams: Stream[] = [];
@@ -61,7 +65,7 @@ abstract class SourceHandler {
     parsedId: ParsedId,
     type: 'torrent' | 'usenet'
   ): string {
-    let cacheKey = `${type}:${parsedId.type}:${parsedId.id}:${parsedId.season}:${parsedId.episode}`;
+    let cacheKey = `${type}:${parsedId.type}:${parsedId.value}:${parsedId.season}:${parsedId.episode}`;
     if (this.searchUserEngines) {
       cacheKey += `:${this.searchApi.apiKey}`;
     }
@@ -70,54 +74,62 @@ abstract class SourceHandler {
 
   protected createStream(
     id: ParsedId,
-    torrent: Torrent,
-    file: DebridFile,
+    torrentOrNZB: TorrentWithSelectedFile | NZBWithSelectedFile,
     userData: z.infer<typeof TorBoxSearchAddonUserDataSchema>,
-    season?: string,
-    episode?: string,
-    absoluteEpisode?: string
+    titleMetadata?: TitleMetadata
   ): Stream & { type: 'torrent' | 'usenet' } {
+    if (!torrentOrNZB.service) {
+      throw new Error('Torrent or NZB has no service');
+    }
     const storeAuth = {
-      storeName: file.service.id,
-      storeCredential: userData.services.find(
-        (service) => service.id === file.service.id
+      id: torrentOrNZB.service.id,
+      credential: userData.services.find(
+        (service) => service.id === torrentOrNZB.service!.id
       )?.credential,
     };
 
-    const playbackInfo =
-      torrent.type === 'torrent'
+    // const playbackInfo: PlaybackInfo = {
+    //   type: 'usenet',
+    //   hash: torrent.hash,
+    //   magnet: torrent.type === 'torrent' ? torrent.magnet : undefined,
+    //   title: torrent.title,
+    //   nzb: torrent.type === 'usenet' ? torrent.nzb : undefined,
+    //   file: torrent.file,
+    //   metadata: titleMetadata,
+    // };
+    const playbackInfo: PlaybackInfo =
+      torrentOrNZB.type === 'torrent'
         ? {
-            parsedId: {
-              id: id.id,
-              type: id.type,
-              season: season || undefined,
-              episode: episode || undefined,
-              absoluteEpisode: absoluteEpisode || undefined,
-            },
             type: 'torrent',
-            hash: torrent.hash,
-            index: file.index,
-            title: torrent.title,
+            hash: torrentOrNZB.hash,
+            sources: torrentOrNZB.sources,
+            // magnet: torrentOrNZB.magnet,
+            title: torrentOrNZB.title,
+            file: torrentOrNZB.file,
+            metadata: titleMetadata,
           }
         : {
             type: 'usenet',
-            nzb: torrent.nzb,
-            title: torrent.title,
+            nzb: torrentOrNZB.nzb,
+            title: torrentOrNZB.title,
+            hash: torrentOrNZB.hash,
+            file: torrentOrNZB.file,
+            metadata: titleMetadata,
           };
 
-    const svcMeta = SERVICE_DETAILS[file.service.id];
-    const name = `[${svcMeta.shortName} ${file.service.cached ? '⚡' : '⏳'}${file.service.owned ? ' ☁️' : ''}] TorBox Search`;
-    const description = `${torrent.title}\n${file.filename}\n${torrent.indexer ? `🔍 ${torrent.indexer}` : ''} ${torrent.seeders ? `👤 ${torrent.seeders}` : ''} ${torrent.age && torrent.age !== '0d' ? `🕒 ${torrent.age}` : ''}`;
+    const svcMeta = SERVICE_DETAILS[torrentOrNZB.service.id];
+    const name = `[${svcMeta.shortName} ${torrentOrNZB.service.cached ? '⚡' : '⏳'}${torrentOrNZB.service.owned ? ' ☁️' : ''}] TorBox Search`;
+    const description = `${torrentOrNZB.title}\n${torrentOrNZB.file.name}\n${torrentOrNZB.indexer ? `🔍 ${torrentOrNZB.indexer}` : ''} ${torrentOrNZB.seeders ? `👤 ${torrentOrNZB.seeders}` : ''} ${torrentOrNZB.age && torrentOrNZB.age !== '0d' ? `🕒 ${torrentOrNZB.age}` : ''}`;
 
     return {
-      url: `${Env.BASE_URL}/api/v1/debrid/resolve/${encodeURIComponent(Buffer.from(JSON.stringify(storeAuth)).toString('base64'))}/${encodeURIComponent(Buffer.from(JSON.stringify(playbackInfo)).toString('base64'))}/${encodeURIComponent(file.filename || torrent.title)}`,
+      url: `${Env.BASE_URL}/api/v1/debrid/playback/${encodeURIComponent(Buffer.from(JSON.stringify(storeAuth)).toString('base64'))}/${encodeURIComponent(Buffer.from(JSON.stringify(playbackInfo)).toString('base64'))}/${encodeURIComponent(torrentOrNZB.file.name || torrentOrNZB.title || 'unknown')}`,
       name,
       description,
-      type: torrent.type,
-      infoHash: torrent.hash,
+      type: torrentOrNZB.type,
+      infoHash: torrentOrNZB.hash,
       behaviorHints: {
-        videoSize: file.size,
-        filename: file.filename,
+        videoSize: torrentOrNZB.file.size,
+        filename: torrentOrNZB.file.name,
       },
     };
   }
@@ -132,10 +144,88 @@ abstract class SourceHandler {
       externalUrl: 'stremio:///',
     };
   }
+
+  protected async processMetadata(
+    parsedId: ParsedId,
+    metadata?: {
+      tmdb_id?: string | number | null;
+      titles: string[];
+      globalID?: string;
+      title?: string;
+      imdb_id?: string | null;
+    },
+    tmdbAccessToken?: string
+  ): Promise<TitleMetadata | undefined> {
+    if (!metadata) return undefined;
+
+    const { tmdb_id, titles } = metadata;
+    let absoluteEpisode;
+
+    const animeEntry = AnimeDatabase.getInstance().getEntryById(
+      parsedId.type,
+      parsedId.value
+    );
+    const tmdbId = animeEntry?.mappings?.themoviedbId ?? tmdb_id;
+
+    const traktAliases = await getTraktAliases(parsedId);
+
+    // For anime sources, fetch additional season info from TMDB
+    if (animeEntry && parsedId.season && parsedId.episode) {
+      const seasonFetchStart = Date.now();
+      try {
+        const tmdbMetadata = await new TMDBMetadata({
+          accessToken: tmdbAccessToken,
+        }).getMetadata(`tmdb:${tmdbId}`, 'series');
+
+        const seasons = tmdbMetadata?.seasons?.map(
+          ({ season_number, episode_count }) => ({
+            number: season_number.toString(),
+            episodes: episode_count,
+          })
+        );
+
+        if (seasons) {
+          absoluteEpisode = calculateAbsoluteEpisode(
+            parsedId.season.toString(),
+            parsedId.episode.toString(),
+            seasons
+          );
+        }
+
+        logger.debug(
+          `Fetched additional season info for ${parsedId.type}:${parsedId.value} in ${getTimeTakenSincePoint(seasonFetchStart)}`
+        );
+      } catch (error) {
+        logger.error(
+          `Failed to fetch TMDB metadata for ${parsedId.type}:${parsedId.value} - ${error}`
+        );
+      }
+    }
+
+    const titleMetadata: TitleMetadata = {
+      titles: [...new Set([...(traktAliases ?? []), ...titles])],
+      season: parsedId.season ? Number(parsedId.season) : undefined,
+      episode: parsedId.episode ? Number(parsedId.episode) : undefined,
+      absoluteEpisode: absoluteEpisode ? Number(absoluteEpisode) : undefined,
+    };
+
+    // Store metadata in cache
+    await this.metadataCache.set(
+      `metadata:${parsedId.type}:${parsedId.value}`,
+      titleMetadata,
+      Env.BUILTIN_TORBOX_SEARCH_METADATA_CACHE_TTL
+    );
+
+    return titleMetadata;
+  }
 }
 
 export class TorrentSourceHandler extends SourceHandler {
-  private readonly debridServices: DebridService[];
+  // private readonly debridServices: DebridService[];
+  private readonly services: z.infer<
+    typeof TorBoxSearchAddonUserDataSchema
+  >['services'];
+  private readonly clientIp?: string;
 
   constructor(
     searchApi: TorboxSearchApi,
@@ -144,27 +234,23 @@ export class TorrentSourceHandler extends SourceHandler {
     clientIp?: string
   ) {
     super(searchApi, searchUserEngines);
-    this.debridServices = services.map(
-      (service) => new DebridService(service, clientIp)
-    );
+    this.services = services;
+    this.clientIp = clientIp;
   }
 
   async getStreams(
     parsedId: ParsedId,
     userData: z.infer<typeof TorBoxSearchAddonUserDataSchema>
   ): Promise<Stream[]> {
-    const { type, id, season, episode } = parsedId;
-    let torrents: Torrent[] = [];
+    const { type, value, season, episode } = parsedId;
+    let fetchResult: { torrents: Torrent[]; metadata?: TitleMetadata };
     try {
-      torrents = await this.fetchTorrents(
-        type,
-        id,
-        season,
-        episode,
+      fetchResult = await this.fetchTorrents(
+        parsedId,
         userData.tmdbAccessToken
       );
     } catch (error) {
-      if (error instanceof TorboxApiError) {
+      if (error instanceof TorboxSearchApiError) {
         switch (error.errorCode) {
           case 'BAD_TOKEN':
             return [
@@ -174,145 +260,108 @@ export class TorrentSourceHandler extends SourceHandler {
               }),
             ];
           default:
-            logger.error(`Error fetching torrents for ${type}:${id}: ${error}`);
+            logger.error(
+              `Error fetching torrents for ${type}:${value}: ${error}`
+            );
             throw error;
         }
       }
       logger.error(
-        `Unexpected error fetching torrents for ${type}:${id}: ${error}`
+        `Unexpected error fetching torrents for ${type}:${value}: ${error}`
       );
       throw error;
     }
 
-    if (torrents.length === 0) return [];
+    if (fetchResult.torrents.length === 0) return [];
 
     if (userData.onlyShowUserSearchResults) {
-      const userSearchResults = torrents.filter(
+      const userSearchResults = fetchResult.torrents.filter(
         (torrent) => torrent.userSearch
       );
       logger.info(
-        `Filtered out ${torrents.length - userSearchResults.length} torrents that were not user search results`
+        `Filtered out ${fetchResult.torrents.length - userSearchResults.length} torrents that were not user search results`
       );
       if (userSearchResults.length > 0) {
-        torrents = userSearchResults;
+        fetchResult.torrents = userSearchResults;
       } else {
         return [];
       }
     }
 
-    const titleMetadata = await this.metadataCache.get(
-      `metadata:${type}:${id}`
+    const { results, errors } = await processTorrents(
+      fetchResult.torrents.map((torrent) => ({
+        ...torrent,
+        type: 'torrent',
+      })),
+      this.services,
+      parsedId.fullId,
+      fetchResult.metadata,
+      this.clientIp
     );
-    const filesByHash = await this.getAvailableFilesFromDebrid(
-      torrents,
-      parsedId,
-      titleMetadata
+
+    results.forEach((result) => {
+      result.service!.owned =
+        fetchResult.torrents.find((torrent) => torrent.hash === result.hash)
+          ?.owned ?? false;
+    });
+
+    return results.map((result) =>
+      this.createStream(parsedId, result, userData, fetchResult.metadata)
     );
-    const absoluteEpisode =
-      season && episode && titleMetadata?.seasons
-        ? calculateAbsoluteEpisode(season, episode, titleMetadata.seasons)
-        : undefined;
-
-    const streams: Stream[] = [];
-    for (const torrent of torrents) {
-      const availableFiles = filesByHash.get(torrent.hash);
-      if (availableFiles) {
-        for (const file of availableFiles) {
-          streams.push(
-            this.createStream(
-              parsedId,
-              torrent,
-              file,
-              userData,
-              season,
-              episode,
-              absoluteEpisode
-            )
-          );
-        }
-      }
-    }
-
-    streams.push(...this.errorStreams);
-
-    return streams;
   }
 
   private async fetchTorrents(
-    idType: TorboxSearchApiIdType,
-    id: string,
-    season?: string,
-    episode?: string,
+    parsedId: ParsedId,
     tmdbAccessToken?: string
-  ): Promise<Torrent[]> {
-    const cacheKey = this.getCacheKey(
-      { type: idType, id, season, episode },
-      'torrent'
-    );
+  ): Promise<{ torrents: Torrent[]; metadata?: TitleMetadata }> {
+    const { type, value, season, episode, externalType } = parsedId;
+    const cacheKey = this.getCacheKey(parsedId, 'torrent');
 
     const cachedTorrents = await this.searchCache.get(cacheKey);
+    const cachedMetadata = await this.metadataCache.get(
+      `metadata:${type}:${value}`
+    );
 
     if (
       cachedTorrents &&
       (!this.searchUserEngines ||
         Env.BUILTIN_TORBOX_SEARCH_CACHE_PER_USER_SEARCH_ENGINE)
     ) {
-      logger.info(`Found ${cachedTorrents.length} (cached) torrents for ${id}`);
-      return cachedTorrents;
+      logger.info(
+        `Found ${cachedTorrents.length} (cached) torrents for ${type}:${value}`
+      );
+      return { torrents: cachedTorrents, metadata: cachedMetadata };
     }
 
     const start = Date.now();
-    const data = await this.searchApi.getTorrentsById(idType, id, {
-      search_user_engines: this.searchUserEngines ? 'true' : 'false',
-      season,
-      episode,
-      metadata: 'true',
-      check_owned: 'true',
-    });
+    const data = await this.searchApi.getTorrentsById(
+      externalType as TorboxSearchApiIdType,
+      value.toString(),
+      {
+        search_user_engines: this.searchUserEngines ? 'true' : 'false',
+        season,
+        episode,
+        metadata: 'true',
+        check_owned: 'true',
+      }
+    );
 
     const torrents = convertDataToTorrents(data.torrents);
     logger.info(
-      `Found ${torrents.length} torrents for ${id} in ${getTimeTakenSincePoint(start)}`
+      `Found ${torrents.length} torrents for ${type}:${value} in ${getTimeTakenSincePoint(start)}`
     );
 
+    let titleMetadata: TitleMetadata | undefined;
     if (data.metadata) {
-      const { tmdb_id, titles } = data.metadata;
-      let seasons;
-
-      if (
-        ['kitsu_id', 'mal_id', 'anilist_id', 'anidb_id'].includes(idType) &&
-        tmdb_id
-      ) {
-        const seasonFetchStart = Date.now();
-        try {
-          const tmdbMetadata = await new TMDBMetadata({
-            accessToken: tmdbAccessToken,
-          }).getMetadata(`tmdb:${tmdb_id}`, 'series');
-          seasons = tmdbMetadata?.seasons?.map(
-            ({ season_number, episode_count }) => ({
-              number: season_number.toString(),
-              episodes: episode_count,
-            })
-          );
-          logger.debug(
-            `Fetched additional season info for ${id} in ${getTimeTakenSincePoint(seasonFetchStart)}`
-          );
-        } catch (error) {
-          logger.error(
-            `Failed to fetch TMDB metadata for ${idType}:${id} - ${error}`
-          );
-        }
-      }
-
-      this.metadataCache.set(
-        `metadata:${idType}:${id}`,
-        { titles: [...new Set(titles)], seasons },
-        Env.BUILTIN_TORBOX_SEARCH_METADATA_CACHE_TTL
+      titleMetadata = await this.processMetadata(
+        parsedId,
+        data.metadata,
+        tmdbAccessToken
       );
     }
 
     if (torrents.length === 0) {
-      return [];
+      return { torrents: [], metadata: titleMetadata };
     }
 
     if (this.useCache) {
@@ -328,79 +377,68 @@ export class TorrentSourceHandler extends SourceHandler {
       );
     }
 
-    return torrents;
-  }
-
-  private async getAvailableFilesFromDebrid(
-    torrents: Torrent[],
-    parsedId: ParsedId,
-    titleMetadata?: TitleMetadata
-  ): Promise<Map<string, DebridFile[]>> {
-    const allFiles = new Map<string, DebridFile[]>();
-    const servicePromises = this.debridServices.map((service) =>
-      service.getAvailableFiles(torrents, parsedId, titleMetadata)
-    );
-
-    const results = await Promise.allSettled(servicePromises);
-
-    for (const result of results) {
-      if (result.status === 'fulfilled') {
-        if (result.value instanceof Array) {
-          for (const file of result.value) {
-            const existing = allFiles.get(file.hash) || [];
-            allFiles.set(file.hash, [...existing, file]);
-          }
-        } else {
-          this.errorStreams.push(
-            this.createErrorStream({
-              title: result.value.error.title,
-              description: result.value.error.description,
-            })
-          );
-        }
-      }
-    }
-    return allFiles;
+    return { torrents, metadata: titleMetadata };
   }
 }
 
 export class UsenetSourceHandler extends SourceHandler {
   private readonly torboxApi: TorboxApi;
+  private readonly services: z.infer<
+    typeof TorBoxSearchAddonUserDataSchema
+  >['services'];
   private readonly clientIp?: string;
 
   constructor(
     searchApi: TorboxSearchApi,
     torboxApi: TorboxApi,
-    searchUserEngines: boolean
+    searchUserEngines: boolean,
+    services: z.infer<typeof TorBoxSearchAddonUserDataSchema>['services'],
+    clientIp?: string
   ) {
     super(searchApi, searchUserEngines);
     this.torboxApi = torboxApi;
+    this.services = services.filter((service) => service.id === 'torbox');
+    this.clientIp = clientIp;
   }
 
   async getStreams(
     parsedId: ParsedId,
     userData: z.infer<typeof TorBoxSearchAddonUserDataSchema>
   ): Promise<Stream[]> {
-    const { type, id, season, episode } = parsedId;
+    const { type, value, season, episode, externalType } = parsedId;
     const cacheKey = this.getCacheKey(parsedId, 'usenet');
-    let usingCachedSearch = false;
+    let titleMetadata: TitleMetadata | undefined;
 
     let torrents = await this.searchCache.get(cacheKey);
 
     if (!torrents) {
       const start = Date.now();
       try {
-        const data = await this.searchApi.getUsenetById(type, id, {
-          season,
-          episode,
-          check_cache: 'true',
-          check_owned: 'true',
-          search_user_engines: this.searchUserEngines ? 'true' : 'false',
-        });
+        const data = await this.searchApi.getUsenetById(
+          externalType as TorboxSearchApiIdType,
+          value.toString(),
+          {
+            season,
+            episode,
+            check_cache: 'true',
+            check_owned: 'true',
+            search_user_engines: this.searchUserEngines ? 'true' : 'false',
+            metadata: 'true',
+          }
+        );
         torrents = convertDataToTorrents(data.nzbs);
         logger.info(
-          `Found ${torrents.length} NZBs for ${id} in ${getTimeTakenSincePoint(start)}`
+          `Found ${torrents.length} NZBs for ${parsedId.type}:${parsedId.value} in ${getTimeTakenSincePoint(start)}`
         );
+
+        if (data.metadata) {
+          titleMetadata = await this.processMetadata(
+            parsedId,
+            data.metadata,
+            userData.tmdbAccessToken
+          );
+        }
+
         if (torrents.length === 0) {
           return [];
         }
@@ -412,7 +450,7 @@ export class UsenetSourceHandler extends SourceHandler {
           );
         }
       } catch (error) {
-        if (error instanceof TorboxApiError) {
+        if (error instanceof TorboxSearchApiError) {
           switch (error.errorCode) {
             case 'BAD_TOKEN':
               return [
@@ -422,16 +460,21 @@ export class UsenetSourceHandler extends SourceHandler {
                 }),
               ];
             default:
-              logger.error(`Error fetching NZBs for ${id}: ${error.message}`);
+              logger.error(
+                `Error fetching NZBs for ${type}:${value}: ${error.message}`
+              );
               throw error;
           }
         }
-        logger.error(`Unexpected error fetching NZBs for ${id}: ${error}`);
+        logger.error(
+          `Unexpected error fetching NZBs for ${type}:${value}: ${error}`
+        );
         throw error;
       }
     } else {
-      usingCachedSearch = true;
-      logger.info(`Found ${torrents.length} (cached) NZBs for ${id}`);
+      logger.info(
+        `Found ${torrents.length} (cached) NZBs for ${type}:${value}`
+      );
     }
 
     if (userData.onlyShowUserSearchResults) {
@@ -448,90 +491,29 @@ export class UsenetSourceHandler extends SourceHandler {
       }
     }
 
-    let instantAvailability: Map<string, boolean> | undefined;
-    // when using a cached search, we need to check instant availability separately
-    if (usingCachedSearch) {
-      instantAvailability = await this.getInstantAvailability(torrents);
-    }
+    const nzbs = torrents
+      .filter((torrent) => torrent.nzb)
+      .map((torrent) => ({
+        ...torrent,
+        type: 'usenet' as const,
+        nzb: torrent.nzb!,
+      }));
 
-    return torrents.map((torrent) => {
-      const file: DebridFile = {
-        hash: torrent.hash,
-        filename: torrent.title,
-        size: torrent.size,
-        index: -1,
-        service: {
-          id: 'torbox',
-          cached:
-            instantAvailability?.get(torrent.hash) ?? torrent.cached ?? false,
-          owned: torrent.owned ?? false,
-        },
-      };
-      return this.createStream(
-        parsedId,
-        torrent,
-        file,
-        userData,
-        season,
-        episode
-      );
+    const { results, errors } = await processNZBs(
+      nzbs,
+      this.services,
+      parsedId.fullId,
+      titleMetadata,
+      this.clientIp
+    );
+
+    results.forEach((result) => {
+      result.service!.owned =
+        nzbs.find((nzb) => nzb.hash === result.hash)?.owned ?? false;
     });
-  }
 
-  private async getInstantAvailability(
-    torrents: Torrent[]
-  ): Promise<Map<string, boolean> | undefined> {
-    const start = Date.now();
-    const instantAvailability = new Map<string, boolean>();
-
-    const torrentsToCheck: Torrent[] = [];
-    for (const torrent of torrents) {
-      const cachedStatus = await this.instantAvailabilityCache.get(
-        torrent.hash
-      );
-      if (cachedStatus !== undefined) {
-        instantAvailability.set(torrent.hash, cachedStatus);
-      } else {
-        torrentsToCheck.push(torrent);
-      }
-    }
-    if (torrentsToCheck.length > 0) {
-      logger.debug(
-        `Checking instant availability for ${torrentsToCheck.length} NZBs`
-      );
-      const data = await this.torboxApi.usenet.getUsenetCachedAvailability(
-        'v1',
-        {
-          hash: torrentsToCheck.map((torrent) => torrent.hash).join(','),
-          format: 'list',
-        }
-      );
-      if (!data.data?.success) {
-        throw new Error(
-          `Failed to check instant availability: ${data.data?.detail} - ${data.data?.error}`
-        );
-      }
-      if (!Array.isArray(data.data.data)) {
-        throw new Error('Invalid response from Torbox API');
-      }
-      for (const torrent of torrentsToCheck) {
-        const item = data.data.data.find((item) => item.hash === torrent.hash);
-        instantAvailability.set(torrent.hash, Boolean(item));
-        this.instantAvailabilityCache.set(
-          torrent.hash,
-          Boolean(item),
-          Env.BUILTIN_TORBOX_SEARCH_INSTANT_AVAILABILITY_CACHE_TTL
-        );
-      }
-    }
-    const cachedTorrents = torrents.filter(
-      (torrent) => instantAvailability.get(torrent.hash) ?? torrent.cached
+    return results.map((result) =>
+      this.createStream(parsedId, result, userData, titleMetadata)
     );
-    logger.info(
-      `Checked instant availability for ${torrents.length} NZBs in ${getTimeTakenSincePoint(start)}: ${cachedTorrents.length} / ${torrents.length} cached (with ${
-        torrents.length - torrentsToCheck.length
-      } cached statuses)`
-    );
-    return instantAvailability;
   }
 }

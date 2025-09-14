@@ -52,16 +52,27 @@ import { ContentDeepDivePreset } from './contentDeepDive';
 import { AICompanionPreset } from './aiCompanion';
 import { GoogleOAuth } from '../builtins/gdrive/api';
 import { TorBoxSearchPreset } from './torboxSearch';
+import { TorznabPreset } from './torznab';
 import { AStreamPreset } from './aStream';
 import { Env } from '../utils/env';
+import { ZileanPreset } from './zilean';
+import { AnimeToshoPreset } from './animetosho';
+import { NewznabPreset } from './newznab';
+import { ProwlarrPreset } from './prowlarr';
 
 let PRESET_LIST: string[] = [
   'custom',
+  'torznab',
+  'newznab',
+  'aiostreams',
   'torrentio',
   'comet',
   'mediafusion',
   'stremthruTorz',
   'stremthruStore',
+  'animetosho',
+  'zilean',
+  Env.BUILTIN_PROWLARR_URL && Env.BUILTIN_PROWLARR_API_KEY ? 'prowlarr' : '',
   'jackettio',
   'peerflix',
   'orion',
@@ -109,7 +120,6 @@ let PRESET_LIST: string[] = [
   'ai-search',
   'more-like-this',
   'content-deep-dive',
-  'aiostreams',
 ].filter(Boolean);
 
 export class PresetManager {
@@ -236,6 +246,16 @@ export class PresetManager {
         return GDrivePreset;
       case 'torbox-search':
         return TorBoxSearchPreset;
+      case 'torznab':
+        return TorznabPreset;
+      case 'newznab':
+        return NewznabPreset;
+      case 'zilean':
+        return ZileanPreset;
+      case 'animetosho':
+        return AnimeToshoPreset;
+      case 'prowlarr':
+        return ProwlarrPreset;
       default:
         throw new Error(`Preset ${id} not found`);
     }

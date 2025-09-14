@@ -238,6 +238,10 @@ export class Cache<K, V> {
       return cachedValue as ReturnType<T>;
     }
     const result = await fn(...args);
+    // do not cache empty arrays
+    if (Array.isArray(result) && result.length === 0) {
+      return result as ReturnType<T>;
+    }
     await this.set(key, result, ttl);
     return result;
   }
@@ -275,5 +279,9 @@ export class Cache<K, V> {
 
   async waitUntilReady(): Promise<void> {
     return this.backend.waitUntilReady();
+  }
+
+  getType(): 'memory' | 'redis' {
+    return this.backend instanceof MemoryCacheBackend ? 'memory' : 'redis';
   }
 }

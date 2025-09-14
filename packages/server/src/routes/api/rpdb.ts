@@ -9,7 +9,7 @@ import { RPDB } from '@aiostreams/core';
 import { createResponse } from '../../utils/responses';
 import { z } from 'zod';
 
-const router = Router();
+const router: Router = Router();
 const logger = createLogger('server');
 
 const searchParams = z.object({
@@ -38,13 +38,14 @@ router.get('/', async (req: Request, res: Response, next: NextFunction) => {
     const { id, type, fallback, apiKey } = data;
     const rpdb = new RPDB(apiKey);
     const posterUrl = (await rpdb.getPosterUrl(type, id)) || fallback;
-    if (!(posterUrl && fallback)) {
+    if (!posterUrl) {
       res.status(404).json(
         createResponse({
           success: false,
           detail: 'Not found',
         })
       );
+      return;
     }
     res.redirect(301, posterUrl!);
   } catch (error: any) {

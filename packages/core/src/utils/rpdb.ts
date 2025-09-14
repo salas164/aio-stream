@@ -2,21 +2,14 @@ import { Cache } from './cache';
 import { makeRequest } from './http';
 import { RPDBIsValidResponse } from '../db/schemas';
 import { Env } from './env';
-export type IdType = 'imdb' | 'tmdb' | 'tvdb';
-
-interface Id {
-  type: IdType;
-  value: string;
-}
+import { IdParser } from './id-parser';
+import { AnimeDatabase } from './anime-database';
 
 const apiKeyValidationCache = Cache.getInstance<string, boolean>('rpdbApiKey');
 const posterCheckCache = Cache.getInstance<string, string>('rpdbPosterCheck');
 
 export class RPDB {
   private readonly apiKey: string;
-  private readonly TMDB_ID_REGEX = /^(?:tmdb)[-:](\d+)(?::\d+:\d+)?$/;
-  private readonly TVDB_ID_REGEX = /^(?:tvdb)[-:](\d+)(?::\d+:\d+)?$/;
-  private readonly IMDB_ID_REGEX = /^(?:tt)(\d+)(?::\d+:\d+)?$/;
   constructor(apiKey: string) {
     this.apiKey = apiKey;
     if (!this.apiKey) {
@@ -64,20 +57,59 @@ export class RPDB {
     id: string,
     checkExists: boolean = true
   ): Promise<string | null> {
-    const parsedId = this.getParsedId(id, type);
+    const parsedId = IdParser.parse(id, type);
+    if (!parsedId) return null;
+
+    let idType: 'tmdb' | 'imdb' | 'tvdb';
+    let idValue: string;
+
+    switch (parsedId.type) {
+      case 'themoviedbId':
+        idType = 'tmdb';
+        idValue = `${type}-${parsedId.value}`;
+        break;
+      case 'imdbId':
+        idType = 'imdb';
+        idValue = parsedId.value.toString();
+        break;
+      case 'thetvdbId':
+        if (type === 'movie') return null; // tvdb not supported for movies
+        idType = 'tvdb';
+        idValue = parsedId.value.toString();
+        break;
+      default: {
+        // Try to map unsupported id types
+        const entry = AnimeDatabase.getInstance().getEntryById(
+          parsedId.type,
+          parsedId.value
+        );
+        if (!entry) return null;
+
+        if (entry.mappings?.thetvdbId && type === 'series') {
+          idType = 'tvdb';
+          idValue = `${entry.mappings.thetvdbId}`;
+        } else if (entry.mappings?.themoviedbId) {
+          idType = 'tmdb';
+          idValue = `${type}-${entry.mappings.themoviedbId}`;
+        } else if (entry.mappings?.imdbId) {
+          idType = 'imdb';
+          idValue = `tt${entry.mappings.imdbId}`;
+        } else {
+          return null;
+        }
+        break;
+      }
+    }
     const cacheKey = `${type}-${id}-${this.apiKey}`;
     const cached = await posterCheckCache.get(cacheKey);
     if (cached) {
       return cached;
     }
-    if (!parsedId) {
+    if (!idType || !idValue) {
       return null;
     }
-    if (parsedId.type === 'tvdb' && type === 'movie') {
-      // rpdb doesnt seem to support tvdb for movies
-      return null;
-    }
-    const posterUrl = `https://api.ratingposterdb.com/${this.apiKey}/${parsedId.type}/poster-default/${parsedId.value}.jpg?fallback=true`;
+
+    const posterUrl = `https://api.ratingposterdb.com/${this.apiKey}/${idType}/poster-default/${idValue}.jpg?fallback=true`;
     if (!checkExists) {
       return posterUrl;
     }
@@ -97,22 +129,22 @@ export class RPDB {
     return posterUrl;
   }
 
-  private getParsedId(id: string, type: string): Id | null {
-    if (this.TMDB_ID_REGEX.test(id)) {
-      const match = id.match(this.TMDB_ID_REGEX);
-      if (['movie', 'series'].includes(type)) {
-        return match ? { type: 'tmdb', value: `${type}-${match[1]}` } : null;
-      }
-      return null;
-    }
-    if (this.IMDB_ID_REGEX.test(id)) {
-      const match = id.match(this.IMDB_ID_REGEX);
-      return match ? { type: 'imdb', value: `tt${match[1]}` } : null;
-    }
-    if (this.TVDB_ID_REGEX.test(id)) {
-      const match = id.match(this.TVDB_ID_REGEX);
-      return match ? { type: 'tvdb', value: match[1] } : null;
-    }
-    return null;
-  }
+  // private getParsedId(id: string, type: string): Id | null {
+  //   if (this.TMDB_ID_REGEX.test(id)) {
+  //     const match = id.match(this.TMDB_ID_REGEX);
+  //     if (['movie', 'series'].includes(type)) {
+  //       return match ? { type: 'tmdb', value: `${type}-${match[1]}` } : null;
+  //     }
+  //     return null;
+  //   }
+  //   if (this.IMDB_ID_REGEX.test(id)) {
+  //     const match = id.match(this.IMDB_ID_REGEX);
+  //     return match ? { type: 'imdb', value: `tt${match[1]}` } : null;
+  //   }
+  //   if (this.TVDB_ID_REGEX.test(id)) {
+  //     const match = id.match(this.TVDB_ID_REGEX);
+  //     return match ? { type: 'tvdb', value: match[1] } : null;
+  //   }
+  //   return null;
+  // }
 }

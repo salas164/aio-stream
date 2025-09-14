@@ -309,17 +309,18 @@ export class MoreLikeThisPreset extends Preset {
         default: 'en',
       },
       {
-        id: 'streamButtonPlatform',
+        id: 'streamButtons',
         name: 'Stream Button Platform',
         description:
-          'The type of buttons to show as streams on movie/series pages.',
-        type: 'select',
+          "This addon provides a set of streams in Stremio that act as buttons for easier access. Disable any you don't need.",
+        type: 'multi-select',
         options: [
-          { label: 'Both', value: 'both' },
-          { label: 'Web', value: 'web' },
+          { label: 'Go to detail page', value: 'details' },
+          { label: 'Show recommendations', value: 'recs' },
           { label: 'App', value: 'app' },
+          { label: 'Web', value: 'web' },
         ],
-        default: 'both',
+        default: ['details', 'recs', 'app', 'web'],
       },
       {
         id: 'includeTmdbCollection',
@@ -363,7 +364,7 @@ export class MoreLikeThisPreset extends Preset {
     return {
       ID: 'more-like-this',
       NAME: 'More Like This',
-      LOGO: `https://raw.githubusercontent.com/rama1997/More-Like-This/refs/heads/main/assets/logo.jpg`,
+      LOGO: `https://raw.githubusercontent.com/rama1997/More-Like-This/refs/heads/main/assets/images/logo.jpg`,
       URL: Env.MORE_LIKE_THIS_URL,
       TIMEOUT: Env.DEFAULT_MORE_LIKE_THIS_TIMEOUT || Env.DEFAULT_TIMEOUT,
       USER_AGENT:
@@ -421,8 +422,10 @@ export class MoreLikeThisPreset extends Preset {
 
     const isKeyValid = (key: string): string =>
       typeof key === 'string' && key.length > 0 ? 'true' : '';
-
-    const config = {
+    const streamButtons = options.streamButtons
+      ? options.streamButtons.join(',')
+      : ['details', 'recs', 'app', 'web'];
+    const config: Record<string, string> = {
       tmdbApiKey: tmdbApiKey ?? '',
       validatedTmdbApiKey: isKeyValid(tmdbApiKey ?? ''),
       includeTmdbCollection: options.includeTmdbCollection ? 'on' : '',
@@ -436,8 +439,13 @@ export class MoreLikeThisPreset extends Preset {
       catalogOrder: 'TMDB,Trakt,Simkl,Gemini+AI,TasteDive,Watchmode',
       metadataSource: options.metadataSource,
       language: options.language,
-      streamButtonPlatform: options.streamButtonPlatform,
       enableTitleSearching: options.enableTitleSearching ? 'on' : '',
+      streamDetailEnabled: streamButtons.includes('details') ? 'on' : '',
+      streamRecEnabled: streamButtons.includes('recs') ? 'on' : '',
+      streamAppEnabled: streamButtons.includes('app') ? 'on' : '',
+      streamWebEnabled: streamButtons.includes('web') ? 'on' : '',
+      combineCatalogs: options.combineCatalogs ? 'on' : '',
+      streamOrder: streamButtons,
       rpdbApiKey: '',
       validatedRpdbApiKey: 'true',
       forCopy: 'true',
@@ -471,7 +479,9 @@ export class MoreLikeThisPreset extends Preset {
 
       let manifestUrl = response.headers.get('Location');
       if (response.status < 300 || response.status >= 400) {
-        throw new Error(`${response.status} - ${response.statusText}`);
+        throw new Error(
+          `${response.status} - ${response.statusText}: ${await response.text()}`
+        );
       }
       if (!manifestUrl) {
         throw new Error('Manifest URL not present in redirect');

@@ -360,14 +360,28 @@ export const UserDataSchema = z.object({
   requiredStreamExpressions: z.array(z.string().min(1).max(3000)).optional(),
   preferredStreamExpressions: z.array(z.string().min(1).max(3000)).optional(),
   includedStreamExpressions: z.array(z.string().min(1).max(3000)).optional(),
-  disableGroups: z.boolean().optional(),
+  // disableGroups: z.boolean().optional(),
+  // groups: z
+  //   .array(
+  //     z.object({
+  //       addons: z.array(z.string().min(1)),
+  //       condition: z.string().min(1).max(200),
+  //     })
+  //   )
+  //   .optional(),
   groups: z
-    .array(
-      z.object({
-        addons: z.array(z.string().min(1)),
-        condition: z.string().min(1).max(200),
-      })
-    )
+    .object({
+      enabled: z.boolean().optional(),
+      groupings: z
+        .array(
+          z.object({
+            addons: z.array(z.string().min(1)),
+            condition: z.string().min(1).max(200),
+          })
+        )
+        .optional(),
+      behaviour: z.enum(['sequential', 'parallel']).optional(),
+    })
     .optional(),
   sortCriteria: z.object({
     // global must be defined.
@@ -453,6 +467,12 @@ export const TABLES = {
       updated_at TIMESTAMP DEFAULT (CURRENT_TIMESTAMP),
       accessed_at TIMESTAMP DEFAULT (CURRENT_TIMESTAMP)
     `,
+  distributed_locks: `
+      key TEXT PRIMARY KEY,
+      owner TEXT NOT NULL,
+      expires_at BIGINT NOT NULL,
+      result TEXT
+    `,
 };
 
 const strictManifestResourceSchema = z.object({
@@ -526,7 +546,7 @@ export type Manifest = z.infer<typeof ManifestSchema>;
 export const SubtitleSchema = z
   .object({
     id: z.string().min(1),
-    url: z.string().url(),
+    url: z.string(),
     lang: z.string().min(1),
   })
   .passthrough();
@@ -539,30 +559,30 @@ export type Subtitle = z.infer<typeof SubtitleSchema>;
 
 export const StreamSchema = z
   .object({
-    url: z.string().url().or(z.null()).optional(),
-    ytId: z.string().min(1).or(z.null()).optional(),
-    infoHash: z.string().min(1).or(z.null()).optional(),
+    url: z.string().or(z.null()).optional(),
+    ytId: z.string().nullable().optional(),
+    infoHash: z.string().nullable().optional(),
     fileIdx: z.number().or(z.null()).optional(),
-    externalUrl: z.string().min(1).or(z.null()).optional(),
-    name: z.string().min(1).or(z.null()).optional(),
-    title: z.string().min(1).or(z.null()).optional(),
-    description: z.string().min(1).or(z.null()).optional(),
+    externalUrl: z.string().nullable().optional(),
+    name: z.string().nullable().optional(),
+    title: z.string().nullable().optional(),
+    description: z.string().nullable().optional(),
     subtitles: z.array(SubtitleSchema).or(z.null()).optional(),
     sources: z.array(z.string().min(1)).or(z.null()).optional(),
     behaviorHints: z
       .object({
         countryWhitelist: z.array(z.string().length(3)).or(z.null()).optional(),
         notWebReady: z.boolean().or(z.null()).optional(),
-        bingeGroup: z.string().min(1).or(z.null()).optional(),
+        bingeGroup: z.string().nullable().optional(),
         proxyHeaders: z
           .object({
             request: z.record(z.string().min(1), z.string().min(1)).optional(),
             response: z.record(z.string().min(1), z.string().min(1)).optional(),
           })
           .optional(),
-        videoHash: z.string().min(1).or(z.null()).optional(),
+        videoHash: z.string().nullable().optional(),
         videoSize: z.number().or(z.null()).optional(),
-        filename: z.string().min(1).or(z.null()).optional(),
+        filename: z.string().nullable().optional(),
       })
       .optional(),
   })
@@ -638,7 +658,7 @@ export const ParsedStreamSchema = z.object({
     .optional(),
   duration: z.number().optional(),
   library: z.boolean().optional(),
-  url: z.string().url().optional(),
+  url: z.string().optional(),
   ytId: z.string().min(1).optional(),
   externalUrl: z.string().min(1).optional(),
   error: z

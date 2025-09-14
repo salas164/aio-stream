@@ -24,6 +24,15 @@ const isIpInRange = (ip: string, range: string) => {
   return ip === range;
 };
 
+const isPrivateIp = (ip?: string) => {
+  if (!ip) {
+    return false;
+  }
+  return /^(10\.|(::ffff)?127\.|172\.(1[6-9]|2[0-9]|3[01])\.|192\.168\.|::1)/.test(
+    ip
+  );
+};
+
 export const ipMiddleware = (
   req: Request,
   res: Response,
@@ -52,7 +61,7 @@ export const ipMiddleware = (
       req.get('CF-Connecting-IP') ||
       ip
     : ip;
-  req.userIp = userIp;
+  req.userIp = isPrivateIp(userIp) ? undefined : userIp;
   req.requestIp = requestIp;
   next();
 };

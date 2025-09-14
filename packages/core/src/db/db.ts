@@ -53,6 +53,17 @@ export class DB {
     return DB.dialect;
   }
 
+  isSQLite(): boolean {
+    return this.getDialect() === 'sqlite';
+  }
+
+  getRowsAffected(result: any): number {
+    if (this.isSQLite()) {
+      return result.changes || 0;
+    }
+    return result.rowCount || 0;
+  }
+
   async initialise(
     uri: string,
     dsnModifiers: DSNModifier[] = []
@@ -77,7 +88,6 @@ export class DB {
         await this.execute('PRAGMA foreign_keys = ON');
         await this.execute('PRAGMA synchronous = OFF');
         await this.execute('PRAGMA journal_mode = WAL');
-        await this.execute('PRAGMA locking_mode = IMMEDIATE');
       }
 
       DB.initialised = true;
@@ -204,25 +214,52 @@ export class DB {
         },
       };
     } else if (this.uri.dialect === 'sqlite') {
-      const db = this.db as Database<any>;
-      await db.run('BEGIN');
+      // For sqlite, we manually manage the transaction state.
+      await (this.db as Database<any>).exec('BEGIN');
+      let isFinalised = false;
+
       return {
         commit: async () => {
-          await db.run('COMMIT');
+          if (isFinalised) return;
+          await (this.db as Database<any>).exec('COMMIT');
+          isFinalised = true;
         },
         rollback: async () => {
-          await db.run('ROLLBACK');
+          if (isFinalised) return;
+          await (this.db as Database<any>).exec('ROLLBACK');
+          isFinalised = true;
         },
         execute: async (
           query: string,
           params?: any[]
         ): Promise<UnifiedQueryResult> => {
-          const result = await db.all(adaptQuery(query, 'sqlite'), params);
-          return {
-            rows: result,
-            rowCount: result.length || 0,
-            command: 'SELECT',
-          };
+          if (isFinalised) {
+            throw new Error('Transaction has already been finalised.');
+          }
+          const adaptedQuery = adaptQuery(query, 'sqlite');
+          const command = adaptedQuery.trim().split(' ')[0].toUpperCase();
+
+          if (['INSERT', 'UPDATE', 'DELETE'].includes(command)) {
+            const result = await (this.db as Database<any>).run(
+              adaptedQuery,
+              params
+            );
+            return {
+              rows: [],
+              rowCount: result.changes || 0,
+              command: command,
+            };
+          } else {
+            const rows = await (this.db as Database<any>).all(
+              adaptedQuery,
+              params
+            );
+            return {
+              rows: rows,
+              rowCount: rows.length,
+              command: command,
+            };
+          }
         },
       };
     }

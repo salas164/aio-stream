@@ -4,6 +4,8 @@ import {
   FeatureControl,
   getTimeTakenSincePoint,
   constants,
+  AnimeDatabase,
+  IdParser,
 } from '../utils';
 import { TYPES } from '../utils/constants';
 import { compileRegex } from '../utils/regex';
@@ -12,7 +14,11 @@ import { safeRegexTest } from '../utils/regex';
 import { StreamType } from '../utils/constants';
 import { StreamSelector } from '../parser/streamExpression';
 import StreamUtils from './utils';
-import { TMDBMetadata, TMDBMetadataResponse } from '../metadata/tmdb';
+import { MetadataService } from '../metadata/service';
+import { Metadata } from '../metadata/utils';
+import { titleMatch } from '../parser/utils';
+import { partial_ratio } from 'fuzzball';
+import { calculateAbsoluteEpisode } from '../builtins/utils/general';
 
 const logger = createLogger('filterer');
 
@@ -32,7 +38,15 @@ class StreamFilterer {
       total: number;
       details: Record<string, number>;
     }
-    const isAnime = id.startsWith('kitsu');
+    const parsedId = IdParser.parse(id, type);
+    let isAnime = id.startsWith('kitsu');
+
+    if (AnimeDatabase.getInstance().isAnime(id)) {
+      logger.debug(
+        `Determined that ${id} is anime based on an existing entry in the anime database`
+      );
+      isAnime = true;
+    }
     const skipReasons: Record<string, SkipReason> = {
       titleMatching: { total: 0, details: {} },
       yearMatching: { total: 0, details: {} },
@@ -92,17 +106,51 @@ class StreamFilterer {
       ...(this.userData.includedRegexPatterns ?? []),
     ]);
 
-    let requestedMetadata: TMDBMetadataResponse | undefined;
+    let requestedMetadata:
+      | (Metadata & { absoluteEpisode?: number })
+      | undefined;
     if (
       (this.userData.titleMatching?.enabled ||
-        this.userData.yearMatching?.enabled) &&
+        this.userData.yearMatching?.enabled ||
+        this.userData.seasonEpisodeMatching?.enabled) &&
       TYPES.includes(type as any)
     ) {
       try {
-        requestedMetadata = await new TMDBMetadata({
-          accessToken: this.userData.tmdbAccessToken,
-          apiKey: this.userData.tmdbApiKey,
-        }).getMetadata(id, type as any);
+        if (!parsedId) {
+          throw new Error(`Invalid ID: ${id}`);
+        }
+        const animeEntry = AnimeDatabase.getInstance().getEntryById(
+          parsedId.type,
+          parsedId.value
+        );
+        if (animeEntry && !parsedId.season) {
+          parsedId.season =
+            animeEntry.imdb?.fromImdbSeason?.toString() ??
+            animeEntry.trakt?.season?.toString();
+        }
+        requestedMetadata = await new MetadataService({
+          tmdbAccessToken: this.userData.tmdbAccessToken,
+          tmdbApiKey: this.userData.tmdbApiKey,
+        }).getMetadata(parsedId, type as any);
+        if (
+          isAnime &&
+          parsedId.season &&
+          parsedId.episode &&
+          requestedMetadata.seasons
+        ) {
+          const seasons = requestedMetadata.seasons.map(
+            ({ season_number, episode_count }) => ({
+              number: season_number.toString(),
+              episodes: episode_count,
+            })
+          );
+          logger.debug(
+            `Calculating absolute episode with current season and episode: ${parsedId.season}, ${parsedId.episode} and seasons: ${JSON.stringify(seasons)}`
+          );
+          requestedMetadata.absoluteEpisode = Number(
+            calculateAbsoluteEpisode(parsedId.season, parsedId.episode, seasons)
+          );
+        }
         logger.info(`Fetched metadata for ${id}`, requestedMetadata);
       } catch (error) {
         logger.warn(
@@ -127,7 +175,11 @@ class StreamFilterer {
       if (!titleMatchingOptions || !titleMatchingOptions.enabled) {
         return true;
       }
-      if (!requestedMetadata || requestedMetadata.titles.length === 0) {
+      if (
+        !requestedMetadata ||
+        !requestedMetadata.titles ||
+        requestedMetadata.titles.length === 0
+      ) {
         return true;
       }
 
@@ -153,12 +205,21 @@ class StreamFilterer {
       }
 
       if (titleMatchingOptions.mode === 'exact') {
-        return requestedMetadata?.titles.some(
-          (title) => normaliseTitle(title) === normaliseTitle(streamTitle)
+        return titleMatch(
+          normaliseTitle(streamTitle),
+          requestedMetadata.titles.map(normaliseTitle),
+          {
+            threshold: 0.85,
+          }
         );
       } else {
-        return requestedMetadata?.titles.some((title) =>
-          normaliseTitle(streamTitle).includes(normaliseTitle(title))
+        return titleMatch(
+          normaliseTitle(streamTitle),
+          requestedMetadata.titles.map(normaliseTitle),
+          {
+            threshold: 0.85,
+            scorer: partial_ratio,
+          }
         );
       }
     };
@@ -193,33 +254,40 @@ class StreamFilterer {
       }
 
       const streamYear = stream.parsedFile?.year;
-      if (!streamYear && type === 'movie') {
-        // only filter out movies without a year as series results usually don't include a year
-        return false;
-      }
       if (!streamYear) {
-        // non-movie results without a year can be kept in
-        return true;
+        // if no year is present, filter out if its a movie, keep otherwise
+        return type === 'movie' ? false : true;
       }
+
       // streamYear can be a string like "2004" or "2012-2020"
-      const requestedYear = Number(requestedMetadata.year);
-      let streamYearRange: [number, number] | undefined;
-      if (streamYear && streamYear.includes('-')) {
+      // Calculate the requested year range
+      let requestedYearRange: [number, number] = [
+        requestedMetadata.year,
+        requestedMetadata.year,
+      ];
+      if (requestedMetadata.yearEnd) {
+        requestedYearRange[1] = requestedMetadata.yearEnd;
+      }
+
+      // Calculate the stream year range
+      let streamYearRange: [number, number];
+      if (streamYear.includes('-')) {
         const [min, max] = streamYear.split('-').map(Number);
         streamYearRange = [min, max];
       } else {
-        streamYearRange = [Number(streamYear), Number(streamYear)];
+        const yearNum = Number(streamYear);
+        streamYearRange = [yearNum, yearNum];
       }
 
-      let tolerance = yearMatchingOptions.tolerance ?? 1;
-      streamYearRange[0] = streamYearRange[0] - tolerance;
-      streamYearRange[1] = streamYearRange[1] + tolerance;
+      // Apply tolerance to the stream year range
+      const tolerance = yearMatchingOptions.tolerance ?? 1;
+      streamYearRange[0] -= tolerance;
+      streamYearRange[1] += tolerance;
 
-      // requested year should be within the stream year range
-      return (
-        requestedYear >= streamYearRange[0] &&
-        requestedYear <= streamYearRange[1]
-      );
+      // If the requested year range and stream year range overlap, accept the stream
+      const [requestedStart, requestedEnd] = requestedYearRange;
+      const [streamStart, streamEnd] = streamYearRange;
+      return requestedStart <= streamEnd && requestedEnd >= streamStart;
     };
 
     const performSeasonEpisodeMatch = (stream: ParsedStream) => {
@@ -231,17 +299,13 @@ class StreamFilterer {
         return true;
       }
 
-      // parse the id to get the season and episode
-      const seasonEpisodeRegex = /:(\d+):(\d+)$/;
-      const match = id.match(seasonEpisodeRegex);
-
-      if (!match || !match[1] || !match[2]) {
-        // only if both season and episode are present, we can filter
-        return true;
-      }
-
-      const requestedSeason = parseInt(match[1]);
-      const requestedEpisode = parseInt(match[2]);
+      if (!parsedId) return true;
+      const requestedSeason = Number.isInteger(Number(parsedId.season))
+        ? Number(parsedId.season)
+        : undefined;
+      const requestedEpisode = Number.isInteger(Number(parsedId.episode))
+        ? Number(parsedId.episode)
+        : undefined;
 
       if (
         seasonEpisodeMatchingOptions.requestTypes?.length &&
@@ -270,11 +334,14 @@ class StreamFilterer {
         return false;
       }
 
-      // is requested episode present
+      // is the present episode incorrect (does not match either the requested episode or absolute episode if present)
       if (
         requestedEpisode &&
         stream.parsedFile?.episode &&
-        stream.parsedFile.episode !== requestedEpisode
+        stream.parsedFile.episode !== requestedEpisode &&
+        (requestedMetadata?.absoluteEpisode
+          ? stream.parsedFile.episode !== requestedMetadata.absoluteEpisode
+          : true)
       ) {
         return false;
       }

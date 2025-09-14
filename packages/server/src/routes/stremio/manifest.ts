@@ -12,7 +12,7 @@ import { createLogger } from '@aiostreams/core';
 import { stremioManifestRateLimiter } from '../../middlewares/ratelimit';
 
 const logger = createLogger('server');
-const router = Router();
+const router: Router = Router();
 
 export default router;
 

@@ -6,10 +6,17 @@ const logger = createLogger('startup');
 const formatDuration = (seconds: number): string => {
   if (seconds < 60) return `${seconds}s`;
   if (seconds < 3600) return `${Math.floor(seconds / 60)}m ${seconds % 60}s`;
-  const hours = Math.floor(seconds / 3600);
+  const days = Math.floor(seconds / 86400);
+  const hours = Math.floor((seconds % 86400) / 3600);
   const minutes = Math.floor((seconds % 3600) / 60);
   const secs = seconds % 60;
-  return `${hours}h ${minutes}m ${secs}s`;
+  // return `${days}d ${hours}h ${minutes}m ${secs}s`;
+  let result = '';
+  if (days > 0) result += `${days}d `;
+  if (hours > 0) result += `${hours}h `;
+  if (minutes > 0) result += `${minutes}m `;
+  if (secs > 0) result += `${secs}s`;
+  return result;
 };
 
 const formatMilliseconds = (ms: number): string => {
@@ -84,7 +91,7 @@ const logStartupInfo = () => {
     logKeyValue('Port:', Env.PORT.toString());
     logKeyValue('Base URL:', Env.BASE_URL || 'Not configured');
     if (Env.ADDON_PROXY) {
-      logKeyValue('Proxy URL:', Env.ADDON_PROXY);
+      logKeyValue('Proxy URL:', Env.ADDON_PROXY.join(', '));
     }
     if (Env.ADDON_PROXY_CONFIG) {
       logKeyValue('Proxy Config:', Env.ADDON_PROXY_CONFIG);
@@ -232,6 +239,10 @@ const logStartupInfo = () => {
       logKeyValue(
         'Catalog API:',
         `${Env.CATALOG_API_RATE_LIMIT_MAX_REQUESTS}/${formatDuration(Env.CATALOG_API_RATE_LIMIT_WINDOW)}`
+      );
+      logKeyValue(
+        'Anime API:',
+        `${Env.ANIME_API_RATE_LIMIT_MAX_REQUESTS}/${formatDuration(Env.ANIME_API_RATE_LIMIT_WINDOW)}`
       );
       logKeyValue(
         'Stremio Stream:',
@@ -503,22 +514,116 @@ const logStartupInfo = () => {
       'TMDB Access Token:',
       Env.TMDB_ACCESS_TOKEN ? '✅ Configured' : '❌ None'
     );
+    logKeyValue(
+      'TMDB API Key:',
+      Env.TMDB_API_KEY ? '✅ Configured' : '❌ None'
+    );
+    logKeyValue(
+      'Trakt Client ID:',
+      Env.TRAKT_CLIENT_ID ? '✅ Configured' : '❌ None'
+    );
   });
 
   logSection('BUILT-IN ADDONS', '🔧', () => {
+    // Torznab
+    logKeyValue('Torznab:', '');
+    logKeyValue(
+      'Search Timeout:',
+      formatMilliseconds(Env.BUILTIN_TORZNAB_SEARCH_TIMEOUT),
+      '       '
+    );
+    logKeyValue(
+      'Search Cache TTL:',
+      formatDuration(Env.BUILTIN_TORZNAB_SEARCH_CACHE_TTL),
+      '       '
+    );
+    logKeyValue(
+      'Capabilities Cache TTL:',
+      formatDuration(Env.BUILTIN_TORZNAB_CAPABILITIES_CACHE_TTL),
+      '       '
+    );
+
+    // Newznab
+    logKeyValue('Newznab:', '');
+    logKeyValue(
+      'Search Timeout:',
+      formatMilliseconds(Env.BUILTIN_NEWZNAB_SEARCH_TIMEOUT),
+      '       '
+    );
+    logKeyValue(
+      'Search Cache TTL:',
+      formatDuration(Env.BUILTIN_NEWZNAB_SEARCH_CACHE_TTL),
+      '       '
+    );
+    logKeyValue(
+      'Capabilities Cache TTL:',
+      formatDuration(Env.BUILTIN_NEWZNAB_CAPABILITIES_CACHE_TTL),
+      '       '
+    );
+
+    // Prowlarr
+    const prowlarrSearchEnabled =
+      Env.BUILTIN_PROWLARR_URL && Env.BUILTIN_PROWLARR_API_KEY;
+    logKeyValue(
+      'Prowlarr:',
+      prowlarrSearchEnabled
+        ? '✅ Enabled'
+        : '❌ Disabled (Set PROWLARR_URL, PROWLARR_API_KEY)'
+    );
+    if (prowlarrSearchEnabled) {
+      logKeyValue('    URL:', Env.BUILTIN_PROWLARR_URL!, '       ');
+      logKeyValue(
+        '    API Key:',
+        Env.BUILTIN_PROWLARR_API_KEY ? '✅ Configured' : '❌ None',
+        '       '
+      );
+      logKeyValue(
+        '    Indexers:',
+        Env.BUILTIN_PROWLARR_INDEXERS ? '✅ Configured' : '❌ None',
+        '       '
+      );
+      logKeyValue(
+        '    Search Timeout:',
+        formatMilliseconds(Env.BUILTIN_PROWLARR_SEARCH_TIMEOUT),
+        '       '
+      );
+      logKeyValue(
+        '    Search Cache TTL:',
+        formatDuration(Env.BUILTIN_PROWLARR_SEARCH_CACHE_TTL),
+        '       '
+      );
+      logKeyValue(
+        '    Indexers Cache TTL:',
+        formatDuration(Env.BUILTIN_PROWLARR_INDEXERS_CACHE_TTL),
+        '       '
+      );
+    }
+
+    // animetosho
+    logKeyValue('AnimeTosho:', Env.BUILTIN_ANIMETOSHO_URL);
+    if (Env.BUILTIN_ANIMETOSHO_TIMEOUT) {
+      logKeyValue(
+        '  Timeout:',
+        formatMilliseconds(Env.BUILTIN_ANIMETOSHO_TIMEOUT),
+        '     '
+      );
+    }
+
+    logKeyValue('Zilean', Env.BUILTIN_ZILEAN_URL);
+    if (Env.BUILTIN_ZILEAN_TIMEOUT) {
+      logKeyValue(
+        '  Timeout:',
+        formatMilliseconds(Env.BUILTIN_ZILEAN_TIMEOUT),
+        '     '
+      );
+    }
+
     const torboxSearchEnabled = Env.BASE_URL;
     logKeyValue(
       'Torbox Search:',
       torboxSearchEnabled ? '✅ Enabled' : '❌ Disabled (Set BASE_URL)'
     );
     if (torboxSearchEnabled) {
-      if (Env.BUILTIN_TORBOX_SEARCH_INSTANT_AVAILABILITY_CACHE_TTL)
-        logKeyValue(
-          '    Instant Availability Cache TTL:',
-          formatDuration(
-            Env.BUILTIN_TORBOX_SEARCH_INSTANT_AVAILABILITY_CACHE_TTL
-          )
-        );
       logKeyValue(
         '    Metadata Cache TTL:',
         formatDuration(Env.BUILTIN_TORBOX_SEARCH_METADATA_CACHE_TTL)
@@ -1335,7 +1440,6 @@ const logStartupInfo = () => {
 
   // Additional Features
   const features: string[] = [];
-  if (Env.TMDB_ACCESS_TOKEN) features.push('TMDB Integration');
   if (Env.CUSTOM_HTML) features.push('Custom HTML');
   if (Env.ENCRYPT_MEDIAFLOW_URLS) features.push('Encrypt MediaFlow URLs');
   if (Env.ENCRYPT_STREMTHRU_URLS) features.push('Encrypt StremThru URLs');
@@ -1357,7 +1461,9 @@ const logStartupInfo = () => {
       logKeyValue('Pruning :', '❌ DISABLED');
     }
   });
+};
 
+const logStartupFooter = () => {
   // Footer
   logger.info(
     '╔═══════════════════════════════════════════════════════════════╗'
@@ -1366,7 +1472,7 @@ const logStartupInfo = () => {
     '║                  🎬 AIOStreams Ready!                         ║'
   );
   logger.info(
-    '║           All systems initialized successfully                ║'
+    '║           All systems initialised successfully                ║'
   );
   logger.info(
     '╚═══════════════════════════════════════════════════════════════╝'
@@ -1374,4 +1480,4 @@ const logStartupInfo = () => {
   logger.info('');
 };
 
-export { logStartupInfo };
+export { logStartupInfo, logStartupFooter };

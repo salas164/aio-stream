@@ -11,5 +11,8 @@ export {
   GoogleOAuth,
   GDriveAPI,
   TorBoxSearchAddonError,
+  TorznabAddon,
+  NewznabAddon,
+  ProwlarrAddon,
 } from './builtins';
 export { PresetManager } from './presets';

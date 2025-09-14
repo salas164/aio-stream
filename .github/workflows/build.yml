@@ -21,7 +21,9 @@ jobs:
         with:
           node-version: '22.x'
 
+      - name: Install corepack
+        run: corepack enable
       - name: Install Dependencies
-        run: npm ci
+        run: pnpm install --frozen-lockfile
       - name: Build Addon
-        run: npm run build
+        run: pnpm run build

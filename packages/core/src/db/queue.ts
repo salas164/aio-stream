@@ -1,12 +1,17 @@
 import { createLogger } from '../utils';
 import { DB } from './db';
+
 const logger = createLogger('db');
 const db = DB.getInstance();
 
-// Queue for SQLite transactions
+interface QueuedOperation<T> {
+  operation: () => Promise<T>;
+  resolve: (value: T | PromiseLike<T>) => void;
+  reject: (reason?: any) => void;
+}
 
 export class TransactionQueue {
-  private queue: Array<() => Promise<any>> = [];
+  private queue: Array<QueuedOperation<any>> = [];
   private processing = false;
   private static instance: TransactionQueue;
 
@@ -21,38 +26,34 @@ export class TransactionQueue {
 
   async enqueue<T>(operation: () => Promise<T>): Promise<T> {
     // If using PostgreSQL, execute directly without queuing
-    if (db['uri']?.dialect === 'postgres') {
+    if (db.getDialect() === 'postgres') {
       return operation();
     }
 
-    return new Promise((resolve, reject) => {
-      this.queue.push(async () => {
-        try {
-          const result = await operation();
-          resolve(result);
-        } catch (error) {
-          reject(error);
-        }
-      });
+    return new Promise<T>((resolve, reject) => {
+      this.queue.push({ operation, resolve, reject });
       this.processQueue();
     });
   }
 
   private async processQueue() {
-    if (this.processing || this.queue.length === 0) return;
+    if (this.processing || this.queue.length === 0) {
+      return;
+    }
     this.processing = true;
 
-    while (this.queue.length > 0) {
-      const operation = this.queue.shift();
-      if (operation) {
-        try {
-          await operation();
-        } catch (error) {
-          logger.error('Error processing queued operation:', error);
-        }
-      }
-    }
+    const { operation, resolve, reject } = this.queue.shift()!;
 
-    this.processing = false;
+    try {
+      const result = await operation();
+      resolve(result);
+    } catch (error) {
+      logger.error('Error processing queued operation:', error);
+      reject(error);
+    } finally {
+      this.processing = false;
+      // After finishing one operation, check if there are more in the queue
+      this.processQueue();
+    }
   }
 }

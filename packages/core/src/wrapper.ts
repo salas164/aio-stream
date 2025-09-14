@@ -134,7 +134,10 @@ export class Wrapper {
     return validItems;
   }
 
-  async getManifest(): Promise<Manifest> {
+  async getManifest(options?: {
+    timeout?: number;
+    bypassCache?: boolean;
+  }): Promise<Manifest> {
     const cacheKey =
       this.preset.getCacheKey({
         resource: 'manifest',
@@ -184,11 +187,12 @@ export class Wrapper {
 
     return this._request({
       requestFn,
-      timeout: Env.MANIFEST_TIMEOUT,
+      timeout: options?.timeout ?? Env.MANIFEST_TIMEOUT,
       resourceName: 'manifest',
       cacher: manifestCache,
       cacheKey,
       cacheTtl: Env.MANIFEST_CACHE_TTL,
+      bypassCache: options?.bypassCache,
     });
   }
 
@@ -355,6 +359,7 @@ export class Wrapper {
     cacheKey: string;
     cacheTtl: number;
     shouldCache?: (data: T) => boolean;
+    bypassCache?: boolean;
   }): Promise<T> {
     const {
       requestFn,
@@ -364,9 +369,10 @@ export class Wrapper {
       cacheKey,
       cacheTtl,
       shouldCache,
+      bypassCache,
     } = options;
 
-    if (cacher) {
+    if (cacher && !bypassCache) {
       const cached = await cacher.get(cacheKey);
       if (cached) {
         logger.debug(
@@ -379,6 +385,7 @@ export class Wrapper {
     const processRequest = async () => {
       const result = await requestFn();
       const doCache = shouldCache ? shouldCache(result) : true;
+      // bypass cache only skips retrieving from cache, it still caches the result
       if (cacher && doCache) {
         await cacher.set(cacheKey, result, cacheTtl);
       }

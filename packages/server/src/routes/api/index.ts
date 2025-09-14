@@ -7,3 +7,4 @@ export { default as rpdbApi } from './rpdb';
 export { default as gdriveApi } from './gdrive';
 export { default as debridApi } from './debrid';
 export { default as searchApi } from './search';
+export { default as animeApi } from './anime';

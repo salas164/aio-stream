@@ -2,12 +2,13 @@ import { fetch, RequestInit, Response } from 'undici';
 import { z } from 'zod';
 import { TorBoxApiResponseSchema, TorBoxSearchApiDataSchema } from './schemas';
 import {
-  Cache,
   createLogger,
+  DistributedLock,
   Env,
   formatZodError,
   maskSensitiveInfo,
 } from '../../utils';
+import { IdType } from '../../utils/id-parser';
 
 type TorboxSuccessResponse<T> = {
   success: true;
@@ -25,20 +26,20 @@ type TorboxErrorResponse = {
 
 type TorboxResponse<T> = TorboxSuccessResponse<T> | TorboxErrorResponse;
 
-export const supportedIdTypes: TorboxSearchApiIdType[] = [
-  'anime-planet_id',
-  'anidb_id',
-  'anilist_id',
-  'anisearch_id',
-  'imdb_id',
-  'kitsu_id',
-  'livechart_id',
-  'mal_id',
-  'notify.moe_id',
-  'thetvdb_id',
-  'themoviedb_id',
-  'tmdb',
+export const supportedIdTypes: IdType[] = [
+  'animePlanetId',
+  'anidbId',
+  'anilistId',
+  'anisearchId',
+  'imdbId',
+  'kitsuId',
+  'livechartId',
+  'malId',
+  'notifyMoeId',
+  'thetvdbId',
+  'themoviedbId',
 ];
+
 export type TorboxSearchApiIdType =
   | 'anime-planet_id'
   | 'anidb_id'
@@ -50,8 +51,7 @@ export type TorboxSearchApiIdType =
   | 'mal_id'
   | 'notify.moe_id'
   | 'thetvdb_id'
-  | 'themoviedb_id'
-  | 'tmdb';
+  | 'themoviedb_id';
 
 const logger = createLogger('torbox-search');
 
@@ -61,14 +61,14 @@ function isErrorResponse<T>(
   return !response.success;
 }
 
-export class TorboxApiError extends Error {
+export class TorboxSearchApiError extends Error {
   constructor(
     message: string,
     public readonly statusCode: number,
     public readonly errorCode?: string
   ) {
     super(message);
-    this.name = 'TorboxApiError';
+    this.name = 'TorboxSearchApiError';
   }
 }
 
@@ -82,23 +82,26 @@ class TorboxSearchApi {
 
   constructor(public readonly apiKey: string) {}
 
-  private createRequestLock<T>(
+  private async createRequestLock<T>(
     key: string,
     executor: () => Promise<T>
   ): Promise<T> {
-    if (TorboxSearchApi.ongoingRequests.has(key)) {
+    const { result, cached } = await DistributedLock.getInstance().withLock(
+      `tb-search-api:${key}`,
+      executor,
+      {
+        timeout: TorboxSearchApi.timeout,
+        ttl: TorboxSearchApi.timeout * 2,
+      }
+    );
+
+    if (cached) {
       logger.debug(
-        `Found ongoing request for ${key.replace(this.apiKey, maskSensitiveInfo(this.apiKey))}. Waiting for it to complete.`
+        `Found cached result for ${key.replace(this.apiKey, maskSensitiveInfo(this.apiKey))}`
       );
-      return TorboxSearchApi.ongoingRequests.get(key)!;
     }
 
-    const requestPromise = executor().finally(() => {
-      TorboxSearchApi.ongoingRequests.delete(key);
-    });
-
-    TorboxSearchApi.ongoingRequests.set(key, requestPromise);
-    return requestPromise;
+    return result;
   }
 
   async request<T>(
@@ -137,7 +140,7 @@ class TorboxSearchApi {
       });
     } catch (error) {
       if (error instanceof Error && error.name === 'TimeoutError') {
-        throw new TorboxApiError('Request timed out', 408, 'TIMEOUT');
+        throw new TorboxSearchApiError('Request timed out', 408, 'TIMEOUT');
       }
       throw error;
     }
@@ -147,7 +150,7 @@ class TorboxSearchApi {
     const parsedResponse = TorBoxApiResponseSchema(schema).safeParse(data);
 
     if (!parsedResponse.success) {
-      throw new TorboxApiError(
+      throw new TorboxSearchApiError(
         `Failed to parse API response: ${formatZodError(parsedResponse.error)}`,
         response.status,
         'PARSE_ERROR'
@@ -157,7 +160,7 @@ class TorboxSearchApi {
     const result = parsedResponse.data as TorboxResponse<T>;
 
     if (isErrorResponse(result)) {
-      throw new TorboxApiError(
+      throw new TorboxSearchApiError(
         result.detail || result.message || 'Unknown',
         response.status,
         result.error

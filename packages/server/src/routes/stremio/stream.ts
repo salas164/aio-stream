@@ -3,7 +3,7 @@ import { AIOStreams, AIOStreamResponse, Env } from '@aiostreams/core';
 import { stremioStreamRateLimiter } from '../../middlewares/ratelimit';
 import { createLogger } from '@aiostreams/core';
 import { StremioTransformer } from '@aiostreams/core';
-const router = Router();
+const router: Router = Router();
 
 const logger = createLogger('server');
 

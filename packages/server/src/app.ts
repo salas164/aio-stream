@@ -1,5 +1,4 @@
-import express, { Request, Response } from 'express';
-
+import express, { Request, Response, Express } from 'express';
 import {
   userApi,
   healthApi,
@@ -10,6 +9,7 @@ import {
   gdriveApi,
   debridApi,
   searchApi,
+  animeApi,
 } from './routes/api';
 import {
   configure,
@@ -21,7 +21,13 @@ import {
   addonCatalog,
   alias,
 } from './routes/stremio';
-import { gdrive, torboxSearch } from './routes/builtins';
+import {
+  gdrive,
+  torboxSearch,
+  torznab,
+  newznab,
+  prowlarr,
+} from './routes/builtins';
 import {
   ipMiddleware,
   loggerMiddleware,
@@ -38,7 +44,7 @@ import { StremioTransformer } from '@aiostreams/core';
 import { createResponse } from './utils/responses';
 import path from 'path';
 import fs from 'fs';
-const app = express();
+const app: Express = express();
 const logger = createLogger('server');
 
 export const frontendRoot = path.join(__dirname, '../../frontend/out');
@@ -78,6 +84,7 @@ apiRouter.use('/debrid', debridApi);
 if (Env.ENABLE_SEARCH_API) {
   apiRouter.use('/search', searchApi);
 }
+apiRouter.use('/anime', animeApi);
 app.use(`/api/v${constants.API_VERSION}`, apiRouter);
 
 // Stremio Routes
@@ -115,6 +122,9 @@ const builtinsRouter = express.Router();
 builtinsRouter.use(internalMiddleware);
 builtinsRouter.use('/gdrive', gdrive);
 builtinsRouter.use('/torbox-search', torboxSearch);
+builtinsRouter.use('/torznab', torznab);
+builtinsRouter.use('/newznab', newznab);
+builtinsRouter.use('/prowlarr', prowlarr);
 app.use('/builtins', builtinsRouter);
 
 app.get(

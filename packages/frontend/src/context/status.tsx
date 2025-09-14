@@ -31,9 +31,11 @@ export function StatusProvider({ children }: { children: ReactNode }) {
 
   useEffect(() => {
     fetch(`${baseUrl}/status`)
-      .then((res) => {
-        if (!res.ok) throw new Error('Failed to fetch status');
-        return res.json();
+      .then(async (res) => {
+        const data = await res.json();
+        if (!res.ok)
+          throw new Error(data.error?.message || 'Failed to fetch status');
+        return data;
       })
       .then((data) => setStatus(data.data))
       .catch((err) => setError(err.message))

@@ -1,11 +1,13 @@
 import { z } from 'zod';
 import { TorBoxSearchApiDataSchema } from './schemas';
-import { ServiceId } from '../../utils';
-import { DebridFile } from './debrid-service';
+import {
+  extractInfoHashFromMagnet,
+  extractTrackersFromMagnet,
+} from '../utils/debrid';
 
 export interface Torrent {
   hash: string;
-  magnet?: string;
+  // magnet?: string;
   title: string;
   fileIdx?: number;
   size: number;
@@ -13,19 +15,22 @@ export interface Torrent {
   age?: string;
   seeders?: number;
   type: 'torrent' | 'usenet';
+  sources: string[];
   nzb?: string;
   userSearch?: boolean;
   cached?: boolean;
   owned?: boolean;
-  availableFiles?: DebridFile[];
 }
 
 export function convertDataToTorrents(
   data: z.infer<typeof TorBoxSearchApiDataSchema>['torrents']
 ): Torrent[] {
   return (data || []).map((file) => ({
-    hash: file.hash,
-    magnet: file.magnet ?? undefined,
+    hash:
+      file.hash ??
+      (file.magnet ? extractInfoHashFromMagnet(file.magnet) : undefined),
+    // magnet: file.magnet ?? undefined,
+    sources: file.magnet ? extractTrackersFromMagnet(file.magnet) : [],
     title: file.raw_title,
     size: file.size,
     indexer: file.tracker,

@@ -1,6 +1,11 @@
 import { Router, Request, Response, NextFunction } from 'express';
 import { createResponse } from '../../utils/responses';
-import { createLogger, UserData, UserDataSchema } from '@aiostreams/core';
+import {
+  createLogger,
+  UserData,
+  UserDataSchema,
+  formatZodError,
+} from '@aiostreams/core';
 import {
   createFormatter,
   ParsedStreamSchema,
@@ -8,7 +13,8 @@ import {
 } from '@aiostreams/core';
 import * as constants from '@aiostreams/core';
 import { formatApiRateLimiter } from '../../middlewares/ratelimit';
-const router = Router();
+
+const router: Router = Router();
 
 router.use(formatApiRateLimiter);
 
@@ -23,7 +29,11 @@ router.post('/', (req: Request, res: Response) => {
   } = ParsedStreamSchema.safeParse(stream);
   if (!streamSuccess) {
     logger.error('Invalid stream', { error: streamError });
-    throw new APIError(constants.ErrorCode.FORMAT_INVALID_STREAM);
+    throw new APIError(
+      constants.ErrorCode.FORMAT_INVALID_STREAM,
+      400,
+      formatZodError(streamError)
+    );
   }
   const {
     success: userDataSuccess,
@@ -32,7 +42,11 @@ router.post('/', (req: Request, res: Response) => {
   } = UserDataSchema.safeParse(userData);
   if (!userDataSuccess) {
     logger.error('Invalid user data', { error: userDataError });
-    throw new APIError(constants.ErrorCode.FORMAT_INVALID_FORMATTER);
+    throw new APIError(
+      constants.ErrorCode.FORMAT_INVALID_FORMATTER,
+      400,
+      formatZodError(userDataError)
+    );
   }
   const formattedStream = createFormatter(userDataData).format(streamData);
   res
