@@ -282,19 +282,17 @@ export abstract class BaseFormatter {
   protected config: FormatterConfig;
   protected userData: UserData;
 
-  private localCache: LocalCache;
-
   constructor(config: FormatterConfig, userData: UserData) {
     this.config = config;
     this.userData = userData;
-    this.localCache = new LocalCache();
   }
 
   public format(stream: ParsedStream): { name: string; description: string } {
     const parseValue = this.convertStreamToParseValue(stream);
+    const localCache = new LocalCache();
     return {
-      name: this.parseString(this.config.name, parseValue, this.localCache) || '',
-      description: this.parseString(this.config.description, parseValue, this.localCache) || '',
+      name: this.parseString(this.config.name, parseValue, localCache) || '',
+      description: this.parseString(this.config.description, parseValue, localCache) || '',
     };
   }
 
