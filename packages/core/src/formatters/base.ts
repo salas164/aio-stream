@@ -282,17 +282,19 @@ export abstract class BaseFormatter {
   protected config: FormatterConfig;
   protected userData: UserData;
 
+  private localCache: LocalCache;
+
   constructor(config: FormatterConfig, userData: UserData) {
     this.config = config;
     this.userData = userData;
+    this.localCache = new LocalCache();
   }
 
   public format(stream: ParsedStream): { name: string; description: string } {
     const parseValue = this.convertStreamToParseValue(stream);
-    const localCache = new LocalCache();
     return {
-      name: this.parseString(this.config.name, parseValue, localCache) || '',
-      description: this.parseString(this.config.description, parseValue, localCache) || '',
+      name: this.parseString(this.config.name, parseValue, this.localCache) || '',
+      description: this.parseString(this.config.description, parseValue, this.localCache) || '',
     };
   }
 
@@ -514,6 +516,9 @@ export abstract class BaseFormatter {
 
 
   protected parseString(str: string, value: ParseValue, localCache: LocalCache): string | null {
+    return localCache.get(str, () => this.parseStringHelper(str, value, localCache));
+  }
+  protected parseStringHelper(str: string, value: ParseValue, localCache: LocalCache): string | null {
     if (!str) return null;
 
     const replacer = (key: string, value: unknown) => {
