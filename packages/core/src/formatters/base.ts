@@ -117,6 +117,26 @@ type ResolvedVariable = {
   result?: any,
   error?: string | undefined;
 };
+/**
+ * LocalCache is used to store templates for
+ * - variables
+ * - variables with modifiers
+ * 
+ * Used to avoid recalculating the same template multiple times
+ */
+class LocalCache {
+  private cache: Map<string, any> = new Map();
+
+  public get(key: string, getFn: () => any): any {
+    const cachedValue = this.cache.get(key);
+    if (cachedValue !== undefined) {
+      return cachedValue;
+    }
+    const result = getFn();
+    this.cache.set(key, result);
+    return result;
+  }
+}
 
 const stringModifiers = {
   'upper': (value: string) => value.toUpperCase(),
@@ -735,19 +755,5 @@ export abstract class BaseFormatter {
     end: number
   ): string {
     return str.slice(0, start) + replace + str.slice(end);
-  }
-}
-
-class LocalCache {
-  private cache: Map<string, any> = new Map();
-
-  public get(key: string, getFn: () => any): any {
-    const cachedValue = this.cache.get(key);
-    if (cachedValue !== undefined) {
-      return cachedValue;
-    }
-    const result = getFn();
-    this.cache.set(key, result);
-    return result;
   }
 }
