@@ -46,7 +46,7 @@ export class StremioTransformer {
   private async convertParsedStreamToStream(
     stream: ParsedStream,
     formatter: {
-      format: (stream: ParsedStream) => { name: string; description: string };
+      format: (stream: ParsedStream) => Promise<{ name: string; description: string }>;
     },
     index: number,
     provideStreamData: boolean
@@ -56,7 +56,7 @@ export class StremioTransformer {
           name: stream.originalName || stream.addon.name,
           description: stream.originalDescription,
         }
-      : formatter.format(stream);
+      : await formatter.format(stream);
 
     const autoPlaySettings = {
       enabled: this.userData.autoPlay?.enabled ?? true,
@@ -203,6 +203,7 @@ export class StremioTransformer {
     }>,
     options?: { provideStreamData: boolean }
   ): Promise<AIOStreamResponse> {
+    const formatter = createFormatter(this.userData);
     const {
       data: { streams, statistics },
       errors,
@@ -210,8 +211,6 @@ export class StremioTransformer {
     const { provideStreamData } = options ?? {};
 
     let transformedStreams: AIOStream[] = [];
-
-    const formatter = createFormatter(this.userData);
 
     const start = Date.now();
 
@@ -328,7 +327,7 @@ export class StremioTransformer {
 
     // Create formatter for stream conversion if needed
     let formatter: {
-      format: (stream: ParsedStream) => { name: string; description: string };
+      format: (stream: ParsedStream) => Promise<{ name: string; description: string }>;
     } | null = null;
     if (
       meta.videos?.some((video) => video.streams && video.streams.length > 0)
