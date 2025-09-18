@@ -125,23 +125,22 @@ export abstract class BaseFormatter {
   private regexBuilder: BaseFormatterRegexBuilder;
   private precompiledNameFunction: CompiledParseFunction | null = null;
   private precompiledDescriptionFunction: CompiledParseFunction | null = null;
-  private variableCache = new Map<string, ResolvedVariable>(); // future: add context & cache into precompiled functions
   
   private _compilationPromise: Promise<void>;
   
   constructor(config: FormatterConfig, userData: UserData) {
     this.config = config;
     this.userData = userData;
-    
+
     this.regexBuilder = new BaseFormatterRegexBuilder(this.convertStreamToParseValue({} as ParsedStream));
-    
+
     // Start template compilation asynchronously in the background
     this._compilationPromise = this.compileTemplatesAsync();
   }
 
   private async compileTemplatesAsync(): Promise<void> {
-    this.precompiledNameFunction = (this.config.name) ? await this.compileTemplate(this.config.name) : () => '';
-    this.precompiledDescriptionFunction = (this.config.description) ? await this.compileTemplate(this.config.description) : () => '';
+    this.precompiledNameFunction = await this.compileTemplate(this.config.name);
+    this.precompiledDescriptionFunction = await this.compileTemplate(this.config.description);
   }
 
   public async format(stream: ParsedStream): Promise<{ name: string; description: string }> {
@@ -156,16 +155,6 @@ export abstract class BaseFormatter {
     return {
       name: this.precompiledNameFunction(parseValue),
       description: this.precompiledDescriptionFunction(parseValue),
-    };
-  }
-
-  /**
-   * Get cache statistics for debugging/monitoring.
-   */
-  public getCacheStats(): { size: number; keys: string[] } {
-    return {
-      size: this.variableCache.size,
-      keys: Array.from(this.variableCache.keys())
     };
   }
 
@@ -310,6 +299,7 @@ export abstract class BaseFormatter {
 
 
   protected async compileTemplate(str: string): Promise<CompiledParseFunction> {
+    if (!str) return () => '';
     const re = this.regexBuilder.buildRegexExpression();
     let matches: RegExpExecArray | null;
 
@@ -345,15 +335,14 @@ export abstract class BaseFormatter {
           // the comparator key between prev and cur (from splitOnComparators)
           const compareKey = foundComparators[i - 1] as keyof typeof ComparatorConstants.comparatorKeyToFuncs;
           const comparatorFn = ComparatorConstants.comparatorKeyToFuncs[compareKey];
-          // const combinedContext = [...prev.context, ...cur.context];
           
           try {
             const result = comparatorFn(prev.result, cur.result);
             const finalResult = { result: result };
-            return finalResult;  // { resolvedVariable: finalResult, context: combinedContext };
+            return finalResult;
           } catch (e) {
             const errorResult = { error: `{unable_to_compare(<${prev.result}>::${compareKey}::<${cur.result}>, ${e})}` };
-            return errorResult;  // { resolvedVariable: errorResult, context: combinedContext };
+            return errorResult;
           }
         });
         return reducedResolvedVarWContext;
@@ -447,13 +436,12 @@ export abstract class BaseFormatter {
               default:  return { error: `{unknown_modifier(${lastModMatched})}` };
             }
           }
-          return getErrorResult();  // { resolvedVariable: getErrorResult(), context: [{variableType: variableType, propertyName: propertyName, value: property}] };
+          return getErrorResult();
         }
       }
       // end of APPLY MULTIPLE MODIFIERS logic
 
-      const finalResult = { result: result };
-      return { resolvedVariable: finalResult, context: [{variableType: variableType, propertyName: propertyName, value: property}] };
+      return { result: result } as ResolvedVariable;
     }
   }
 
