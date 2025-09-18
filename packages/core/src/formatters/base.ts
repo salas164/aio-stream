@@ -1,15 +1,14 @@
-import { ParsedStream, UserData } from '../db';
-// import { constants, Env, createLogger } from '../utils';
-import * as constants from '../utils/constants';
-import { createLogger } from '../utils/logger';
+import { ParsedStream, UserData } from '../db/schemas.js';
+import * as constants from '../utils/constants.js';
+import { createLogger } from '../utils/logger.js';
 import {
   formatBytes,
   formatDuration,
   languageToCode,
   languageToEmoji,
   makeSmall,
-} from './utils';
-import { Env } from '../utils/env';
+} from './utils.js';
+import { Env } from '../utils/env.js';
 
 const logger = createLogger('formatter');
 
@@ -133,17 +132,16 @@ export abstract class BaseFormatter {
   constructor(config: FormatterConfig, userData: UserData) {
     this.config = config;
     this.userData = userData;
-
-    const hardcodedParseValueKeysForRegexMatching = this.convertStreamToParseValue({} as ParsedStream);
-    this.regexBuilder = new BaseFormatterRegexBuilder(hardcodedParseValueKeysForRegexMatching);
+    
+    this.regexBuilder = new BaseFormatterRegexBuilder(this.convertStreamToParseValue({} as ParsedStream));
     
     // Start template compilation asynchronously in the background
     this._compilationPromise = this.compileTemplatesAsync();
   }
 
   private async compileTemplatesAsync(): Promise<void> {
-    this.precompiledNameFunction = await this.compileTemplate(this.config.name);
-    this.precompiledDescriptionFunction = await this.compileTemplate(this.config.description);
+    this.precompiledNameFunction = (this.config.name) ? await this.compileTemplate(this.config.name) : () => '';
+    this.precompiledDescriptionFunction = (this.config.description) ? await this.compileTemplate(this.config.description) : () => '';
   }
 
   public async format(stream: ParsedStream): Promise<{ name: string; description: string }> {
@@ -300,7 +298,7 @@ export abstract class BaseFormatter {
           : null,
         cached:
           stream.service?.cached !== undefined ? stream.service?.cached : null,
-      }
+      },
     };
     parseValue.debug = {
       ...DebugToolReplacementConstants,
