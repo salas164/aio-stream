@@ -305,6 +305,10 @@ export abstract class BaseFormatter {
 
     let compiledMatchTemplateFns: CompiledVariableWInsertFn[] = [];
 
+    for (const key in DebugToolReplacementConstants) {
+        str = str.replace(`{debug.${key}}`, DebugToolReplacementConstants[key as keyof typeof DebugToolReplacementConstants]);
+    }
+
     // Iterate through all {...} matches
     while (matches = re.exec(str)) {
       if (!matches.groups) continue;
@@ -322,7 +326,8 @@ export abstract class BaseFormatter {
         .map(baseString => this.parseModifiedVariable(baseString, {
             mod_tzlocale: matches?.groups?.mod_tzlocale ?? undefined
           })
-        );
+      );
+        
       
       // COMPARATOR logic: compare all ResolvedVariables against each other to make one ResolvedVariable (as precompiled wrapper function (parseValue) => ResolvedVariable)
       let precompiledResolvedVariableFn = (parseValue: ParseValue): ResolvedVariable => {
