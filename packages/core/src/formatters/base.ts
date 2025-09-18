@@ -278,7 +278,7 @@ export abstract class BaseFormatter {
       const index = matches.index as number;
 
 
-      // Validate - variableName (exists in value)
+      // Validate - variableType (exists in value)
       const variableDict = value[matches.groups.variableType as keyof ParseValue];
       if (!variableDict) {
         str = this.replaceCharsFromString(
@@ -502,7 +502,7 @@ class BaseFormatterRegexBuilder {
       }
       return [];
     });
-    return `(?<variableName>${validVariables.join('|')})\\.(?<propertyName>${validProperties.join('|')})`;
+    return `(?<variableType>${validVariables.join('|')})\\.(?<propertyName>${validProperties.join('|')})`;
   }
   /**
    * RegEx Capture Pattern: `::<modifier>`
@@ -542,8 +542,7 @@ class BaseFormatterRegexBuilder {
     const modTZLocale = this.buildTZLocaleRegexPattern();
     const checkTF = this.buildCheckRegexPattern();
 
-    const variableAndModifiers = `${variable}(${modifier})*`;
-    const regexPattern = `\\{${variableAndModifiers}(?<suffix>(${modTZLocale})?(${checkTF})?)\\}`;
+    const regexPattern = `\\{${variable}(?<modifiers>(${modifier})+)?(${modTZLocale})?(${checkTF})?\\}`;
 
     return new RegExp(regexPattern, 'gi');
   }
