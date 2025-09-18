@@ -104,150 +104,20 @@ export interface ParseValue {
   debug?: {
     json: string | null;
     jsonf: string | null;
-    modifier: string | null;
-  };
+  } & typeof DebugToolReplacementConstants;
 }
-
-const stringModifiers = {
-  'upper': (value: string) => value.toUpperCase(),
-  'lower': (value: string) => value.toLowerCase(),
-  'title': (value: string) => value
-            .split(' ')
-            .map((word) => word.toLowerCase())
-            .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
-            .join(' '),
-  'length': (value: string) => value.length.toString(),
-  'reverse': (value: string) => value.split('').reverse().join(''),
-  'base64': (value: string) => btoa(value),
-  'string': (value: string) => value,
-}
-
-const arrayModifierGetOrDefault = (value: string[], i: number) => value.length > 0 ? String(value[i]) : '';
-const arrayModifiers = {
-  'join': (value: string[]) => value.join(", "),
-  'length': (value: string[]) => value.length.toString(),
-  'first': (value: string[]) => arrayModifierGetOrDefault(value, 0),
-  'last': (value: string[]) => arrayModifierGetOrDefault(value, value.length - 1),
-  'random': (value: string[]) => arrayModifierGetOrDefault(value, Math.floor(Math.random() * value.length)),
-  'sort': (value: string[]) => [...value].sort(),
-  'reverse': (value: string[]) => [...value].reverse(),
-}
-
-const numberModifiers = {
-  'comma': (value: number) => value.toLocaleString(),
-  'hex': (value: number) => value.toString(16),
-  'octal': (value: number) => value.toString(8),
-  'binary': (value: number) => value.toString(2),
-  'bytes': (value: number) => formatBytes(value, 1000),
-  'bytes10': (value: number) => formatBytes(value, 1000),
-  'bytes2': (value: number) => formatBytes(value, 1024),
-  'string': (value: number) => value.toString(),
-  'time': (value: number) => formatDuration(value),
-}
-
-export const conditionalModifiers = {
-  exact: {
-    'istrue': (value: any) => value === true,
-    'isfalse': (value: any) => value === false,
-    'exists': (value: any) => {
-      // Handle null, undefined, empty strings, empty arrays
-      if (value === undefined || value === null) return false;
-      if (typeof value === 'string') return /\S/.test(value); // has at least one non-whitespace character
-      if (Array.isArray(value)) return value.length > 0;
-      // For other types (numbers, booleans, objects), consider them as "existing"
-      return true;
-    },
-  },
-
-  prefix: {
-    '$': (value: string, check: string) => value.startsWith(check),
-    '^': (value: string, check: string) => value.endsWith(check),
-    '~': (value: string, check: string) => value.includes(check),
-    '=': (value: string, check: string) => value == check,
-    '>=': (value: string | number, check: string | number) => value >= check,
-    '>': (value: string | number, check: string | number) => value > check,
-    '<=': (value: string | number, check: string | number) => value <= check,
-    '<': (value: string | number, check: string | number) => value < check,
-  },
-}
-
-const hardcodedModifiersForRegexMatching = {
-  "join('.*?')": null,
-  'join(".*?")': null,
-  "$.*?": null,
-  "^.*?": null,
-  "~.*?": null,
-  "=.*?": null,
-  ">=.*?": null,
-  ">.*?": null,
-  "<=.*?": null,
-  "<.*?": null,
-}
-
-const modifiers = {
-  ...hardcodedModifiersForRegexMatching,
-  ...stringModifiers,
-  ...numberModifiers,
-  ...arrayModifiers,
-  ...conditionalModifiers.exact,
-  // ...conditionalModifiers.prefix,
-}
-
-const debugModifierToolReplacement = `
-String: {config.addonName}
-  ::upper {config.addonName::upper}
-  ::lower {config.addonName::lower}
-  ::title {config.addonName::title}
-  ::length {config.addonName::length}
-  ::reverse {config.addonName::reverse}
-{tools.newLine}
-
-Number: {stream.size}
-  ::bytes {stream.size::bytes}
-  ::time {stream.size::time}
-  ::hex {stream.size::hex}
-  ::octal {stream.size::octal}
-  ::binary {stream.size::binary}
-{tools.newLine}
-
-Array: {stream.languages}
-  ::join('-separator-') {stream.languages::join("-separator-")}
-  ::length {stream.languages::length}
-  ::first {stream.languages::first}
-  ::last {stream.languages::last}
-{tools.newLine}
-
-Boolean: {stream.proxied}
-  ::istrue {stream.proxied::istrue["true"||"false"]}
-  ::isfalse {stream.proxied::isfalse["true"||"false"]}
-{tools.newLine}
-
-Conditional:
-  filename::exists    {stream.filename::exists["true"||"false"]}
-  filename::$Movie    {stream.filename::$Movie["true"||"false"]}
-  filename::^Title    {stream.filename::^Title["true"||"false"]}
-  filename::~test     {stream.filename::~test["true"||"false"]}
-  filename::=test     {stream.filename::=test["true"||"false"]}
-  filesize::>=100     {stream.size::>=100["true"||"false"]}
-  filesize::>50       {stream.size::>50["true"||"false"]}
-  filesize::<=200     {stream.size::<=200["true"||"false"]}
-  filesize::<150      {stream.size::<150["true"||"false"]}
-{tools.newLine}
-
-[Advanced] Multiple modifiers
-  <string>::reverse::title::reverse   {config.addonName} -> {config.addonName::reverse::title::reverse}
-  <number>::string::reverse           {stream.size} -> {stream.size::string::reverse}
-  <array>::string::reverse            {stream.languages} -> {stream.languages::join("::")::reverse}
-  <boolean>::length::>=2              {stream.languages} -> {stream.languages::length::>=2["true"||"false"]}
-`;
 
 export abstract class BaseFormatter {
   protected config: FormatterConfig;
   protected userData: UserData;
 
+  private regexBuilder: BaseFormatterRegexBuilder;
+
   constructor(config: FormatterConfig, userData: UserData) {
     this.config = config;
     this.userData = userData;
+
+    this.regexBuilder = new BaseFormatterRegexBuilder(this.convertStreamToParseValue({} as ParsedStream));
   }
 
   public format(stream: ParsedStream): { name: string; description: string } {
@@ -289,7 +159,7 @@ export abstract class BaseFormatter {
     const onlyUserSpecifiedLanguages = sortedLanguages?.filter((lang) =>
       userSpecifiedLanguages.includes(lang as any)
     );
-    return {
+    let parseValue: ParseValue = {
       config: {
         addonName: this.userData.addonName || Env.ADDON_NAME,
       },
@@ -389,60 +259,18 @@ export abstract class BaseFormatter {
           stream.service?.cached !== undefined ? stream.service?.cached : null,
       },
     };
-  }
-
-  // Build the modifier regex pattern from modifier keys
-  protected buildModifierRegexPattern(): string {
-    const validModifiers = Object.keys(modifiers)
-      .map(key => key.replace(/[\(\)\'\"\$\^\~\=\>\<]/g, '\\$&'));
-    return `::(${validModifiers.join('|')})`;
-  }
-
-  protected buildRegexExpression(): RegExp {
-    // Dynamically build the `variable` regex pattern from ParseValue keys
-    // Futureproof: if we add new keys to ParseValue interface, we must add them here too
-    const hardcodedParseValueKeysForRegexMatching = this.convertStreamToParseValue({} as ParsedStream);
-    const validVariables: (keyof ParseValue)[] = Object.keys(hardcodedParseValueKeysForRegexMatching) as (keyof ParseValue)[];
-    // Get all valid properties (subkeys) from ParseValue structure
-    const validProperties = validVariables.flatMap(sectionKey => {
-      const section = hardcodedParseValueKeysForRegexMatching[sectionKey as keyof ParseValue];
-      if (section && typeof section === 'object' && section !== null) {
-        return Object.keys(section);
-      }
-      return [];
-    });
-    const variable = `(?<variableName>${validVariables.join('|')})\\.(?<propertyName>${validProperties.join('|')})`;
-
-    const singleValidModifier = this.buildModifierRegexPattern();
-    
-    // Build the conditional check pattern separately
-    // Use [^"]* to capture anything except quotes, making it non-greedy
-    const checkTrue = `"(?<mod_check_true>[^"]*)"`;
-    const checkFalse = `"(?<mod_check_false>[^"]*)"`;
-    const checkTF = `\\[(?<mod_check>${checkTrue}\\|\\|${checkFalse})\\]`;
-
-    // TZ Locale pattern (e.g. 'UTC', 'GMT', 'EST', 'PST', 'en-US', 'en-GB', 'Europe/London', 'America/New_York')
-    const modTZLocale = `::(?<mod_tzlocale>[A-Za-z]{2,3}(?:-[A-Z]{2})?|[A-Za-z]+?/[A-Za-z_]+?)`;
-
-    const regexPattern = `\\{${variable}(?<modifiers>(${singleValidModifier})+)?(${modTZLocale})?(${checkTF})?\\}`;
-    
-    return new RegExp(regexPattern, 'gi')
+    parseValue.debug = {
+      ...DebugToolReplacementConstants,
+      json: JSON.stringify({ ...parseValue, debug: undefined }),
+      jsonf: JSON.stringify({ ...parseValue, debug: undefined }, (_, value) => value, 2),
+    };
+    return parseValue;
   }
 
   protected parseString(str: string, value: ParseValue): string | null {
     if (!str) return null;
 
-    const replacer = (key: string, value: unknown) => {
-      return value;
-    };
-
-    value.debug = {
-      json: JSON.stringify({ ...value, debug: undefined }, replacer),
-      jsonf: JSON.stringify({ ...value, debug: undefined }, replacer, 2),
-      modifier: debugModifierToolReplacement,
-    };
-
-    const re = this.buildRegexExpression();
+    const re = this.regexBuilder.buildRegexExpression();
     let matches: RegExpExecArray | null;
 
     while (matches = re.exec(str)) {
@@ -450,8 +278,9 @@ export abstract class BaseFormatter {
 
       const index = matches.index as number;
 
+
       // Validate - variableName (exists in value)
-      const variableDict = value[matches.groups.variableName as keyof ParseValue];
+      const variableDict = value[matches.groups.variableType as keyof ParseValue];
       if (!variableDict) {
         str = this.replaceCharsFromString(
           str,
@@ -516,15 +345,15 @@ export abstract class BaseFormatter {
     parseValue: ParseValue,
   ): string | undefined {
     const singleModTerminator = '((::)|($))'; // :: if there's multiple modifiers or $ for the end of the string
-    const singleValidModRe = new RegExp(this.buildModifierRegexPattern() + singleModTerminator, 'gi');
+    const singleValidModRe = new RegExp(this.regexBuilder.buildModifierRegexPattern() + singleModTerminator, 'gi');
     
     let result = input as any;
     // iterate over modifiers in order of appearance
     for (const modMatch of [...groups.modifiers.matchAll(singleValidModRe)].sort((a, b) => (a.index ?? 0) - (b.index ?? 0))) {
       if (result === undefined) break;
       result = this.applySingleModifier(
-        modMatch[1], // First capture group (the modifier name)
         result,
+        modMatch[1], // First capture group (the modifier name)
         groups.mod_tzlocale ?? "",
       );
     }
@@ -548,40 +377,44 @@ export abstract class BaseFormatter {
     }
   }
 
+  /**
+   * @param variable - the variable to apply the modifier to (e.g. `123`, `"TorBox"`, `["English", "Italian"]`, etc.)
+   * @param mod - the modifier to apply
+   */
   protected applySingleModifier(
+    variable: any,
     mod: string,
-    input: any,
     tzlocale?: string,
   ): string | boolean | undefined {
     const _mod = mod;
     mod = mod.toLowerCase();
 
     // CONDITIONAL MODIFIERS
-    const isExact = Object.keys(conditionalModifiers.exact).includes(mod);
-    const isPrefix = Object.keys(conditionalModifiers.prefix).some(key => mod.startsWith(key));
+    const isExact = Object.keys(ModifierConstants.conditionalModifiers.exact).includes(mod);
+    const isPrefix = Object.keys(ModifierConstants.conditionalModifiers.prefix).some(key => mod.startsWith(key));
     if (isExact || isPrefix) {
       // try to coerce true/false value from modifier
       let conditional: boolean | undefined;
       try {
 
         // PRE-CHECK(s) -- skip resolving conditional modifier if value DNE, defaulting to false conditional
-        if (!conditionalModifiers.exact.exists(input)) {
+        if (!ModifierConstants.conditionalModifiers.exact.exists(variable)) {
           conditional = false;
         }
         
         // EXACT
         else if (isExact) {
-          const modAsKey = mod as keyof typeof conditionalModifiers.exact;
-          conditional = conditionalModifiers.exact[modAsKey](input);
+          const modAsKey = mod as keyof typeof ModifierConstants.conditionalModifiers.exact;
+          conditional = ModifierConstants.conditionalModifiers.exact[modAsKey](variable);
         }
         
         // PREFIX
         else if (isPrefix) {
           // get the longest prefix match
-          const modPrefix = Object.keys(conditionalModifiers.prefix).sort((a, b) => b.length - a.length).find(key => mod.startsWith(key))!!;
+          const modPrefix = Object.keys(ModifierConstants.conditionalModifiers.prefix).sort((a, b) => b.length - a.length).find(key => mod.startsWith(key))!!;
           
           // Pre-process string value and check to allow for intuitive comparisons
-          const stringValue = input.toString().toLowerCase();
+          const stringValue = variable.toString().toLowerCase();
           let stringCheck = mod.substring(modPrefix.length).toLowerCase();
           // remove whitespace from stringCheck if it isn't in stringValue
           stringCheck = !/\s/.test(stringValue) ? stringCheck.replace(/\s/g, '') : stringCheck;
@@ -591,7 +424,7 @@ export abstract class BaseFormatter {
           const isNumericComparison = ["<", "<=", ">", ">=", "="].includes(modPrefix) && 
             !isNaN(parsedNumericValue) && !isNaN(parsedNumericCheck);
           
-          conditional = conditionalModifiers.prefix[modPrefix as keyof typeof conditionalModifiers.prefix](
+          conditional = ModifierConstants.conditionalModifiers.prefix[modPrefix as keyof typeof ModifierConstants.conditionalModifiers.prefix](
             isNumericComparison ? parsedNumericValue as any : stringValue, 
             isNumericComparison ? parsedNumericCheck as any : stringCheck,
           );
@@ -603,30 +436,30 @@ export abstract class BaseFormatter {
     }
 
     // --- STRING MODIFIERS ---
-    else if (typeof input === 'string') {
-      if (mod in stringModifiers)
-        return stringModifiers[mod as keyof typeof stringModifiers](input);
+    else if (typeof variable === 'string') {
+      if (mod in ModifierConstants.stringModifiers)
+        return ModifierConstants.stringModifiers[mod as keyof typeof ModifierConstants.stringModifiers](variable);
     }
 
     // --- ARRAY MODIFIERS ---
-    else if (Array.isArray(input)) {
-      if (mod in arrayModifiers)
-        return arrayModifiers[mod as keyof typeof arrayModifiers](input)?.toString();
+    else if (Array.isArray(variable)) {
+      if (mod in ModifierConstants.arrayModifiers)
+        return ModifierConstants.arrayModifiers[mod as keyof typeof ModifierConstants.arrayModifiers](variable)?.toString();
 
       // handle hardcoded modifiers here
       switch (true) {
         case mod.startsWith('join(') && mod.endsWith(')'): {
           // Extract the separator from join('separator') or join("separator")
           const separator = _mod.substring(6, _mod.length - 2)
-          return input.join(separator);
+          return variable.join(separator);
         }
       }
     }
 
     // --- NUMBER MODIFIERS ---
-    else if (typeof input === 'number') {
-      if (mod in numberModifiers)
-        return numberModifiers[mod as keyof typeof numberModifiers](input);
+    else if (typeof variable === 'number') {
+      if (mod in ModifierConstants.numberModifiers)
+        return ModifierConstants.numberModifiers[mod as keyof typeof ModifierConstants.numberModifiers](variable);
     }
 
     return undefined;
@@ -640,4 +473,215 @@ export abstract class BaseFormatter {
   ): string {
     return str.slice(0, start) + replace + str.slice(end);
   }
+}
+
+/**
+ * Used to store the actual value of a parsed, and potentially modified, variable
+ * or an error message if the parsed/modified result becomes invalid for any reason
+ */
+type ResolvedVariable = {
+  result?: any,
+  error?: string | undefined;
+};
+
+
+class BaseFormatterRegexBuilder {
+  private hardcodedParseValueKeysForRegexMatching: ParseValue;
+  constructor(hardcodedParseValueKeysForRegexMatching: ParseValue) {
+    this.hardcodedParseValueKeysForRegexMatching = hardcodedParseValueKeysForRegexMatching;
+  }
+  /**
+   * RegEx Capture Pattern: `<variableType>.<propertyName>`
+   */
+  public buildVariableRegexPattern(): string {
+    const validVariables: (keyof ParseValue)[] = Object.keys(this.hardcodedParseValueKeysForRegexMatching) as (keyof ParseValue)[];
+    // Get all valid properties (subkeys) from ParseValue structure
+    const validProperties = validVariables.flatMap(sectionKey => {
+      const section = this.hardcodedParseValueKeysForRegexMatching[sectionKey as keyof ParseValue];
+      if (section && typeof section === 'object' && section !== null) {
+        return Object.keys(section);
+      }
+      return [];
+    });
+    return `(?<variableName>${validVariables.join('|')})\\.(?<propertyName>${validProperties.join('|')})`;
+  }
+  /**
+   * RegEx Capture Pattern: `::<modifier>`
+   */
+  public buildModifierRegexPattern(): string {
+    const validModifiers = Object.keys(ModifierConstants.modifiers)
+      .map(key => key.replace(/[\(\)\'\"\$\^\~\=\>\<]/g, '\\$&'));
+    return `::(${validModifiers.join('|')})`;
+  }
+  /**
+   * RegEx Capture Pattern: `::<tzLocale>`
+   * 
+   * (with named capture group `tzLocale`)
+   */
+  public buildTZLocaleRegexPattern(): string {
+    // TZ Locale pattern (e.g. 'UTC', 'GMT', 'EST', 'PST', 'en-US', 'en-GB', 'Europe/London', 'America/New_York')
+    return `::(?<mod_tzlocale>[A-Za-z]{2,3}(?:-[A-Z]{2})?|[A-Za-z]+?/[A-Za-z_]+?)`;
+  }
+  /**
+   * RegEx Capture Pattern: `["<check_true>||<check_false>"]`
+   * 
+   * (with named capture group `<mod_check_true>` and `<mod_check_false>` and `mod_check`=`"<check_true>||<check_false>"`)
+   */
+  public buildCheckRegexPattern(): string {
+    // Build the conditional check pattern separately
+    // Use [^"]* to capture anything except quotes, making it non-greedy
+    const checkTrue = `"(?<mod_check_true>[^"]*)"`;
+    const checkFalse = `"(?<mod_check_false>[^"]*)"`;
+    return `\\[(?<mod_check>${checkTrue}\\|\\|${checkFalse})\\]`;
+  }
+  /**
+   * RegEx Captures: `{ <singleModifiedVariable> (::<comparator>::<singleModifiedVariable>)* (<tz>?) (<[t||f]>?) }`
+   */
+  public buildRegexExpression(): RegExp {
+    const variable = this.buildVariableRegexPattern();
+    const modifier = this.buildModifierRegexPattern();
+    const modTZLocale = this.buildTZLocaleRegexPattern();
+    const checkTF = this.buildCheckRegexPattern();
+
+    const variableAndModifiers = `${variable}(${modifier})*`;
+    const regexPattern = `\\{${variableAndModifiers}(?<suffix>(${modTZLocale})?(${checkTF})?)\\}`;
+
+    return new RegExp(regexPattern, 'gi');
+  }
+}
+
+/**
+ * Static Constants
+ */
+class ModifierConstants {
+  static stringModifiers = {
+    'upper': (value: string) => value.toUpperCase(),
+    'lower': (value: string) => value.toLowerCase(),
+    'title': (value: string) => value
+              .split(' ')
+              .map((word) => word.toLowerCase())
+              .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+              .join(' '),
+    'length': (value: string) => value.length.toString(),
+    'reverse': (value: string) => value.split('').reverse().join(''),
+    'base64': (value: string) => btoa(value),
+    'string': (value: string) => value,
+}
+
+  static arrayModifierGetOrDefault = (value: string[], i: number) => value.length > 0 ? String(value[i]) : '';
+  static arrayModifiers = {
+    'join': (value: string[]) => value.join(", "),
+    'length': (value: string[]) => value.length.toString(),
+    'first': (value: string[]) => this.arrayModifierGetOrDefault(value, 0),
+    'last': (value: string[]) => this.arrayModifierGetOrDefault(value, value.length - 1),
+    'random': (value: string[]) => this.arrayModifierGetOrDefault(value, Math.floor(Math.random() * value.length)),
+    'sort': (value: string[]) => [...value].sort(),
+    'reverse': (value: string[]) => [...value].reverse(),
+  }
+
+  static numberModifiers = {
+    'comma': (value: number) => value.toLocaleString(),
+    'hex': (value: number) => value.toString(16),
+    'octal': (value: number) => value.toString(8),
+    'binary': (value: number) => value.toString(2),
+    'bytes': (value: number) => formatBytes(value, 1000),
+    'bytes10': (value: number) => formatBytes(value, 1000),
+    'bytes2': (value: number) => formatBytes(value, 1024),
+    'string': (value: number) => value.toString(),
+    'time': (value: number) => formatDuration(value),
+  }
+
+  static conditionalModifiers = {
+    exact: {
+      'istrue': (value: any) => value === true,
+      'isfalse': (value: any) => value === false,
+      'exists': (value: any) => {
+        // Handle null, undefined, empty strings, empty arrays
+        if (value === undefined || value === null) return false;
+        if (typeof value === 'string') return /\S/.test(value); // has at least one non-whitespace character
+        if (Array.isArray(value)) return value.length > 0;
+        // For other types (numbers, booleans, objects), consider them as "existing"
+        return true;
+      },
+    },
+
+    prefix: {
+      '$': (value: string, check: string) => value.startsWith(check),
+      '^': (value: string, check: string) => value.endsWith(check),
+      '~': (value: string, check: string) => value.includes(check),
+      '=': (value: string, check: string) => value == check,
+      '>=': (value: string | number, check: string | number) => value >= check,
+      '>': (value: string | number, check: string | number) => value > check,
+      '<=': (value: string | number, check: string | number) => value <= check,
+      '<': (value: string | number, check: string | number) => value < check,
+    },
+  }
+
+  static hardcodedModifiersForRegexMatching = {
+    "join('.*?')": null,
+    'join(".*?")': null,
+    "$.*?": null,
+    "^.*?": null,
+    "~.*?": null,
+    "=.*?": null,
+    ">=.*?": null,
+    ">.*?": null,
+    "<=.*?": null,
+    "<.*?": null,
+  }
+
+  static modifiers = {
+    ...this.hardcodedModifiersForRegexMatching,
+    ...this.stringModifiers,
+    ...this.numberModifiers,
+    ...this.arrayModifiers,
+    ...this.conditionalModifiers.exact,
+    ...this.conditionalModifiers.prefix,
+  }
+}
+
+const DebugToolReplacementConstants = {
+  modifier: `
+String: {config.addonName}
+  ::upper {config.addonName::upper}
+  ::lower {config.addonName::lower}
+  ::title {config.addonName::title}
+  ::length {config.addonName::length}
+  ::reverse {config.addonName::reverse}
+{tools.newLine}
+Number: {stream.size}
+  ::bytes {stream.size::bytes}
+  ::time {stream.size::time}
+  ::hex {stream.size::hex}
+  ::octal {stream.size::octal}
+  ::binary {stream.size::binary}
+{tools.newLine}
+Array: {stream.languages}
+  ::join('-separator-') {stream.languages::join("-separator-")}
+  ::length {stream.languages::length}
+  ::first {stream.languages::first}
+  ::last {stream.languages::last}
+{tools.newLine}
+Conditional:
+  String: {stream.filename}
+    filename::exists    {stream.filename::exists["true"||"false"]}
+    filename::$Movie    {stream.filename::$Movie["true"||"false"]}
+    filename::^mkv    {stream.filename::^mkv["true"||"false"]}
+    filename::~Title     {stream.filename::~Title["true"||"false"]}
+    filename::=test     {stream.filename::=test["true"||"false"]}
+  Number: {stream.size}
+    filesize::>=100     {stream.size::>=100["true"||"false"]}
+    filesize::>50       {stream.size::>50["true"||"false"]}
+    filesize::<=200     {stream.size::<=200["true"||"false"]}
+    filesize::<150      {stream.size::<150["true"||"false"]}
+  Boolean: {stream.proxied}
+    ::istrue {stream.proxied::istrue["true"||"false"]}
+    ::isfalse {stream.proxied::isfalse["true"||"false"]}
+{tools.newLine}
+[Advanced] Multiple modifiers
+  <string>::reverse::title::reverse   {config.addonName} -> {config.addonName::reverse::title::reverse}
+  <number>::string::reverse           {stream.size} -> {stream.size::string::reverse}
+  <array>::string::reverse            {stream.languages} -> {stream.languages::join("::")::reverse}
+  <boolean>::length::>=2              {stream.languages} -> {stream.languages::length::>=2["true"||"false"]}
+`,
 }
