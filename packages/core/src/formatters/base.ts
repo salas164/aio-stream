@@ -1,15 +1,14 @@
-import { ParsedStream, UserData } from '../db';
-// import { constants, Env, createLogger } from '../utils';
-import * as constants from '../utils/constants';
-import { createLogger } from '../utils/logger';
+import { ParsedStream, UserData } from '../db/schemas.js';
+import * as constants from '../utils/constants.js';
+import { createLogger } from '../utils/logger.js';
 import {
   formatBytes,
   formatDuration,
   languageToCode,
   languageToEmoji,
   makeSmall,
-} from './utils';
-import { Env } from '../utils/env';
+} from './utils.js';
+import { Env } from '../utils/env.js';
 
 const logger = createLogger('formatter');
 
@@ -366,7 +365,7 @@ export abstract class BaseFormatter {
         let check_false = groups.mod_check_false ?? "";
         if (typeof check_true !== 'string' || typeof check_false !== 'string')
           return `{unknown_conditional_modifier_check_true_or_false}`;
-        
+
         if (parseValue) {
           check_true = this.parseString(check_true, parseValue) || check_true;
           check_false = this.parseString(check_false, parseValue) || check_false;
@@ -401,13 +400,13 @@ export abstract class BaseFormatter {
         if (!ModifierConstants.conditionalModifiers.exact.exists(variable)) {
           conditional = false;
         }
-        
+
         // EXACT
         else if (isExact) {
           const modAsKey = mod as keyof typeof ModifierConstants.conditionalModifiers.exact;
           conditional = ModifierConstants.conditionalModifiers.exact[modAsKey](variable);
         }
-        
+
         // PREFIX
         else if (isPrefix) {
           // get the longest prefix match
@@ -418,7 +417,7 @@ export abstract class BaseFormatter {
           let stringCheck = mod.substring(modPrefix.length).toLowerCase();
           // remove whitespace from stringCheck if it isn't in stringValue
           stringCheck = !/\s/.test(stringValue) ? stringCheck.replace(/\s/g, '') : stringCheck;
-          
+
           // parse value/check as if they're numbers (123,456 -> 123456)
           const [parsedNumericValue, parsedNumericCheck] = [Number(stringValue.replace(/,\s/g, '')), Number(stringCheck.replace(/,\s/g, ''))];
           const isNumericComparison = ["<", "<=", ">", ">=", "="].includes(modPrefix) && 
