@@ -619,6 +619,22 @@ export abstract class BaseFormatter {
         return ModifierConstants.stringModifiers[
           mod as keyof typeof ModifierConstants.stringModifiers
         ](variable);
+
+      // handle hardcoded modifiers here
+      switch (true) {
+        case mod.startsWith('replace(') && mod.endsWith(')'): {
+					const findStartChar = mod.charAt(8); // either " or '
+					const findEndChar = mod.charAt(mod.length - 2); // either " or '
+
+					// Extract the separator from replace(['"]...<matching'">, ['"]...<matching'">)
+					const content = _mod.substring(9, _mod.length - 2);
+
+					// split on findStartChar<whitespace?>,<whitespace?>findEndChar
+					const [key, replaceKey, shouldBeUndefined] = content.split(new RegExp(`${findStartChar}\\s*,\\s*${findEndChar}`))
+
+					if (!shouldBeUndefined && key && replaceKey) return variable.replaceAll(key, replaceKey);
+        }
+      }
     }
 
     // --- ARRAY MODIFIERS ---
@@ -820,7 +836,11 @@ class ModifierConstants {
     },
   };
 
-  static hardcodedModifiersForRegexMatching = {
+	static hardcodedModifiersForRegexMatching = {
+		"replace('.*?','.*?')": null,
+		"replace(\".*?\",'.*?')": null,
+		"replace('.*?',\".*?\")": null,
+		'replace(".*?",".*?")': null,
     "join('.*?')": null,
     'join(".*?")': null,
     '$.*?': null,
