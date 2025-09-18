@@ -2,698 +2,649 @@
 
 ## [2.12.2](https://github.com/Viren070/AIOStreams/compare/v2.12.1...v2.12.2) (2025-09-02)
 
-
 ### Bug Fixes
 
-* await regexAllowed check in validateRegexes function ([be1a257](https://github.com/Viren070/AIOStreams/commit/be1a257477f8a8f82a49b06e1cc35dc526c79f6e))
-* **debridio-scraper:** add debrider to supported services ([24d0974](https://github.com/Viren070/AIOStreams/commit/24d097464c3a09f65dec5a16726786cc61d85e66))
-* move cache hit message into debug level ([c515e19](https://github.com/Viren070/AIOStreams/commit/c515e19f196ce3b8c42604bf6c1f0c36f3f615c1))
+- await regexAllowed check in validateRegexes function ([be1a257](https://github.com/Viren070/AIOStreams/commit/be1a257477f8a8f82a49b06e1cc35dc526c79f6e))
+- **debridio-scraper:** add debrider to supported services ([24d0974](https://github.com/Viren070/AIOStreams/commit/24d097464c3a09f65dec5a16726786cc61d85e66))
+- move cache hit message into debug level ([c515e19](https://github.com/Viren070/AIOStreams/commit/c515e19f196ce3b8c42604bf6c1f0c36f3f615c1))
 
 ## [2.12.1](https://github.com/Viren070/AIOStreams/compare/v2.12.0...v2.12.1) (2025-08-31)
 
-
 ### Bug Fixes
 
-* add groups to pro mode ([cc51cc0](https://github.com/Viren070/AIOStreams/commit/cc51cc006c4fe19897219b1280a88d30e3f05c55))
-* assign trusted and ip in userdata for search api ([78c94df](https://github.com/Viren070/AIOStreams/commit/78c94dfec3d56757f77aeb4ddc1435f282972c80))
-* handle default undefined value of select-with-custom during validation ([6acc26f](https://github.com/Viren070/AIOStreams/commit/6acc26f9879874fbbfc3cc4e4420280e464a0a2c))
-* make global size filter optional to allow only resolution-specific ([735bba5](https://github.com/Viren070/AIOStreams/commit/735bba5e33436753eea630a7079ece6be67fb14a))
-* remove debug logging in year matching ([408a288](https://github.com/Viren070/AIOStreams/commit/408a28825942186bdc94001658cb537b8f62d845))
-* remove size and type from default auto play attributes ([1968a1c](https://github.com/Viren070/AIOStreams/commit/1968a1c7e18be78064d94bceb64eb9c17eef234f))
-* remove trailing slashes in presetUrls validator ([f613772](https://github.com/Viren070/AIOStreams/commit/f6137721adf7316dc077e9c46eaccfc1be1742ba))
-* support year ranges during year matching ([a39a85b](https://github.com/Viren070/AIOStreams/commit/a39a85b97ba0f28aa927bee3fb8232b34ad6d502))
-* update alias route to handle requested path correctly with express 5 ([bd88d3d](https://github.com/Viren070/AIOStreams/commit/bd88d3de8b534fba227881b68d4dfdf93081f0cb))
-* use partial record instead of record in schemas ([61cd2bc](https://github.com/Viren070/AIOStreams/commit/61cd2bc29e1e1c53b4add011b8352be24b49c574))
-* use slice instead of splice to avoid modifying value of environment variable ([ee2ea41](https://github.com/Viren070/AIOStreams/commit/ee2ea419ba3c8d03403b0d02540c4d324d496a24))
+- add groups to pro mode ([cc51cc0](https://github.com/Viren070/AIOStreams/commit/cc51cc006c4fe19897219b1280a88d30e3f05c55))
+- assign trusted and ip in userdata for search api ([78c94df](https://github.com/Viren070/AIOStreams/commit/78c94dfec3d56757f77aeb4ddc1435f282972c80))
+- handle default undefined value of select-with-custom during validation ([6acc26f](https://github.com/Viren070/AIOStreams/commit/6acc26f9879874fbbfc3cc4e4420280e464a0a2c))
+- make global size filter optional to allow only resolution-specific ([735bba5](https://github.com/Viren070/AIOStreams/commit/735bba5e33436753eea630a7079ece6be67fb14a))
+- remove debug logging in year matching ([408a288](https://github.com/Viren070/AIOStreams/commit/408a28825942186bdc94001658cb537b8f62d845))
+- remove size and type from default auto play attributes ([1968a1c](https://github.com/Viren070/AIOStreams/commit/1968a1c7e18be78064d94bceb64eb9c17eef234f))
+- remove trailing slashes in presetUrls validator ([f613772](https://github.com/Viren070/AIOStreams/commit/f6137721adf7316dc077e9c46eaccfc1be1742ba))
+- support year ranges during year matching ([a39a85b](https://github.com/Viren070/AIOStreams/commit/a39a85b97ba0f28aa927bee3fb8232b34ad6d502))
+- update alias route to handle requested path correctly with express 5 ([bd88d3d](https://github.com/Viren070/AIOStreams/commit/bd88d3de8b534fba227881b68d4dfdf93081f0cb))
+- use partial record instead of record in schemas ([61cd2bc](https://github.com/Viren070/AIOStreams/commit/61cd2bc29e1e1c53b4add011b8352be24b49c574))
+- use slice instead of splice to avoid modifying value of environment variable ([ee2ea41](https://github.com/Viren070/AIOStreams/commit/ee2ea419ba3c8d03403b0d02540c4d324d496a24))
 
 ## [2.12.0](https://github.com/Viren070/AIOStreams/compare/v2.11.6...v2.12.0) (2025-08-30)
 
-
 ### Features
 
-* add pro/noob mode ([571ea7f](https://github.com/Viren070/AIOStreams/commit/571ea7fbc30f5216cbe439be7333b310eafbb2c1))
-* add search API ([571ea7f](https://github.com/Viren070/AIOStreams/commit/571ea7fbc30f5216cbe439be7333b310eafbb2c1))
-* add stream type as auto play attribute ([571ea7f](https://github.com/Viren070/AIOStreams/commit/571ea7fbc30f5216cbe439be7333b310eafbb2c1))
-* allow specifying multiple URLs for comet and mediafusion in .env ([571ea7f](https://github.com/Viren070/AIOStreams/commit/571ea7fbc30f5216cbe439be7333b310eafbb2c1))
-* **frontend:** move more stuff into pro only mode ([c68bb0e](https://github.com/Viren070/AIOStreams/commit/c68bb0e60ecf421f1f59a7b7edebb52a5cd15266))
-* move more stuff into pro only ([73ccd15](https://github.com/Viren070/AIOStreams/commit/73ccd15f7e11351ae7b13acf15405b7330b10b2b))
-* remove `ALLOW_UNAUTHENTICATED_SEARCH_API` env var ([df97bde](https://github.com/Viren070/AIOStreams/commit/df97bde45cd058e3c6e68645e495bb054ef557a0))
-* use redis store in rate limiter when possible ([571ea7f](https://github.com/Viren070/AIOStreams/commit/571ea7fbc30f5216cbe439be7333b310eafbb2c1))
-
+- add pro/noob mode ([571ea7f](https://github.com/Viren070/AIOStreams/commit/571ea7fbc30f5216cbe439be7333b310eafbb2c1))
+- add search API ([571ea7f](https://github.com/Viren070/AIOStreams/commit/571ea7fbc30f5216cbe439be7333b310eafbb2c1))
+- add stream type as auto play attribute ([571ea7f](https://github.com/Viren070/AIOStreams/commit/571ea7fbc30f5216cbe439be7333b310eafbb2c1))
+- allow specifying multiple URLs for comet and mediafusion in .env ([571ea7f](https://github.com/Viren070/AIOStreams/commit/571ea7fbc30f5216cbe439be7333b310eafbb2c1))
+- **frontend:** move more stuff into pro only mode ([c68bb0e](https://github.com/Viren070/AIOStreams/commit/c68bb0e60ecf421f1f59a7b7edebb52a5cd15266))
+- move more stuff into pro only ([73ccd15](https://github.com/Viren070/AIOStreams/commit/73ccd15f7e11351ae7b13acf15405b7330b10b2b))
+- remove `ALLOW_UNAUTHENTICATED_SEARCH_API` env var ([df97bde](https://github.com/Viren070/AIOStreams/commit/df97bde45cd058e3c6e68645e495bb054ef557a0))
+- use redis store in rate limiter when possible ([571ea7f](https://github.com/Viren070/AIOStreams/commit/571ea7fbc30f5216cbe439be7333b310eafbb2c1))
 
 ### Bug Fixes
 
-* add rate limit to legacy endpoint ([0702d4f](https://github.com/Viren070/AIOStreams/commit/0702d4fb932a8cd601d8cac329ecef06be0dd76f))
-* allow empty credential value in schema and add min length constraint for config validation ([4962465](https://github.com/Viren070/AIOStreams/commit/49624654b6f5be852e455df23683f6edbdafa336))
-* behaviorHint passthrough in meta response ([571ea7f](https://github.com/Viren070/AIOStreams/commit/571ea7fbc30f5216cbe439be7333b310eafbb2c1))
-* ensure catalog resource has correct types ([9a5339e](https://github.com/Viren070/AIOStreams/commit/9a5339e1385e853daf6432acb7df41a5ee16b2a6))
-* **frontend:** dynamically determine menus based on mode ([5e969ff](https://github.com/Viren070/AIOStreams/commit/5e969ff2dc46d0d0897b86b7df0452e80da84f20))
-* give priority to URL/service over infoHash ([085d394](https://github.com/Viren070/AIOStreams/commit/085d394c03c33cee6b30ba26026a19e5e0fdfd10))
-* remove required attribute from service credential fields, ([571ea7f](https://github.com/Viren070/AIOStreams/commit/571ea7fbc30f5216cbe439be7333b310eafbb2c1))
-* set value of default URL to undefined so updates to env apply for all users when using multiple URLs ([a3007e6](https://github.com/Viren070/AIOStreams/commit/a3007e659f57ea61edfba2e8066f67853d58eeec))
+- add rate limit to legacy endpoint ([0702d4f](https://github.com/Viren070/AIOStreams/commit/0702d4fb932a8cd601d8cac329ecef06be0dd76f))
+- allow empty credential value in schema and add min length constraint for config validation ([4962465](https://github.com/Viren070/AIOStreams/commit/49624654b6f5be852e455df23683f6edbdafa336))
+- behaviorHint passthrough in meta response ([571ea7f](https://github.com/Viren070/AIOStreams/commit/571ea7fbc30f5216cbe439be7333b310eafbb2c1))
+- ensure catalog resource has correct types ([9a5339e](https://github.com/Viren070/AIOStreams/commit/9a5339e1385e853daf6432acb7df41a5ee16b2a6))
+- **frontend:** dynamically determine menus based on mode ([5e969ff](https://github.com/Viren070/AIOStreams/commit/5e969ff2dc46d0d0897b86b7df0452e80da84f20))
+- give priority to URL/service over infoHash ([085d394](https://github.com/Viren070/AIOStreams/commit/085d394c03c33cee6b30ba26026a19e5e0fdfd10))
+- remove required attribute from service credential fields, ([571ea7f](https://github.com/Viren070/AIOStreams/commit/571ea7fbc30f5216cbe439be7333b310eafbb2c1))
+- set value of default URL to undefined so updates to env apply for all users when using multiple URLs ([a3007e6](https://github.com/Viren070/AIOStreams/commit/a3007e659f57ea61edfba2e8066f67853d58eeec))
 
 ## [2.11.6](https://github.com/Viren070/AIOStreams/compare/v2.11.5...v2.11.6) (2025-08-28)
 
-
 ### Bug Fixes
 
-* correctly extract json error for error metas ([5ddab33](https://github.com/Viren070/AIOStreams/commit/5ddab3308219aa17c0f89b3d522d3408f20e2ebf))
-* **presets/aiostreams:** passthrough the proxied attribute ([62bf6de](https://github.com/Viren070/AIOStreams/commit/62bf6de6d9087ee5cd74942585b286fd2eda8296)), closes [#321](https://github.com/Viren070/AIOStreams/issues/321)
+- correctly extract json error for error metas ([5ddab33](https://github.com/Viren070/AIOStreams/commit/5ddab3308219aa17c0f89b3d522d3408f20e2ebf))
+- **presets/aiostreams:** passthrough the proxied attribute ([62bf6de](https://github.com/Viren070/AIOStreams/commit/62bf6de6d9087ee5cd74942585b286fd2eda8296)), closes [#321](https://github.com/Viren070/AIOStreams/issues/321)
 
 ## [2.11.5](https://github.com/Viren070/AIOStreams/compare/v2.11.4...v2.11.5) (2025-08-26)
 
-
 ### Bug Fixes
 
-* **parser:** improve BluRay REMUX regex ([4a658a1](https://github.com/Viren070/AIOStreams/commit/4a658a11159cfd9e15198b8f4f0dfa53e5e0b56e))
-* **presets/webstreamr:** return original parsed file when no resolution matched ([07db3d9](https://github.com/Viren070/AIOStreams/commit/07db3d9d542d51c15f5364a1be543c6c8578c9c4))
+- **parser:** improve BluRay REMUX regex ([4a658a1](https://github.com/Viren070/AIOStreams/commit/4a658a11159cfd9e15198b8f4f0dfa53e5e0b56e))
+- **presets/webstreamr:** return original parsed file when no resolution matched ([07db3d9](https://github.com/Viren070/AIOStreams/commit/07db3d9d542d51c15f5364a1be543c6c8578c9c4))
 
 ## [2.11.4](https://github.com/Viren070/AIOStreams/compare/v2.11.3...v2.11.4) (2025-08-26)
 
-
 ### Bug Fixes
 
-* fallback to undefined when name is null ([757138e](https://github.com/Viren070/AIOStreams/commit/757138ee4073cc1badec96cb0208d483ddf94df9))
-* only define bingeGroup when auto play is enabled ([de47fff](https://github.com/Viren070/AIOStreams/commit/de47fffdee081669c82808c7986f2aabd833b49d))
-* **presets/webstreamr:** update provider list, add show error option, parse error streams, only use resolution from stream name, ([1fd6730](https://github.com/Viren070/AIOStreams/commit/1fd67309b0306058f04f31502d49045524d004d8))
+- fallback to undefined when name is null ([757138e](https://github.com/Viren070/AIOStreams/commit/757138ee4073cc1badec96cb0208d483ddf94df9))
+- only define bingeGroup when auto play is enabled ([de47fff](https://github.com/Viren070/AIOStreams/commit/de47fffdee081669c82808c7986f2aabd833b49d))
+- **presets/webstreamr:** update provider list, add show error option, parse error streams, only use resolution from stream name, ([1fd6730](https://github.com/Viren070/AIOStreams/commit/1fd67309b0306058f04f31502d49045524d004d8))
 
 ## [2.11.3](https://github.com/Viren070/AIOStreams/compare/v2.11.2...v2.11.3) (2025-08-25)
 
-
 ### Features
 
-* add alternate `u` prefixed formatter language variables and sort language variables based on language settings ([271c183](https://github.com/Viren070/AIOStreams/commit/271c1836a81a352466158a44629be991277bf9ea)), closes [#323](https://github.com/Viren070/AIOStreams/issues/323)
-
+- add alternate `u` prefixed formatter language variables and sort language variables based on language settings ([271c183](https://github.com/Viren070/AIOStreams/commit/271c1836a81a352466158a44629be991277bf9ea)), closes [#323](https://github.com/Viren070/AIOStreams/issues/323)
 
 ### Bug Fixes
 
-* add helper function for adding usenet download ([34075d5](https://github.com/Viren070/AIOStreams/commit/34075d58865cdf7d51abf8eb41338d372c67956d))
-* **frontend:** improve clarity of descriptions and add alerts for auto play and exporting ([4855cf9](https://github.com/Viren070/AIOStreams/commit/4855cf97d7e1d348454ebe334bcf466939035896))
-* **presets/mediafusion:** include encoded user data hash in manifest url ([200d1b7](https://github.com/Viren070/AIOStreams/commit/200d1b7b44bb0d0f1d5066923ff8e64bf4b716db))
+- add helper function for adding usenet download ([34075d5](https://github.com/Viren070/AIOStreams/commit/34075d58865cdf7d51abf8eb41338d372c67956d))
+- **frontend:** improve clarity of descriptions and add alerts for auto play and exporting ([4855cf9](https://github.com/Viren070/AIOStreams/commit/4855cf97d7e1d348454ebe334bcf466939035896))
+- **presets/mediafusion:** include encoded user data hash in manifest url ([200d1b7](https://github.com/Viren070/AIOStreams/commit/200d1b7b44bb0d0f1d5066923ff8e64bf4b716db))
 
 ## [2.11.2](https://github.com/Viren070/AIOStreams/compare/v2.11.1...v2.11.2) (2025-08-24)
 
-
 ### Bug Fixes
 
-* add 'DB' to known names for debrider ([8ac29e0](https://github.com/Viren070/AIOStreams/commit/8ac29e0d19bcf583da9fdf2bc6fd31a02445400d))
-* add rpdb api key to cache key ([d81206f](https://github.com/Viren070/AIOStreams/commit/d81206ff200f484bc7dbd8eee6b5422ec2b3b4dc))
+- add 'DB' to known names for debrider ([8ac29e0](https://github.com/Viren070/AIOStreams/commit/8ac29e0d19bcf583da9fdf2bc6fd31a02445400d))
+- add rpdb api key to cache key ([d81206f](https://github.com/Viren070/AIOStreams/commit/d81206ff200f484bc7dbd8eee6b5422ec2b3b4dc))
 
 ## [2.11.1](https://github.com/Viren070/AIOStreams/compare/v2.11.0...v2.11.1) (2025-08-24)
 
-
 ### Bug Fixes
 
-* add handling for RATE_LIMIT_EXCEEDED errors in middleware ([3af18db](https://github.com/Viren070/AIOStreams/commit/3af18db213f787baca55a5fa5e5293040815a660))
-* determine useProxy after mapping ([9effbf8](https://github.com/Viren070/AIOStreams/commit/9effbf84b03b291c850667b7307461bd59981277))
-* make description optional in manifest ([7bcbccb](https://github.com/Viren070/AIOStreams/commit/7bcbccb573fcff8935d6e2d45f9e76fa51c4c7f4))
-* **presets/ai-companion:** adjust validation schema ([8f9f68b](https://github.com/Viren070/AIOStreams/commit/8f9f68bdf8c27a24adbdf152fb76a3122fd51c1b)), closes [#319](https://github.com/Viren070/AIOStreams/issues/319)
-* **presets/comet:** add debrider to supported services ([a30419d](https://github.com/Viren070/AIOStreams/commit/a30419da0051fe80c1f4eec6f98917b9aa162576))
-* **redis:** prevent setting cache with zero TTL ([69e76e1](https://github.com/Viren070/AIOStreams/commit/69e76e1a3054f4d54a570f2e552e2083fb34a889))
+- add handling for RATE_LIMIT_EXCEEDED errors in middleware ([3af18db](https://github.com/Viren070/AIOStreams/commit/3af18db213f787baca55a5fa5e5293040815a660))
+- determine useProxy after mapping ([9effbf8](https://github.com/Viren070/AIOStreams/commit/9effbf84b03b291c850667b7307461bd59981277))
+- make description optional in manifest ([7bcbccb](https://github.com/Viren070/AIOStreams/commit/7bcbccb573fcff8935d6e2d45f9e76fa51c4c7f4))
+- **presets/ai-companion:** adjust validation schema ([8f9f68b](https://github.com/Viren070/AIOStreams/commit/8f9f68bdf8c27a24adbdf152fb76a3122fd51c1b)), closes [#319](https://github.com/Viren070/AIOStreams/issues/319)
+- **presets/comet:** add debrider to supported services ([a30419d](https://github.com/Viren070/AIOStreams/commit/a30419da0051fe80c1f4eec6f98917b9aa162576))
+- **redis:** prevent setting cache with zero TTL ([69e76e1](https://github.com/Viren070/AIOStreams/commit/69e76e1a3054f4d54a570f2e552e2083fb34a889))
 
 ## [2.11.0](https://github.com/Viren070/AIOStreams/compare/v2.10.0...v2.11.0) (2025-08-24)
 
-
 ### Features
 
-* add reverse order option for catalogs ([#310](https://github.com/Viren070/AIOStreams/issues/310)) ([1d941f0](https://github.com/Viren070/AIOStreams/commit/1d941f0707b4780fadcc782ec8e36035a76cb8ab)), closes [#299](https://github.com/Viren070/AIOStreams/issues/299)
-* add size as auto play attribute ([dbe629a](https://github.com/Viren070/AIOStreams/commit/dbe629a0384422a3b9890056c19f83e541cf4088)), closes [#312](https://github.com/Viren070/AIOStreams/issues/312)
-* **core/formatter:** add `stream.languageCodes` property ([ea724a6](https://github.com/Viren070/AIOStreams/commit/ea724a635fae90dd89887fd996c87c8ca5dfb907))
-* **core/formatter:** add `stream.smallLanguageCodes` and fix for Latino ([4197fa5](https://github.com/Viren070/AIOStreams/commit/4197fa543876bfff666ec7e505748ba2a5b9f0de))
-* enable deduplicator by default ([3366919](https://github.com/Viren070/AIOStreams/commit/336691954f7974a277897a63c9f353142a80927f))
-* merge shuffle and reverse into one modifier button and make them mutually exclusive ([5b3aba1](https://github.com/Viren070/AIOStreams/commit/5b3aba1008939b19aeb8d6968cb3382c4460e94d))
-
+- add reverse order option for catalogs ([#310](https://github.com/Viren070/AIOStreams/issues/310)) ([1d941f0](https://github.com/Viren070/AIOStreams/commit/1d941f0707b4780fadcc782ec8e36035a76cb8ab)), closes [#299](https://github.com/Viren070/AIOStreams/issues/299)
+- add size as auto play attribute ([dbe629a](https://github.com/Viren070/AIOStreams/commit/dbe629a0384422a3b9890056c19f83e541cf4088)), closes [#312](https://github.com/Viren070/AIOStreams/issues/312)
+- **core/formatter:** add `stream.languageCodes` property ([ea724a6](https://github.com/Viren070/AIOStreams/commit/ea724a635fae90dd89887fd996c87c8ca5dfb907))
+- **core/formatter:** add `stream.smallLanguageCodes` and fix for Latino ([4197fa5](https://github.com/Viren070/AIOStreams/commit/4197fa543876bfff666ec7e505748ba2a5b9f0de))
+- enable deduplicator by default ([3366919](https://github.com/Viren070/AIOStreams/commit/336691954f7974a277897a63c9f353142a80927f))
+- merge shuffle and reverse into one modifier button and make them mutually exclusive ([5b3aba1](https://github.com/Viren070/AIOStreams/commit/5b3aba1008939b19aeb8d6968cb3382c4460e94d))
 
 ### Bug Fixes
 
-* **builtins/torbox-search:** correctly handle search user engine when caching ([d17da3d](https://github.com/Viren070/AIOStreams/commit/d17da3d7b27d993fdc3b7afb30f97a1f43e4ef1e))
-* **builtins/torbox-search:** handle timeout errors and log errors in torrent handler ([4757db0](https://github.com/Viren070/AIOStreams/commit/4757db06992f20f26ce86a26a9cb327ff7b36bcf))
-* **builtins/torbox-search:** move log for results above early exit in usenet handler ([72005a5](https://github.com/Viren070/AIOStreams/commit/72005a5c50acddc80e193d336bb2d99d265441f8))
-* check if poster is from RPDB before converting ([3067ac3](https://github.com/Viren070/AIOStreams/commit/3067ac3cc36a9c4d826f12abea55c17cac1437ef))
-* check URL path when using stremthru for proxy check ([db003db](https://github.com/Viren070/AIOStreams/commit/db003db7d59ad104b9cd53cf509e474b073ae5f3))
-* **core/formatters:** convert language code fallback to uppercase ([4903114](https://github.com/Viren070/AIOStreams/commit/4903114f05995a804d2f77efa555880e3bf57ad3))
-* **core/formatters:** convert to uppercase before mapping ([c32039d](https://github.com/Viren070/AIOStreams/commit/c32039d862c7dfcebb7eebee1b1978c370435e38))
-* **Dockerfile:** add static files to image ([7edf671](https://github.com/Viren070/AIOStreams/commit/7edf671aa00b3bc15a53de0f42e99dfc2b0fb9aa))
-* **frontend:** wrap regex pattern alert buttons ([955fe97](https://github.com/Viren070/AIOStreams/commit/955fe977367b42489d4d311b178302def87c0fd6))
-* handle errors on status route and improve error messages ([90f0097](https://github.com/Viren070/AIOStreams/commit/90f00977b49026849101903b1b14bd8076dd0e1f))
-* handle forced/default values for preset options in frontend and config validation ([766ff02](https://github.com/Viren070/AIOStreams/commit/766ff021679cef8fb80c774b3fbc655566ecf0ee))
-* improve season extraction logic from metadata ([28775fa](https://github.com/Viren070/AIOStreams/commit/28775fab6617f14d0d683094f2d6549fc5ca8be3))
-* mention addon in timeout error ([49a0413](https://github.com/Viren070/AIOStreams/commit/49a04137c0a194172676605c40155b336a07650f))
-* validate TMDB API Key during config validation ([4c50f35](https://github.com/Viren070/AIOStreams/commit/4c50f3578ad8dad5528dc003da2ab175685572a8))
+- **builtins/torbox-search:** correctly handle search user engine when caching ([d17da3d](https://github.com/Viren070/AIOStreams/commit/d17da3d7b27d993fdc3b7afb30f97a1f43e4ef1e))
+- **builtins/torbox-search:** handle timeout errors and log errors in torrent handler ([4757db0](https://github.com/Viren070/AIOStreams/commit/4757db06992f20f26ce86a26a9cb327ff7b36bcf))
+- **builtins/torbox-search:** move log for results above early exit in usenet handler ([72005a5](https://github.com/Viren070/AIOStreams/commit/72005a5c50acddc80e193d336bb2d99d265441f8))
+- check if poster is from RPDB before converting ([3067ac3](https://github.com/Viren070/AIOStreams/commit/3067ac3cc36a9c4d826f12abea55c17cac1437ef))
+- check URL path when using stremthru for proxy check ([db003db](https://github.com/Viren070/AIOStreams/commit/db003db7d59ad104b9cd53cf509e474b073ae5f3))
+- **core/formatters:** convert language code fallback to uppercase ([4903114](https://github.com/Viren070/AIOStreams/commit/4903114f05995a804d2f77efa555880e3bf57ad3))
+- **core/formatters:** convert to uppercase before mapping ([c32039d](https://github.com/Viren070/AIOStreams/commit/c32039d862c7dfcebb7eebee1b1978c370435e38))
+- **Dockerfile:** add static files to image ([7edf671](https://github.com/Viren070/AIOStreams/commit/7edf671aa00b3bc15a53de0f42e99dfc2b0fb9aa))
+- **frontend:** wrap regex pattern alert buttons ([955fe97](https://github.com/Viren070/AIOStreams/commit/955fe977367b42489d4d311b178302def87c0fd6))
+- handle errors on status route and improve error messages ([90f0097](https://github.com/Viren070/AIOStreams/commit/90f00977b49026849101903b1b14bd8076dd0e1f))
+- handle forced/default values for preset options in frontend and config validation ([766ff02](https://github.com/Viren070/AIOStreams/commit/766ff021679cef8fb80c774b3fbc655566ecf0ee))
+- improve season extraction logic from metadata ([28775fa](https://github.com/Viren070/AIOStreams/commit/28775fab6617f14d0d683094f2d6549fc5ca8be3))
+- mention addon in timeout error ([49a0413](https://github.com/Viren070/AIOStreams/commit/49a04137c0a194172676605c40155b336a07650f))
+- validate TMDB API Key during config validation ([4c50f35](https://github.com/Viren070/AIOStreams/commit/4c50f3578ad8dad5528dc003da2ab175685572a8))
 
 ## [2.10.0](https://github.com/Viren070/AIOStreams/compare/v2.9.0...v2.10.0) (2025-08-21)
 
-
 ### Features
 
-* add customisable auto play settings ([6159789](https://github.com/Viren070/AIOStreams/commit/6159789a9566c8bf6d61d32cd0f5cf0bde9357d9))
-* add debrider as service and update mediafusion preset ([#305](https://github.com/Viren070/AIOStreams/issues/305)) ([5d27944](https://github.com/Viren070/AIOStreams/commit/5d279442b62fc13d25ae09f506a52a4ecda2bfa8))
-* add first file auto play method ([a7d0650](https://github.com/Viren070/AIOStreams/commit/a7d06504f05ded2f524a1833756da42b057e2f23))
-* add redis support ([bc9dd5c](https://github.com/Viren070/AIOStreams/commit/bc9dd5c85902872a9e8b8ca5647bcff341304819))
-* add separate URL mappings option for stream URLs and outgoing request URLs ([a09f1f2](https://github.com/Viren070/AIOStreams/commit/a09f1f2347c70d83b59baaf9bce89cca46dc9425))
-* add URL mappings configuration for outgoing requests ([a996624](https://github.com/Viren070/AIOStreams/commit/a996624875e6c220ed9b28b355ceff8d828f6589))
-* allow filtering files with undefined size with SEL ([7d5911e](https://github.com/Viren070/AIOStreams/commit/7d5911e4079af54d121b18c21b3c18aabd81d214))
-* allow setting allowed regexes through URLs ([1af4175](https://github.com/Viren070/AIOStreams/commit/1af4175fbe256c7f342c785a1957b1b6d49979d9))
-* **builtins/torbox-search:** add debrider support ([6159789](https://github.com/Viren070/AIOStreams/commit/6159789a9566c8bf6d61d32cd0f5cf0bde9357d9))
-* **builtins/torbox-search:** check instant availability for cached usenet searches ([beeb07d](https://github.com/Viren070/AIOStreams/commit/beeb07d182ac04aadf373086ba742464aab73f5b))
-* **builtins/torbox-search:** mark items in torbox library as your media ([00a4187](https://github.com/Viren070/AIOStreams/commit/00a41877c129daad37874ed6e1edc723225518b0))
-* **frontend:** show allowed import URLs in UI ([f4a9c5d](https://github.com/Viren070/AIOStreams/commit/f4a9c5dad83b332a16f128a6bb90210467317ab7))
-* **frontend:** show configure button for marketplace addons with overriden URLs ([6159789](https://github.com/Viren070/AIOStreams/commit/6159789a9566c8bf6d61d32cd0f5cf0bde9357d9))
-* process addon resource requests in background after initial timeout ([c31e7fc](https://github.com/Viren070/AIOStreams/commit/c31e7fca42ac47fc5d3ad4f7d55f95450117a776))
-* refresh regex patterns from URLs in intervals ([0cd2afb](https://github.com/Viren070/AIOStreams/commit/0cd2afb577e79d69b790dc393cf3639e908d04c0))
-* remove p2p streams when necessary during deduplication and update deduplicator multi group option values ([054781a](https://github.com/Viren070/AIOStreams/commit/054781a695f4387be4d43e6a097ff400edd98b04))
-* update ([6159789](https://github.com/Viren070/AIOStreams/commit/6159789a9566c8bf6d61d32cd0f5cf0bde9357d9))
-
+- add customisable auto play settings ([6159789](https://github.com/Viren070/AIOStreams/commit/6159789a9566c8bf6d61d32cd0f5cf0bde9357d9))
+- add debrider as service and update mediafusion preset ([#305](https://github.com/Viren070/AIOStreams/issues/305)) ([5d27944](https://github.com/Viren070/AIOStreams/commit/5d279442b62fc13d25ae09f506a52a4ecda2bfa8))
+- add first file auto play method ([a7d0650](https://github.com/Viren070/AIOStreams/commit/a7d06504f05ded2f524a1833756da42b057e2f23))
+- add redis support ([bc9dd5c](https://github.com/Viren070/AIOStreams/commit/bc9dd5c85902872a9e8b8ca5647bcff341304819))
+- add separate URL mappings option for stream URLs and outgoing request URLs ([a09f1f2](https://github.com/Viren070/AIOStreams/commit/a09f1f2347c70d83b59baaf9bce89cca46dc9425))
+- add URL mappings configuration for outgoing requests ([a996624](https://github.com/Viren070/AIOStreams/commit/a996624875e6c220ed9b28b355ceff8d828f6589))
+- allow filtering files with undefined size with SEL ([7d5911e](https://github.com/Viren070/AIOStreams/commit/7d5911e4079af54d121b18c21b3c18aabd81d214))
+- allow setting allowed regexes through URLs ([1af4175](https://github.com/Viren070/AIOStreams/commit/1af4175fbe256c7f342c785a1957b1b6d49979d9))
+- **builtins/torbox-search:** add debrider support ([6159789](https://github.com/Viren070/AIOStreams/commit/6159789a9566c8bf6d61d32cd0f5cf0bde9357d9))
+- **builtins/torbox-search:** check instant availability for cached usenet searches ([beeb07d](https://github.com/Viren070/AIOStreams/commit/beeb07d182ac04aadf373086ba742464aab73f5b))
+- **builtins/torbox-search:** mark items in torbox library as your media ([00a4187](https://github.com/Viren070/AIOStreams/commit/00a41877c129daad37874ed6e1edc723225518b0))
+- **frontend:** show allowed import URLs in UI ([f4a9c5d](https://github.com/Viren070/AIOStreams/commit/f4a9c5dad83b332a16f128a6bb90210467317ab7))
+- **frontend:** show configure button for marketplace addons with overriden URLs ([6159789](https://github.com/Viren070/AIOStreams/commit/6159789a9566c8bf6d61d32cd0f5cf0bde9357d9))
+- process addon resource requests in background after initial timeout ([c31e7fc](https://github.com/Viren070/AIOStreams/commit/c31e7fca42ac47fc5d3ad4f7d55f95450117a776))
+- refresh regex patterns from URLs in intervals ([0cd2afb](https://github.com/Viren070/AIOStreams/commit/0cd2afb577e79d69b790dc393cf3639e908d04c0))
+- remove p2p streams when necessary during deduplication and update deduplicator multi group option values ([054781a](https://github.com/Viren070/AIOStreams/commit/054781a695f4387be4d43e6a097ff400edd98b04))
+- update ([6159789](https://github.com/Viren070/AIOStreams/commit/6159789a9566c8bf6d61d32cd0f5cf0bde9357d9))
 
 ### Bug Fixes
 
-* add DER to knownNames for Debrider ([b22c5c2](https://github.com/Viren070/AIOStreams/commit/b22c5c209215c72e6c055eaf4e157153946df388))
-* always prefix bingeGroup with addon id, ([a7d0650](https://github.com/Viren070/AIOStreams/commit/a7d06504f05ded2f524a1833756da42b057e2f23))
-* always prefix redis keys with aiostreams ([95f2c12](https://github.com/Viren070/AIOStreams/commit/95f2c12748c1ba469966dd608a19c16f8c674a03))
-* **builtins/torbox-search:** continue if metadata can't be fetched ([2159cd3](https://github.com/Viren070/AIOStreams/commit/2159cd36c3a171a7afa62dc25dd330b4d59123af))
-* **builtins/torbox-search:** don't cache empty search results ([6159789](https://github.com/Viren070/AIOStreams/commit/6159789a9566c8bf6d61d32cd0f5cf0bde9357d9))
-* convert requests to BASE_URL to INTERNAL_URL to avoid hairpinning issues ([6159789](https://github.com/Viren070/AIOStreams/commit/6159789a9566c8bf6d61d32cd0f5cf0bde9357d9))
-* correct parsing of error ID to ensure proper error metadata generation ([048bc02](https://github.com/Viren070/AIOStreams/commit/048bc02b3366f7ddfd36d44e0804c696d33a7036))
-* correctly handle undefined/0 year tolerance during year matching ([967af82](https://github.com/Viren070/AIOStreams/commit/967af824489333965a3c3f1e833df69f578ff80e))
-* correctly sanitise keywords to create a valid regex pattern ([88a071e](https://github.com/Viren070/AIOStreams/commit/88a071e9dd877157b65c9596bac90097bfe2aa62)), closes [#307](https://github.com/Viren070/AIOStreams/issues/307)
-* don't cache empty stream results ([7b833ed](https://github.com/Viren070/AIOStreams/commit/7b833ed36d261f25548ef5b907e02efdd268b7c2))
-* fetch metadata if year matching is enabled too and apply request types and addon ([98fd9d3](https://github.com/Viren070/AIOStreams/commit/98fd9d3fae3417da002c7e77df71850a299fde38))
-* filter out references to non-existent presets during validation ([6159789](https://github.com/Viren070/AIOStreams/commit/6159789a9566c8bf6d61d32cd0f5cf0bde9357d9))
-* fix debug log for uncached usenet download detection ([d1eb04d](https://github.com/Viren070/AIOStreams/commit/d1eb04d5d68f247b086f651ea246987570916461))
-* force memory cache for regexes ([3145734](https://github.com/Viren070/AIOStreams/commit/314573480d550be07a8c230ef1858cb0d7e631c0))
-* **frontend:** ensure services array is updated with missing services when it changes ([751e411](https://github.com/Viren070/AIOStreams/commit/751e411d63d62c1867cfc810af00a501ead1a512))
-* **frontend:** filter out addonPassword and tmdbApiKey in export when exclude credentials is true ([6159789](https://github.com/Viren070/AIOStreams/commit/6159789a9566c8bf6d61d32cd0f5cf0bde9357d9))
-* **frontend:** return null for non-existent services and improve type saftey ([ea2c692](https://github.com/Viren070/AIOStreams/commit/ea2c692d9790502ce06265475f9f47e5e4123a78))
-* only log cache stats for memory cache ([5ddf430](https://github.com/Viren070/AIOStreams/commit/5ddf4309308a3da2332b6e0a8f332a8e1e7fe4a5))
-* **presets/comet:** add scraping in progress to error messages ([6159789](https://github.com/Viren070/AIOStreams/commit/6159789a9566c8bf6d61d32cd0f5cf0bde9357d9))
-* **presets/debridio:** update logo and create constants for common options ([86f17e8](https://github.com/Viren070/AIOStreams/commit/86f17e80dbb2945b417eeca47fcdda535edc1172))
-* **presets/mediafusion:** append user data hash to manifest URL to have unique cache entries ([6e30b7b](https://github.com/Viren070/AIOStreams/commit/6e30b7b4ce768000f1b80f151ba22c7f7c5dd049))
-* **presets/more-like-this:** update manifest generation logic ([6159789](https://github.com/Viren070/AIOStreams/commit/6159789a9566c8bf6d61d32cd0f5cf0bde9357d9))
-* **presets/nuviostreams:** add new providers and fix title parsing ([6159789](https://github.com/Viren070/AIOStreams/commit/6159789a9566c8bf6d61d32cd0f5cf0bde9357d9))
-* **presets/nuviostreams:** allow leaving providers blank to use default ([6159789](https://github.com/Viren070/AIOStreams/commit/6159789a9566c8bf6d61d32cd0f5cf0bde9357d9))
-* **presets/streaming-catalogs:** add new catalogues ([6159789](https://github.com/Viren070/AIOStreams/commit/6159789a9566c8bf6d61d32cd0f5cf0bde9357d9))
-* **presets/stremthru:** add debrider to supported services ([6159789](https://github.com/Viren070/AIOStreams/commit/6159789a9566c8bf6d61d32cd0f5cf0bde9357d9))
-* **presets/subdl:** use correct option type for subdl api key and link to panel ([74b16f2](https://github.com/Viren070/AIOStreams/commit/74b16f24e8e3e933b4bd576d852209d9d1fc6e7b))
-* **presets/torbox-search:** enforce minimum source and fix description ([6159789](https://github.com/Viren070/AIOStreams/commit/6159789a9566c8bf6d61d32cd0f5cf0bde9357d9))
-* **presets/torrentio:** leave providers blank by default ([6159789](https://github.com/Viren070/AIOStreams/commit/6159789a9566c8bf6d61d32cd0f5cf0bde9357d9))
-* **presets/torrentsdb:** add debrider to supported services ([6159789](https://github.com/Viren070/AIOStreams/commit/6159789a9566c8bf6d61d32cd0f5cf0bde9357d9))
-* return modified stream URL after applying mappings ([3b25701](https://github.com/Viren070/AIOStreams/commit/3b257011e758f70b93e140e8ed2f78099423a714))
-* support pattern only exports for allowed import URLs ([bb90592](https://github.com/Viren070/AIOStreams/commit/bb905923acbfbecf079c018e5e8559caa2f82d66))
+- add DER to knownNames for Debrider ([b22c5c2](https://github.com/Viren070/AIOStreams/commit/b22c5c209215c72e6c055eaf4e157153946df388))
+- always prefix bingeGroup with addon id, ([a7d0650](https://github.com/Viren070/AIOStreams/commit/a7d06504f05ded2f524a1833756da42b057e2f23))
+- always prefix redis keys with aiostreams ([95f2c12](https://github.com/Viren070/AIOStreams/commit/95f2c12748c1ba469966dd608a19c16f8c674a03))
+- **builtins/torbox-search:** continue if metadata can't be fetched ([2159cd3](https://github.com/Viren070/AIOStreams/commit/2159cd36c3a171a7afa62dc25dd330b4d59123af))
+- **builtins/torbox-search:** don't cache empty search results ([6159789](https://github.com/Viren070/AIOStreams/commit/6159789a9566c8bf6d61d32cd0f5cf0bde9357d9))
+- convert requests to BASE_URL to INTERNAL_URL to avoid hairpinning issues ([6159789](https://github.com/Viren070/AIOStreams/commit/6159789a9566c8bf6d61d32cd0f5cf0bde9357d9))
+- correct parsing of error ID to ensure proper error metadata generation ([048bc02](https://github.com/Viren070/AIOStreams/commit/048bc02b3366f7ddfd36d44e0804c696d33a7036))
+- correctly handle undefined/0 year tolerance during year matching ([967af82](https://github.com/Viren070/AIOStreams/commit/967af824489333965a3c3f1e833df69f578ff80e))
+- correctly sanitise keywords to create a valid regex pattern ([88a071e](https://github.com/Viren070/AIOStreams/commit/88a071e9dd877157b65c9596bac90097bfe2aa62)), closes [#307](https://github.com/Viren070/AIOStreams/issues/307)
+- don't cache empty stream results ([7b833ed](https://github.com/Viren070/AIOStreams/commit/7b833ed36d261f25548ef5b907e02efdd268b7c2))
+- fetch metadata if year matching is enabled too and apply request types and addon ([98fd9d3](https://github.com/Viren070/AIOStreams/commit/98fd9d3fae3417da002c7e77df71850a299fde38))
+- filter out references to non-existent presets during validation ([6159789](https://github.com/Viren070/AIOStreams/commit/6159789a9566c8bf6d61d32cd0f5cf0bde9357d9))
+- fix debug log for uncached usenet download detection ([d1eb04d](https://github.com/Viren070/AIOStreams/commit/d1eb04d5d68f247b086f651ea246987570916461))
+- force memory cache for regexes ([3145734](https://github.com/Viren070/AIOStreams/commit/314573480d550be07a8c230ef1858cb0d7e631c0))
+- **frontend:** ensure services array is updated with missing services when it changes ([751e411](https://github.com/Viren070/AIOStreams/commit/751e411d63d62c1867cfc810af00a501ead1a512))
+- **frontend:** filter out addonPassword and tmdbApiKey in export when exclude credentials is true ([6159789](https://github.com/Viren070/AIOStreams/commit/6159789a9566c8bf6d61d32cd0f5cf0bde9357d9))
+- **frontend:** return null for non-existent services and improve type saftey ([ea2c692](https://github.com/Viren070/AIOStreams/commit/ea2c692d9790502ce06265475f9f47e5e4123a78))
+- only log cache stats for memory cache ([5ddf430](https://github.com/Viren070/AIOStreams/commit/5ddf4309308a3da2332b6e0a8f332a8e1e7fe4a5))
+- **presets/comet:** add scraping in progress to error messages ([6159789](https://github.com/Viren070/AIOStreams/commit/6159789a9566c8bf6d61d32cd0f5cf0bde9357d9))
+- **presets/debridio:** update logo and create constants for common options ([86f17e8](https://github.com/Viren070/AIOStreams/commit/86f17e80dbb2945b417eeca47fcdda535edc1172))
+- **presets/mediafusion:** append user data hash to manifest URL to have unique cache entries ([6e30b7b](https://github.com/Viren070/AIOStreams/commit/6e30b7b4ce768000f1b80f151ba22c7f7c5dd049))
+- **presets/more-like-this:** update manifest generation logic ([6159789](https://github.com/Viren070/AIOStreams/commit/6159789a9566c8bf6d61d32cd0f5cf0bde9357d9))
+- **presets/nuviostreams:** add new providers and fix title parsing ([6159789](https://github.com/Viren070/AIOStreams/commit/6159789a9566c8bf6d61d32cd0f5cf0bde9357d9))
+- **presets/nuviostreams:** allow leaving providers blank to use default ([6159789](https://github.com/Viren070/AIOStreams/commit/6159789a9566c8bf6d61d32cd0f5cf0bde9357d9))
+- **presets/streaming-catalogs:** add new catalogues ([6159789](https://github.com/Viren070/AIOStreams/commit/6159789a9566c8bf6d61d32cd0f5cf0bde9357d9))
+- **presets/stremthru:** add debrider to supported services ([6159789](https://github.com/Viren070/AIOStreams/commit/6159789a9566c8bf6d61d32cd0f5cf0bde9357d9))
+- **presets/subdl:** use correct option type for subdl api key and link to panel ([74b16f2](https://github.com/Viren070/AIOStreams/commit/74b16f24e8e3e933b4bd576d852209d9d1fc6e7b))
+- **presets/torbox-search:** enforce minimum source and fix description ([6159789](https://github.com/Viren070/AIOStreams/commit/6159789a9566c8bf6d61d32cd0f5cf0bde9357d9))
+- **presets/torrentio:** leave providers blank by default ([6159789](https://github.com/Viren070/AIOStreams/commit/6159789a9566c8bf6d61d32cd0f5cf0bde9357d9))
+- **presets/torrentsdb:** add debrider to supported services ([6159789](https://github.com/Viren070/AIOStreams/commit/6159789a9566c8bf6d61d32cd0f5cf0bde9357d9))
+- return modified stream URL after applying mappings ([3b25701](https://github.com/Viren070/AIOStreams/commit/3b257011e758f70b93e140e8ed2f78099423a714))
+- support pattern only exports for allowed import URLs ([bb90592](https://github.com/Viren070/AIOStreams/commit/bb905923acbfbecf079c018e5e8559caa2f82d66))
 
 ## [2.9.0](https://github.com/Viren070/AIOStreams/compare/v2.8.2...v2.9.0) (2025-08-15)
 
-
 ### Features
 
-* add 'DV Only' and 'HDR Only' visual tags ([01d4ecf](https://github.com/Viren070/AIOStreams/commit/01d4ecf76d96935e531cd2f9e33ac2e78e01d83b))
-* add AI Companion ([93fd611](https://github.com/Viren070/AIOStreams/commit/93fd61169f84846ac30135e02c27e95124d547a7))
-* add AStream ([5fc4cea](https://github.com/Viren070/AIOStreams/commit/5fc4cea2ea61835ea24ed8644b226796af4ee012)), closes [#298](https://github.com/Viren070/AIOStreams/issues/298)
-* add configurable year tolerance during year matching ([05d3cac](https://github.com/Viren070/AIOStreams/commit/05d3cac778b896c5f596f4cdd5ef33c24712487c))
-* add content deep dive to marketplace, closes [#284](https://github.com/Viren070/AIOStreams/issues/284) ([c48d37c](https://github.com/Viren070/AIOStreams/commit/c48d37c389404ae47de236a4a971e718f4143e5f))
-* add forceInUi option to min/max constraints for better UX ([6308f8f](https://github.com/Viren070/AIOStreams/commit/6308f8fb45034aeb7cb9d4bccd87a9e32564ef88))
-* add gdrive builtin addon ([05d3cac](https://github.com/Viren070/AIOStreams/commit/05d3cac778b896c5f596f4cdd5ef33c24712487c))
-* add modal for viewing allowed regex patterns in regex filter menu ([5b31f0c](https://github.com/Viren070/AIOStreams/commit/5b31f0cb784b7f00ea21675c94237431f1500934))
-* add multi group behaviour option for deduplicator ([a564e02](https://github.com/Viren070/AIOStreams/commit/a564e02d196e15732d12be9f50ac069e23eaefb8))
-* add torbox search builtin addon ([05d3cac](https://github.com/Viren070/AIOStreams/commit/05d3cac778b896c5f596f4cdd5ef33c24712487c))
-* allow deleting user ([05d3cac](https://github.com/Viren070/AIOStreams/commit/05d3cac778b896c5f596f4cdd5ef33c24712487c))
-* allow setting allowed regexes for all users ([05d3cac](https://github.com/Viren070/AIOStreams/commit/05d3cac778b896c5f596f4cdd5ef33c24712487c)), closes [#244](https://github.com/Viren070/AIOStreams/issues/244)
-* assign unassigned addons to the first group in StreamFetcher ([11c52cb](https://github.com/Viren070/AIOStreams/commit/11c52cb1f96bfb76278596bff7fea907ddf62dd0))
-* **builtins/torbox-search:** add caching option for user-specific search engines in TorBox Search ([3c2b5b7](https://github.com/Viren070/AIOStreams/commit/3c2b5b778b725baab762201dbcf527b594831878))
-* **builtins/torbox-search:** add only show user search results option ([eef55af](https://github.com/Viren070/AIOStreams/commit/eef55afbe0395e89740a98681221a2d4076bcef4))
-* **builtins/torbox-search:** general improvements ([c48d37c](https://github.com/Viren070/AIOStreams/commit/c48d37c389404ae47de236a4a971e718f4143e5f))
-* centralise TMDB credentials and automatically provide to addons when needed ([ed5893e](https://github.com/Viren070/AIOStreams/commit/ed5893ea50e6580879fea6be21857614d003eb1d))
-* **frontend:** show logo from manifest for custom addons ([604ab02](https://github.com/Viren070/AIOStreams/commit/604ab023a85bcdfc21e62574d35d367a94510e44))
-* handle streams provided in meta responses ([8014790](https://github.com/Viren070/AIOStreams/commit/8014790821c74cb3c3f7b1e03bd90f38a1261238))
-* make `BASE_URL` required ([05d3cac](https://github.com/Viren070/AIOStreams/commit/05d3cac778b896c5f596f4cdd5ef33c24712487c))
-* separate year matching into independent option, closes [#292](https://github.com/Viren070/AIOStreams/issues/292) ([c48d37c](https://github.com/Viren070/AIOStreams/commit/c48d37c389404ae47de236a4a971e718f4143e5f))
-* support multiple `ADDON_PASSWORD`s ([1413075](https://github.com/Viren070/AIOStreams/commit/14130752a4116454f302f68964e672840dd9c615))
-* update ([c48d37c](https://github.com/Viren070/AIOStreams/commit/c48d37c389404ae47de236a4a971e718f4143e5f))
-* update ([05d3cac](https://github.com/Viren070/AIOStreams/commit/05d3cac778b896c5f596f4cdd5ef33c24712487c))
-
+- add 'DV Only' and 'HDR Only' visual tags ([01d4ecf](https://github.com/Viren070/AIOStreams/commit/01d4ecf76d96935e531cd2f9e33ac2e78e01d83b))
+- add AI Companion ([93fd611](https://github.com/Viren070/AIOStreams/commit/93fd61169f84846ac30135e02c27e95124d547a7))
+- add AStream ([5fc4cea](https://github.com/Viren070/AIOStreams/commit/5fc4cea2ea61835ea24ed8644b226796af4ee012)), closes [#298](https://github.com/Viren070/AIOStreams/issues/298)
+- add configurable year tolerance during year matching ([05d3cac](https://github.com/Viren070/AIOStreams/commit/05d3cac778b896c5f596f4cdd5ef33c24712487c))
+- add content deep dive to marketplace, closes [#284](https://github.com/Viren070/AIOStreams/issues/284) ([c48d37c](https://github.com/Viren070/AIOStreams/commit/c48d37c389404ae47de236a4a971e718f4143e5f))
+- add forceInUi option to min/max constraints for better UX ([6308f8f](https://github.com/Viren070/AIOStreams/commit/6308f8fb45034aeb7cb9d4bccd87a9e32564ef88))
+- add gdrive builtin addon ([05d3cac](https://github.com/Viren070/AIOStreams/commit/05d3cac778b896c5f596f4cdd5ef33c24712487c))
+- add modal for viewing allowed regex patterns in regex filter menu ([5b31f0c](https://github.com/Viren070/AIOStreams/commit/5b31f0cb784b7f00ea21675c94237431f1500934))
+- add multi group behaviour option for deduplicator ([a564e02](https://github.com/Viren070/AIOStreams/commit/a564e02d196e15732d12be9f50ac069e23eaefb8))
+- add torbox search builtin addon ([05d3cac](https://github.com/Viren070/AIOStreams/commit/05d3cac778b896c5f596f4cdd5ef33c24712487c))
+- allow deleting user ([05d3cac](https://github.com/Viren070/AIOStreams/commit/05d3cac778b896c5f596f4cdd5ef33c24712487c))
+- allow setting allowed regexes for all users ([05d3cac](https://github.com/Viren070/AIOStreams/commit/05d3cac778b896c5f596f4cdd5ef33c24712487c)), closes [#244](https://github.com/Viren070/AIOStreams/issues/244)
+- assign unassigned addons to the first group in StreamFetcher ([11c52cb](https://github.com/Viren070/AIOStreams/commit/11c52cb1f96bfb76278596bff7fea907ddf62dd0))
+- **builtins/torbox-search:** add caching option for user-specific search engines in TorBox Search ([3c2b5b7](https://github.com/Viren070/AIOStreams/commit/3c2b5b778b725baab762201dbcf527b594831878))
+- **builtins/torbox-search:** add only show user search results option ([eef55af](https://github.com/Viren070/AIOStreams/commit/eef55afbe0395e89740a98681221a2d4076bcef4))
+- **builtins/torbox-search:** general improvements ([c48d37c](https://github.com/Viren070/AIOStreams/commit/c48d37c389404ae47de236a4a971e718f4143e5f))
+- centralise TMDB credentials and automatically provide to addons when needed ([ed5893e](https://github.com/Viren070/AIOStreams/commit/ed5893ea50e6580879fea6be21857614d003eb1d))
+- **frontend:** show logo from manifest for custom addons ([604ab02](https://github.com/Viren070/AIOStreams/commit/604ab023a85bcdfc21e62574d35d367a94510e44))
+- handle streams provided in meta responses ([8014790](https://github.com/Viren070/AIOStreams/commit/8014790821c74cb3c3f7b1e03bd90f38a1261238))
+- make `BASE_URL` required ([05d3cac](https://github.com/Viren070/AIOStreams/commit/05d3cac778b896c5f596f4cdd5ef33c24712487c))
+- separate year matching into independent option, closes [#292](https://github.com/Viren070/AIOStreams/issues/292) ([c48d37c](https://github.com/Viren070/AIOStreams/commit/c48d37c389404ae47de236a4a971e718f4143e5f))
+- support multiple `ADDON_PASSWORD`s ([1413075](https://github.com/Viren070/AIOStreams/commit/14130752a4116454f302f68964e672840dd9c615))
+- update ([c48d37c](https://github.com/Viren070/AIOStreams/commit/c48d37c389404ae47de236a4a971e718f4143e5f))
+- update ([05d3cac](https://github.com/Viren070/AIOStreams/commit/05d3cac778b896c5f596f4cdd5ef33c24712487c))
 
 ### Bug Fixes
 
-* adjust error logging for metadata fetching ([1187f1a](https://github.com/Viren070/AIOStreams/commit/1187f1a8572e7353d185e367b5f2565a563857fc))
-* **ai-search:** correctly check for tmdb api key ([a27a308](https://github.com/Viren070/AIOStreams/commit/a27a308ce584e934bab806f3c2652f686f6e107c))
-* **astream:** add github link ([24124c4](https://github.com/Viren070/AIOStreams/commit/24124c43698c924168e10f583a1790bc0dd08117))
-* block head requests on debrid resolve and add missing return ([c643cbb](https://github.com/Viren070/AIOStreams/commit/c643cbb3e764ec19a2c7bf0bae8dd61cd7ad6c67))
-* **builtins/gdrive:** improve logging ([bba4e56](https://github.com/Viren070/AIOStreams/commit/bba4e5614e8b0a2c436ea6be9c3f8178cb00fb0a))
-* **builtins/torbox-search:** adjust validation schemas for api ([6d8ea42](https://github.com/Viren070/AIOStreams/commit/6d8ea4274d07f2c257ce2dce0da7d6e68c420671))
-* **builtins/torbox-search:** cache playback links for usenet ([7ae6127](https://github.com/Viren070/AIOStreams/commit/7ae612732f10a2898664bc01e1742e7e663e1c95))
-* **builtins/torbox-search:** ensure errors are logged during usenet fetch ([4147ea3](https://github.com/Viren070/AIOStreams/commit/4147ea3c7e735f804dae63c6eadf86985bdc7534))
-* **builtins/torbox-search:** ensure files are always added during scrape ([23b8aa1](https://github.com/Viren070/AIOStreams/commit/23b8aa1c18daccb43dd78441251fc82c5c682bd0))
-* **builtins/torbox:** set type property at root to workaround https://github.com/colinhacks/zod/issues/2655 ([c66ef9e](https://github.com/Viren070/AIOStreams/commit/c66ef9e2f45606c495fc90be272617ad29b936c4))
-* check for allowed regexes during filtering ([7b0b98f](https://github.com/Viren070/AIOStreams/commit/7b0b98f135cf7b68be309ff4c2ac313efef67b7c))
-* correctly handle server side forcing of deprecated public proxy URLs ([1cdb0f3](https://github.com/Viren070/AIOStreams/commit/1cdb0f376efc72cf49d0842fd2f7725e353468a9))
-* **debrid:** correctly handle request download link response ([91772fe](https://github.com/Viren070/AIOStreams/commit/91772fe0d3e045de90066075ea9266c56dd9ba85))
-* don't allow empty URLs in environment variables ([53ca896](https://github.com/Viren070/AIOStreams/commit/53ca8969c717fa47e45d564b50a6d7e7e300356c))
-* don't show errors during catalog pagination to avoid repeated requests ([d623305](https://github.com/Viren070/AIOStreams/commit/d62330531d4ae4cde716655a1bc474a3fa9dbbb8))
-* don't validate config on get and adjust error handling ([063446e](https://github.com/Viren070/AIOStreams/commit/063446eedd2479b4b08f5e33c93d40e0d08304a3))
-* ensure forced proxy information is always checked/used when provided ([05d3cac](https://github.com/Viren070/AIOStreams/commit/05d3cac778b896c5f596f4cdd5ef33c24712487c))
-* ensure items are always removed from cache when TTL expires ([5325e50](https://github.com/Viren070/AIOStreams/commit/5325e5048c5a6b3ddd68e508a423d7ed18b3697d))
-* fallback to stream addon name when stream name is not provided when stream passthrough is enabled ([c48d37c](https://github.com/Viren070/AIOStreams/commit/c48d37c389404ae47de236a4a971e718f4143e5f))
-* **frontend:** add spacing between alerts in regex tab ([682c187](https://github.com/Viren070/AIOStreams/commit/682c18786b2a4b602bd7b7fafdf936a7250897e0))
-* **frontend:** fix css issues in filter menu ([5e99e7a](https://github.com/Viren070/AIOStreams/commit/5e99e7adf7274b0992ca90dafa7d82c606a5be68))
-* **frontend:** only break-all on code ([8e97599](https://github.com/Viren070/AIOStreams/commit/8e97599639a433385546e329b889ca503ed8c72a))
-* improve error messages ([633f2d2](https://github.com/Viren070/AIOStreams/commit/633f2d24bbea0ad1b41204319d715dcd529567b1))
-* log full error for unexpected errors during stream retrieval ([043de07](https://github.com/Viren070/AIOStreams/commit/043de074bdb3488ab7ab511cdc186aed4886ec43))
-* match HDR10P for HDR10+ ([0d7c8d9](https://github.com/Viren070/AIOStreams/commit/0d7c8d92b19b89893daeaa254bd4767d60d9c127))
-* only add access token header when present ([498282f](https://github.com/Viren070/AIOStreams/commit/498282fd8298df33a3d1e55d98cf37c01df48b18))
-* override type to live for usa tv, argentina tv, and debridio tv ([05d3cac](https://github.com/Viren070/AIOStreams/commit/05d3cac778b896c5f596f4cdd5ef33c24712487c))
-* pass name when creating usenet download ([9832f5e](https://github.com/Viren070/AIOStreams/commit/9832f5e60c5de8fe1d343f4bd86544d1a1ef207a))
-* remove base when forming url object for addon validation ([40657bb](https://github.com/Viren070/AIOStreams/commit/40657bbc523840cded14cd639f3cff74111b32a2))
-* remove debug logging and adjust builtin torbox search logs ([2a027ca](https://github.com/Viren070/AIOStreams/commit/2a027ca49b6fd48012eb614bfcd78ec9c96bbfb4))
-* remove request headers from stream when proxied ([9dc718e](https://github.com/Viren070/AIOStreams/commit/9dc718e6b073c80514495d5af018b3a26023733d))
-* set default year tolerance to 1 during migration and only if not already set ([3a3972b](https://github.com/Viren070/AIOStreams/commit/3a3972b76309bba9935fa7c0a0bc0cf6c72a4f63))
-* simplify and fix bluray remux detection ([05d3cac](https://github.com/Viren070/AIOStreams/commit/05d3cac778b896c5f596f4cdd5ef33c24712487c))
-* skip internal middleware in development environment ([8f4724e](https://github.com/Viren070/AIOStreams/commit/8f4724e5b3978378e297b2dcbdc9cb7020630b7c))
-* skip mediafusion found but filtered message stream ([05d3cac](https://github.com/Viren070/AIOStreams/commit/05d3cac778b896c5f596f4cdd5ef33c24712487c))
-* **stremthru-store:** ensure release groups don't get parsed as indexer ([05d3cac](https://github.com/Viren070/AIOStreams/commit/05d3cac778b896c5f596f4cdd5ef33c24712487c))
-* **subhero:** add Portuguese (Brazil) option ([76801e2](https://github.com/Viren070/AIOStreams/commit/76801e2fe23e354b0d1c3fc0f1b8cf5e8b54417e))
-* temporarily switch to fork for torbox api package ([c388ef3](https://github.com/Viren070/AIOStreams/commit/c388ef3fab264d54f866b43c3f86784c14a19eef))
-* throw error on rate limit exceeded streams ([05d3cac](https://github.com/Viren070/AIOStreams/commit/05d3cac778b896c5f596f4cdd5ef33c24712487c))
-* **webstreamr:** add missing emojis to message parser ([#294](https://github.com/Viren070/AIOStreams/issues/294)) ([3a53e35](https://github.com/Viren070/AIOStreams/commit/3a53e3575672a299c98e297b31d6f9bc692b7e6b))
+- adjust error logging for metadata fetching ([1187f1a](https://github.com/Viren070/AIOStreams/commit/1187f1a8572e7353d185e367b5f2565a563857fc))
+- **ai-search:** correctly check for tmdb api key ([a27a308](https://github.com/Viren070/AIOStreams/commit/a27a308ce584e934bab806f3c2652f686f6e107c))
+- **astream:** add github link ([24124c4](https://github.com/Viren070/AIOStreams/commit/24124c43698c924168e10f583a1790bc0dd08117))
+- block head requests on debrid resolve and add missing return ([c643cbb](https://github.com/Viren070/AIOStreams/commit/c643cbb3e764ec19a2c7bf0bae8dd61cd7ad6c67))
+- **builtins/gdrive:** improve logging ([bba4e56](https://github.com/Viren070/AIOStreams/commit/bba4e5614e8b0a2c436ea6be9c3f8178cb00fb0a))
+- **builtins/torbox-search:** adjust validation schemas for api ([6d8ea42](https://github.com/Viren070/AIOStreams/commit/6d8ea4274d07f2c257ce2dce0da7d6e68c420671))
+- **builtins/torbox-search:** cache playback links for usenet ([7ae6127](https://github.com/Viren070/AIOStreams/commit/7ae612732f10a2898664bc01e1742e7e663e1c95))
+- **builtins/torbox-search:** ensure errors are logged during usenet fetch ([4147ea3](https://github.com/Viren070/AIOStreams/commit/4147ea3c7e735f804dae63c6eadf86985bdc7534))
+- **builtins/torbox-search:** ensure files are always added during scrape ([23b8aa1](https://github.com/Viren070/AIOStreams/commit/23b8aa1c18daccb43dd78441251fc82c5c682bd0))
+- **builtins/torbox:** set type property at root to workaround https://github.com/colinhacks/zod/issues/2655 ([c66ef9e](https://github.com/Viren070/AIOStreams/commit/c66ef9e2f45606c495fc90be272617ad29b936c4))
+- check for allowed regexes during filtering ([7b0b98f](https://github.com/Viren070/AIOStreams/commit/7b0b98f135cf7b68be309ff4c2ac313efef67b7c))
+- correctly handle server side forcing of deprecated public proxy URLs ([1cdb0f3](https://github.com/Viren070/AIOStreams/commit/1cdb0f376efc72cf49d0842fd2f7725e353468a9))
+- **debrid:** correctly handle request download link response ([91772fe](https://github.com/Viren070/AIOStreams/commit/91772fe0d3e045de90066075ea9266c56dd9ba85))
+- don't allow empty URLs in environment variables ([53ca896](https://github.com/Viren070/AIOStreams/commit/53ca8969c717fa47e45d564b50a6d7e7e300356c))
+- don't show errors during catalog pagination to avoid repeated requests ([d623305](https://github.com/Viren070/AIOStreams/commit/d62330531d4ae4cde716655a1bc474a3fa9dbbb8))
+- don't validate config on get and adjust error handling ([063446e](https://github.com/Viren070/AIOStreams/commit/063446eedd2479b4b08f5e33c93d40e0d08304a3))
+- ensure forced proxy information is always checked/used when provided ([05d3cac](https://github.com/Viren070/AIOStreams/commit/05d3cac778b896c5f596f4cdd5ef33c24712487c))
+- ensure items are always removed from cache when TTL expires ([5325e50](https://github.com/Viren070/AIOStreams/commit/5325e5048c5a6b3ddd68e508a423d7ed18b3697d))
+- fallback to stream addon name when stream name is not provided when stream passthrough is enabled ([c48d37c](https://github.com/Viren070/AIOStreams/commit/c48d37c389404ae47de236a4a971e718f4143e5f))
+- **frontend:** add spacing between alerts in regex tab ([682c187](https://github.com/Viren070/AIOStreams/commit/682c18786b2a4b602bd7b7fafdf936a7250897e0))
+- **frontend:** fix css issues in filter menu ([5e99e7a](https://github.com/Viren070/AIOStreams/commit/5e99e7adf7274b0992ca90dafa7d82c606a5be68))
+- **frontend:** only break-all on code ([8e97599](https://github.com/Viren070/AIOStreams/commit/8e97599639a433385546e329b889ca503ed8c72a))
+- improve error messages ([633f2d2](https://github.com/Viren070/AIOStreams/commit/633f2d24bbea0ad1b41204319d715dcd529567b1))
+- log full error for unexpected errors during stream retrieval ([043de07](https://github.com/Viren070/AIOStreams/commit/043de074bdb3488ab7ab511cdc186aed4886ec43))
+- match HDR10P for HDR10+ ([0d7c8d9](https://github.com/Viren070/AIOStreams/commit/0d7c8d92b19b89893daeaa254bd4767d60d9c127))
+- only add access token header when present ([498282f](https://github.com/Viren070/AIOStreams/commit/498282fd8298df33a3d1e55d98cf37c01df48b18))
+- override type to live for usa tv, argentina tv, and debridio tv ([05d3cac](https://github.com/Viren070/AIOStreams/commit/05d3cac778b896c5f596f4cdd5ef33c24712487c))
+- pass name when creating usenet download ([9832f5e](https://github.com/Viren070/AIOStreams/commit/9832f5e60c5de8fe1d343f4bd86544d1a1ef207a))
+- remove base when forming url object for addon validation ([40657bb](https://github.com/Viren070/AIOStreams/commit/40657bbc523840cded14cd639f3cff74111b32a2))
+- remove debug logging and adjust builtin torbox search logs ([2a027ca](https://github.com/Viren070/AIOStreams/commit/2a027ca49b6fd48012eb614bfcd78ec9c96bbfb4))
+- remove request headers from stream when proxied ([9dc718e](https://github.com/Viren070/AIOStreams/commit/9dc718e6b073c80514495d5af018b3a26023733d))
+- set default year tolerance to 1 during migration and only if not already set ([3a3972b](https://github.com/Viren070/AIOStreams/commit/3a3972b76309bba9935fa7c0a0bc0cf6c72a4f63))
+- simplify and fix bluray remux detection ([05d3cac](https://github.com/Viren070/AIOStreams/commit/05d3cac778b896c5f596f4cdd5ef33c24712487c))
+- skip internal middleware in development environment ([8f4724e](https://github.com/Viren070/AIOStreams/commit/8f4724e5b3978378e297b2dcbdc9cb7020630b7c))
+- skip mediafusion found but filtered message stream ([05d3cac](https://github.com/Viren070/AIOStreams/commit/05d3cac778b896c5f596f4cdd5ef33c24712487c))
+- **stremthru-store:** ensure release groups don't get parsed as indexer ([05d3cac](https://github.com/Viren070/AIOStreams/commit/05d3cac778b896c5f596f4cdd5ef33c24712487c))
+- **subhero:** add Portuguese (Brazil) option ([76801e2](https://github.com/Viren070/AIOStreams/commit/76801e2fe23e354b0d1c3fc0f1b8cf5e8b54417e))
+- temporarily switch to fork for torbox api package ([c388ef3](https://github.com/Viren070/AIOStreams/commit/c388ef3fab264d54f866b43c3f86784c14a19eef))
+- throw error on rate limit exceeded streams ([05d3cac](https://github.com/Viren070/AIOStreams/commit/05d3cac778b896c5f596f4cdd5ef33c24712487c))
+- **webstreamr:** add missing emojis to message parser ([#294](https://github.com/Viren070/AIOStreams/issues/294)) ([3a53e35](https://github.com/Viren070/AIOStreams/commit/3a53e3575672a299c98e297b31d6f9bc692b7e6b))
 
 ## [2.8.2](https://github.com/Viren070/AIOStreams/compare/v2.8.1...v2.8.2) (2025-07-30)
 
-
 ### Bug Fixes
 
-* allow all extra keys ([f8388ed](https://github.com/Viren070/AIOStreams/commit/f8388edfa04e7392c300742d44123f56dd32e1fc))
-* assign encoded token to correct credential ID ([4963123](https://github.com/Viren070/AIOStreams/commit/49631231a1f2581b32f3deffc0584a369fb90326))
-* **streamasia:** url encode mediaflow proxy password ([5bd55b5](https://github.com/Viren070/AIOStreams/commit/5bd55b5a58684fbb07293615a9118f06b5715ca3))
-* url encode extra values ([2eea0a9](https://github.com/Viren070/AIOStreams/commit/2eea0a9ed5ea285d084973edfb4f63e9c5550525))
+- allow all extra keys ([f8388ed](https://github.com/Viren070/AIOStreams/commit/f8388edfa04e7392c300742d44123f56dd32e1fc))
+- assign encoded token to correct credential ID ([4963123](https://github.com/Viren070/AIOStreams/commit/49631231a1f2581b32f3deffc0584a369fb90326))
+- **streamasia:** url encode mediaflow proxy password ([5bd55b5](https://github.com/Viren070/AIOStreams/commit/5bd55b5a58684fbb07293615a9118f06b5715ca3))
+- url encode extra values ([2eea0a9](https://github.com/Viren070/AIOStreams/commit/2eea0a9ed5ea285d084973edfb4f63e9c5550525))
 
 ## [2.8.1](https://github.com/Viren070/AIOStreams/compare/v2.8.0...v2.8.1) (2025-07-30)
 
-
 ### Features
 
-* support socks5 proxy for `ADDON_PROXY` ([de587bb](https://github.com/Viren070/AIOStreams/commit/de587bb2ff0c9f163453f9a67785dc6c3c440f50))
-
+- support socks5 proxy for `ADDON_PROXY` ([de587bb](https://github.com/Viren070/AIOStreams/commit/de587bb2ff0c9f163453f9a67785dc6c3c440f50))
 
 ### Bug Fixes
 
-* add explicit handling of passthrough type in deduplicator ([4797a33](https://github.com/Viren070/AIOStreams/commit/4797a33f7f4503298253489c00d32f56f88d73c4))
-* adjust forced to top sort handling to avoid modifying sort criterias ([146cf16](https://github.com/Viren070/AIOStreams/commit/146cf16fbdcef338b352d6abb0506178ba8ba13a))
-* correctly sanitise filename ([aa66213](https://github.com/Viren070/AIOStreams/commit/aa66213450739d3b5fdb0dc93551978a585b1311))
-* enable result passthrough for tmdb collections ([2408109](https://github.com/Viren070/AIOStreams/commit/2408109bf2c17565c53a4dfc1f76e7521af3164c))
+- add explicit handling of passthrough type in deduplicator ([4797a33](https://github.com/Viren070/AIOStreams/commit/4797a33f7f4503298253489c00d32f56f88d73c4))
+- adjust forced to top sort handling to avoid modifying sort criterias ([146cf16](https://github.com/Viren070/AIOStreams/commit/146cf16fbdcef338b352d6abb0506178ba8ba13a))
+- correctly sanitise filename ([aa66213](https://github.com/Viren070/AIOStreams/commit/aa66213450739d3b5fdb0dc93551978a585b1311))
+- enable result passthrough for tmdb collections ([2408109](https://github.com/Viren070/AIOStreams/commit/2408109bf2c17565c53a4dfc1f76e7521af3164c))
 
 ## [2.8.0](https://github.com/Viren070/AIOStreams/compare/v2.7.0...v2.8.0) (2025-07-29)
 
-
 ### Features
 
-* add explicit redirect handling to avoid external requests and refactor precaching logic ([0e40299](https://github.com/Viren070/AIOStreams/commit/0e4029901bc3dd75570778ec937afa50fc2084f1))
-* add force to top option for custom addons ([6a26e11](https://github.com/Viren070/AIOStreams/commit/6a26e11efcab5d96c4c96c8c79b06c44b42db2af))
-* add more like this ([b1e46a2](https://github.com/Viren070/AIOStreams/commit/b1e46a2bd35a53c85c85ef568c68725a039a0940))
-* add options to force streams to the top of the list in MoreLikeThis and TmdbCollections presets ([08adc25](https://github.com/Viren070/AIOStreams/commit/08adc25218549ab9f57a6511003b10d8bfeae54b))
-* add result passthrough option ([86f7057](https://github.com/Viren070/AIOStreams/commit/86f7057a9fcc32ce2a603525719d49af4ed0b50d))
-* add streamasia ([03afc6e](https://github.com/Viren070/AIOStreams/commit/03afc6e9aa1874b741c504bea1a32c0d73c7284b))
-* **debridio-tv:** enable result passthrough by default and remove debug logs ([096751a](https://github.com/Viren070/AIOStreams/commit/096751a74ac7b7264ff58ba827ce19feb7817bbd))
-
+- add explicit redirect handling to avoid external requests and refactor precaching logic ([0e40299](https://github.com/Viren070/AIOStreams/commit/0e4029901bc3dd75570778ec937afa50fc2084f1))
+- add force to top option for custom addons ([6a26e11](https://github.com/Viren070/AIOStreams/commit/6a26e11efcab5d96c4c96c8c79b06c44b42db2af))
+- add more like this ([b1e46a2](https://github.com/Viren070/AIOStreams/commit/b1e46a2bd35a53c85c85ef568c68725a039a0940))
+- add options to force streams to the top of the list in MoreLikeThis and TmdbCollections presets ([08adc25](https://github.com/Viren070/AIOStreams/commit/08adc25218549ab9f57a6511003b10d8bfeae54b))
+- add result passthrough option ([86f7057](https://github.com/Viren070/AIOStreams/commit/86f7057a9fcc32ce2a603525719d49af4ed0b50d))
+- add streamasia ([03afc6e](https://github.com/Viren070/AIOStreams/commit/03afc6e9aa1874b741c504bea1a32c0d73c7284b))
+- **debridio-tv:** enable result passthrough by default and remove debug logs ([096751a](https://github.com/Viren070/AIOStreams/commit/096751a74ac7b7264ff58ba827ce19feb7817bbd))
 
 ### Bug Fixes
 
-* allow empty id prefixes ([d39a301](https://github.com/Viren070/AIOStreams/commit/d39a301be60e8a3cf99d1cd1bfd795c333ee62d0))
-* correctly handle encrypted public proxy url ([7c08137](https://github.com/Viren070/AIOStreams/commit/7c081377d12f36ac433541a2fe61e2a0d8f5cf5e))
-* enable result passthrough for usa tv, argentina tv, and more like this ([74179aa](https://github.com/Viren070/AIOStreams/commit/74179aab4c929756a4ee178a0098df78cabc43ed))
-* prevent streams from being proxied if urls match proxy or already have proxied set to true ([5320fcf](https://github.com/Viren070/AIOStreams/commit/5320fcf80f832955d7d4cefe9c6b1dca652293ae))
+- allow empty id prefixes ([d39a301](https://github.com/Viren070/AIOStreams/commit/d39a301be60e8a3cf99d1cd1bfd795c333ee62d0))
+- correctly handle encrypted public proxy url ([7c08137](https://github.com/Viren070/AIOStreams/commit/7c081377d12f36ac433541a2fe61e2a0d8f5cf5e))
+- enable result passthrough for usa tv, argentina tv, and more like this ([74179aa](https://github.com/Viren070/AIOStreams/commit/74179aab4c929756a4ee178a0098df78cabc43ed))
+- prevent streams from being proxied if urls match proxy or already have proxied set to true ([5320fcf](https://github.com/Viren070/AIOStreams/commit/5320fcf80f832955d7d4cefe9c6b1dca652293ae))
 
 ## [2.7.0](https://github.com/Viren070/AIOStreams/compare/v2.6.1...v2.7.0) (2025-07-28)
 
-
 ### Features
 
-* add proxy public url option, deprecate `FORCE_PUBLIC_PROXY_` env vars and replace with `FORCE_PROXY_PUBLIC_URL` and `DEFAULT_PROXY_PUBLIC_URL` ([feb4651](https://github.com/Viren070/AIOStreams/commit/feb465176039e3cd5d2308dd8381775b7b1704f1))
-* add RPDB redirect API with fallback support ([884b77e](https://github.com/Viren070/AIOStreams/commit/884b77ecd950962f0ee95c5540a7aeca6431bff8))
-* allow customising addon description ([161a278](https://github.com/Viren070/AIOStreams/commit/161a2781668151ae04b8ac59fd871d65af08399d))
-* allow disabling groups ([dddf80a](https://github.com/Viren070/AIOStreams/commit/dddf80ae438b742e254d6c7436a2bd5a394b7337))
-* **frontend:** allow action prop in SettingsCard and use for catalogue and changelog card ([66d0823](https://github.com/Viren070/AIOStreams/commit/66d08234ac4fc9d9aac8daa1a81775d001159155))
-* **frontend:** automatically refresh catalogs ([c5d6f06](https://github.com/Viren070/AIOStreams/commit/c5d6f064e8c75c0a0db62c50e9611fa855f57217))
-* **frontend:** improve changelog card ([0bf3331](https://github.com/Viren070/AIOStreams/commit/0bf3331b6476db099c8e32771bbd2928b7b8b665))
-* **frontend:** improve handling of old current versions and show available updates ([482ffc0](https://github.com/Viren070/AIOStreams/commit/482ffc04bdd6d99fa811b8051631213a72facee9))
-* **frontend:** improve whats new card ([6508f70](https://github.com/Viren070/AIOStreams/commit/6508f7018a1335f05b99220e9bf01a79c87396c2))
-* **frontend:** remove glowing effect ([0bcba95](https://github.com/Viren070/AIOStreams/commit/0bcba9599e0d7bbe7e967b5b2e4d935be390b9b1))
-* **frontend:** update ui ([52179e1](https://github.com/Viren070/AIOStreams/commit/52179e1bd8bbcacf9a4880d6802b29d1ee51afb9))
-* smarter caching for catalogs, meta, and manifests ([f259e4e](https://github.com/Viren070/AIOStreams/commit/f259e4ed7683ddf257cfa6c2887b84d60ab888aa))
-* use separate cache instances per resource ([0a8e8e4](https://github.com/Viren070/AIOStreams/commit/0a8e8e4fe4ef9cbbe3a7e8a01b4c9698753cad0c))
-
+- add proxy public url option, deprecate `FORCE_PUBLIC_PROXY_` env vars and replace with `FORCE_PROXY_PUBLIC_URL` and `DEFAULT_PROXY_PUBLIC_URL` ([feb4651](https://github.com/Viren070/AIOStreams/commit/feb465176039e3cd5d2308dd8381775b7b1704f1))
+- add RPDB redirect API with fallback support ([884b77e](https://github.com/Viren070/AIOStreams/commit/884b77ecd950962f0ee95c5540a7aeca6431bff8))
+- allow customising addon description ([161a278](https://github.com/Viren070/AIOStreams/commit/161a2781668151ae04b8ac59fd871d65af08399d))
+- allow disabling groups ([dddf80a](https://github.com/Viren070/AIOStreams/commit/dddf80ae438b742e254d6c7436a2bd5a394b7337))
+- **frontend:** allow action prop in SettingsCard and use for catalogue and changelog card ([66d0823](https://github.com/Viren070/AIOStreams/commit/66d08234ac4fc9d9aac8daa1a81775d001159155))
+- **frontend:** automatically refresh catalogs ([c5d6f06](https://github.com/Viren070/AIOStreams/commit/c5d6f064e8c75c0a0db62c50e9611fa855f57217))
+- **frontend:** improve changelog card ([0bf3331](https://github.com/Viren070/AIOStreams/commit/0bf3331b6476db099c8e32771bbd2928b7b8b665))
+- **frontend:** improve handling of old current versions and show available updates ([482ffc0](https://github.com/Viren070/AIOStreams/commit/482ffc04bdd6d99fa811b8051631213a72facee9))
+- **frontend:** improve whats new card ([6508f70](https://github.com/Viren070/AIOStreams/commit/6508f7018a1335f05b99220e9bf01a79c87396c2))
+- **frontend:** remove glowing effect ([0bcba95](https://github.com/Viren070/AIOStreams/commit/0bcba9599e0d7bbe7e967b5b2e4d935be390b9b1))
+- **frontend:** update ui ([52179e1](https://github.com/Viren070/AIOStreams/commit/52179e1bd8bbcacf9a4880d6802b29d1ee51afb9))
+- smarter caching for catalogs, meta, and manifests ([f259e4e](https://github.com/Viren070/AIOStreams/commit/f259e4ed7683ddf257cfa6c2887b84d60ab888aa))
+- use separate cache instances per resource ([0a8e8e4](https://github.com/Viren070/AIOStreams/commit/0a8e8e4fe4ef9cbbe3a7e8a01b4c9698753cad0c))
 
 ### Bug Fixes
 
-* add custom handlers for 3 digit season numbers ([31e1f34](https://github.com/Viren070/AIOStreams/commit/31e1f3422883c317dba3c07febfff97aa5e2a23c))
-* add logs for parsing times and format time correctly ([a8bc9d1](https://github.com/Viren070/AIOStreams/commit/a8bc9d13a15fb83f0b45b43c21f59703ed961efa))
-* add support for 'postgresql' scheme ([3065dfc](https://github.com/Viren070/AIOStreams/commit/3065dfcedd3c76cc0d7747eeef28523d736c2b9b))
-* **core:** carry out deep link conversion on full meta responses too ([1d2699f](https://github.com/Viren070/AIOStreams/commit/1d2699f018fc2db4ab64bea9ef1c4908f184c0a1)), closes [#264](https://github.com/Viren070/AIOStreams/issues/264)
-* **debridio-tmdb:** use exact language options ([762ce59](https://github.com/Viren070/AIOStreams/commit/762ce5968b96853ff1662512f231ca9b4caf037c))
-* **debridio-tv:** correctly generate cache key ([4be707d](https://github.com/Viren070/AIOStreams/commit/4be707dbeeaf340511d28e7a8ed64506879cf1b9))
-* **debridio-tvdb:** append preset ID to cache key ([1b3e8bf](https://github.com/Viren070/AIOStreams/commit/1b3e8bfee46130f3d45055bb9cc62682deb1d501))
-* dont log errors when attempting to convert discover deep links ([f4c09c9](https://github.com/Viren070/AIOStreams/commit/f4c09c94220f46b5f9a6572cd9f21617fef4ebcf))
-* encrypt default proxy public URL in status response if provided ([78229ee](https://github.com/Viren070/AIOStreams/commit/78229eea5bf0f23979e6b42dda0ac8ee9378ea67))
-* ensure trusted is checked before validation on updateUser ([c805e49](https://github.com/Viren070/AIOStreams/commit/c805e49417b83540b9d699e1095ab5f089b02724))
-* filter out unspecified resources from supported resources ([98c82c2](https://github.com/Viren070/AIOStreams/commit/98c82c27b4c8ec008d4c4161723e59f3438ed854)), closes [#277](https://github.com/Viren070/AIOStreams/issues/277)
-* **frontend:** correctly set default channel ([c2a2541](https://github.com/Viren070/AIOStreams/commit/c2a2541fa0a70c26a96d65d52acada430ec67762))
-* **frontend:** fix layout issues on changelog card on smaller screens ([ce2673e](https://github.com/Viren070/AIOStreams/commit/ce2673e39bf109db7514be70a80cbda296c389d1))
-* **frontend:** wrap addon description in MarkdownLite in addon modal ([b7d4173](https://github.com/Viren070/AIOStreams/commit/b7d417367abea4c8aa1d0eec5ac35bf5593a40b3))
-* handle edge cases for title during parsing ([913d591](https://github.com/Viren070/AIOStreams/commit/913d5913271670f5d9b5881b66be71197678386b))
-* improve cache key generation ([4ae1370](https://github.com/Viren070/AIOStreams/commit/4ae13700c6e2a4a9eb693600d7f302a2fb845172))
-* improve german regex pattern ([1da1e9e](https://github.com/Viren070/AIOStreams/commit/1da1e9e32263f6bf8c1846552ad00528192f872e))
-* make 'end' parameter optional in slice function ([2d21435](https://github.com/Viren070/AIOStreams/commit/2d21435a45dba9fbd9d792ff490007e6a9c86d38))
-* only add error and statistic streams to final list if condition allows processing ([b45a37d](https://github.com/Viren070/AIOStreams/commit/b45a37d7e4b95103e4d9df7ccf92b079c757bcff))
-* **peerflix:** update default value of PEERFLIX_URL and update .env.sample ([5161c3c](https://github.com/Viren070/AIOStreams/commit/5161c3c6bf741ab8c4e7dcd273a756d0d683e35c))
-* push error and statistic streams from first group results ([84976b6](https://github.com/Viren070/AIOStreams/commit/84976b63898e7ee9d0d0e95dd9d266197c2a78df))
-* **tmdb-collections:** add stream parser to add collection name to stream.message and improve collection from movie option description ([b99fff0](https://github.com/Viren070/AIOStreams/commit/b99fff08b02fcb21ec9444ada26c022e40701232))
-* **tmdb-collections:** use exact language options ([44ae0f6](https://github.com/Viren070/AIOStreams/commit/44ae0f68e6f97f26d3bfc821c6a9d4a44b7ae292))
-* **tmdb:** use exact language options ([b72bbcc](https://github.com/Viren070/AIOStreams/commit/b72bbcc530a0e3dcf8af78051bee36bbd73be3eb))
-* update German regex pattern for improved language detection ([01e9a99](https://github.com/Viren070/AIOStreams/commit/01e9a9979c4cac96728200a31b78e2920b8e677b))
-* use correct warn method for logging for meta failure during precaching ([1514724](https://github.com/Viren070/AIOStreams/commit/15147249c0a2ed79a4d4e878bce2dbd79c05b920))
+- add custom handlers for 3 digit season numbers ([31e1f34](https://github.com/Viren070/AIOStreams/commit/31e1f3422883c317dba3c07febfff97aa5e2a23c))
+- add logs for parsing times and format time correctly ([a8bc9d1](https://github.com/Viren070/AIOStreams/commit/a8bc9d13a15fb83f0b45b43c21f59703ed961efa))
+- add support for 'postgresql' scheme ([3065dfc](https://github.com/Viren070/AIOStreams/commit/3065dfcedd3c76cc0d7747eeef28523d736c2b9b))
+- **core:** carry out deep link conversion on full meta responses too ([1d2699f](https://github.com/Viren070/AIOStreams/commit/1d2699f018fc2db4ab64bea9ef1c4908f184c0a1)), closes [#264](https://github.com/Viren070/AIOStreams/issues/264)
+- **debridio-tmdb:** use exact language options ([762ce59](https://github.com/Viren070/AIOStreams/commit/762ce5968b96853ff1662512f231ca9b4caf037c))
+- **debridio-tv:** correctly generate cache key ([4be707d](https://github.com/Viren070/AIOStreams/commit/4be707dbeeaf340511d28e7a8ed64506879cf1b9))
+- **debridio-tvdb:** append preset ID to cache key ([1b3e8bf](https://github.com/Viren070/AIOStreams/commit/1b3e8bfee46130f3d45055bb9cc62682deb1d501))
+- dont log errors when attempting to convert discover deep links ([f4c09c9](https://github.com/Viren070/AIOStreams/commit/f4c09c94220f46b5f9a6572cd9f21617fef4ebcf))
+- encrypt default proxy public URL in status response if provided ([78229ee](https://github.com/Viren070/AIOStreams/commit/78229eea5bf0f23979e6b42dda0ac8ee9378ea67))
+- ensure trusted is checked before validation on updateUser ([c805e49](https://github.com/Viren070/AIOStreams/commit/c805e49417b83540b9d699e1095ab5f089b02724))
+- filter out unspecified resources from supported resources ([98c82c2](https://github.com/Viren070/AIOStreams/commit/98c82c27b4c8ec008d4c4161723e59f3438ed854)), closes [#277](https://github.com/Viren070/AIOStreams/issues/277)
+- **frontend:** correctly set default channel ([c2a2541](https://github.com/Viren070/AIOStreams/commit/c2a2541fa0a70c26a96d65d52acada430ec67762))
+- **frontend:** fix layout issues on changelog card on smaller screens ([ce2673e](https://github.com/Viren070/AIOStreams/commit/ce2673e39bf109db7514be70a80cbda296c389d1))
+- **frontend:** wrap addon description in MarkdownLite in addon modal ([b7d4173](https://github.com/Viren070/AIOStreams/commit/b7d417367abea4c8aa1d0eec5ac35bf5593a40b3))
+- handle edge cases for title during parsing ([913d591](https://github.com/Viren070/AIOStreams/commit/913d5913271670f5d9b5881b66be71197678386b))
+- improve cache key generation ([4ae1370](https://github.com/Viren070/AIOStreams/commit/4ae13700c6e2a4a9eb693600d7f302a2fb845172))
+- improve german regex pattern ([1da1e9e](https://github.com/Viren070/AIOStreams/commit/1da1e9e32263f6bf8c1846552ad00528192f872e))
+- make 'end' parameter optional in slice function ([2d21435](https://github.com/Viren070/AIOStreams/commit/2d21435a45dba9fbd9d792ff490007e6a9c86d38))
+- only add error and statistic streams to final list if condition allows processing ([b45a37d](https://github.com/Viren070/AIOStreams/commit/b45a37d7e4b95103e4d9df7ccf92b079c757bcff))
+- **peerflix:** update default value of PEERFLIX_URL and update .env.sample ([5161c3c](https://github.com/Viren070/AIOStreams/commit/5161c3c6bf741ab8c4e7dcd273a756d0d683e35c))
+- push error and statistic streams from first group results ([84976b6](https://github.com/Viren070/AIOStreams/commit/84976b63898e7ee9d0d0e95dd9d266197c2a78df))
+- **tmdb-collections:** add stream parser to add collection name to stream.message and improve collection from movie option description ([b99fff0](https://github.com/Viren070/AIOStreams/commit/b99fff08b02fcb21ec9444ada26c022e40701232))
+- **tmdb-collections:** use exact language options ([44ae0f6](https://github.com/Viren070/AIOStreams/commit/44ae0f68e6f97f26d3bfc821c6a9d4a44b7ae292))
+- **tmdb:** use exact language options ([b72bbcc](https://github.com/Viren070/AIOStreams/commit/b72bbcc530a0e3dcf8af78051bee36bbd73be3eb))
+- update German regex pattern for improved language detection ([01e9a99](https://github.com/Viren070/AIOStreams/commit/01e9a9979c4cac96728200a31b78e2920b8e677b))
+- use correct warn method for logging for meta failure during precaching ([1514724](https://github.com/Viren070/AIOStreams/commit/15147249c0a2ed79a4d4e878bce2dbd79c05b920))
 
 ## [2.6.1](https://github.com/Viren070/AIOStreams/compare/v2.6.0...v2.6.1) (2025-07-16)
 
-
 ### Bug Fixes
 
-* correctly extract extras for subtitle requests ([a1cbeb2](https://github.com/Viren070/AIOStreams/commit/a1cbeb2880a4abaf43f3c2fe9eabab8239e024df))
-* **debridio-tv:** add new zealand option ([3dd2e7a](https://github.com/Viren070/AIOStreams/commit/3dd2e7a3c5189da1b31dbc6f3044477cd065dc91))
-* **fkstream:** allow overriding services ([952dda8](https://github.com/Viren070/AIOStreams/commit/952dda8bd106a5176d12d554280e620219576d12)), closes [#268](https://github.com/Viren070/AIOStreams/issues/268)
+- correctly extract extras for subtitle requests ([a1cbeb2](https://github.com/Viren070/AIOStreams/commit/a1cbeb2880a4abaf43f3c2fe9eabab8239e024df))
+- **debridio-tv:** add new zealand option ([3dd2e7a](https://github.com/Viren070/AIOStreams/commit/3dd2e7a3c5189da1b31dbc6f3044477cd065dc91))
+- **fkstream:** allow overriding services ([952dda8](https://github.com/Viren070/AIOStreams/commit/952dda8bd106a5176d12d554280e620219576d12)), closes [#268](https://github.com/Viren070/AIOStreams/issues/268)
 
 ## [2.6.0](https://github.com/Viren070/AIOStreams/compare/v2.5.4...v2.6.0) (2025-07-16)
 
-
 ### Features
 
-* add ai search addon to marketplace ([c9c1bab](https://github.com/Viren070/AIOStreams/commit/c9c1babc2acaa5d92e3230382bf3dcfca2f874d5))
-* add AIO Subtitle addon to marketplace ([db191fd](https://github.com/Viren070/AIOStreams/commit/db191fd430b17b8452fc6e4a0b2f776f9463f3b3))
-* add fkstream to marketplace ([ee72f3a](https://github.com/Viren070/AIOStreams/commit/ee72f3a1ed4f137ba07a1e23c381b257acaa2bde)), closes [#260](https://github.com/Viren070/AIOStreams/issues/260)
-* add statistics position option to control where statistic streams appear ([47656d0](https://github.com/Viren070/AIOStreams/commit/47656d0413996ae475b6c25d9503fb60595f8429))
-* add subhero to the marketplace ([e70920a](https://github.com/Viren070/AIOStreams/commit/e70920a2701db19796146c486558a59939e616cd))
-* extract episode count during precaching to automatically precache next season when necessary ([6f0e79a](https://github.com/Viren070/AIOStreams/commit/6f0e79a5d9a8951e882251dc7a48d7a70046a0d8))
-* **frontend:** move tmdb access token setting to services menu ([9101acb](https://github.com/Viren070/AIOStreams/commit/9101acb72f02ec5d5573e41e138797040ef39c0a))
-* **webstreamr:** update provider list and automatically provide mediaflow details if possible ([dbde122](https://github.com/Viren070/AIOStreams/commit/dbde1225e4b7c3505009b97e1454fd3f09840625))
-
+- add ai search addon to marketplace ([c9c1bab](https://github.com/Viren070/AIOStreams/commit/c9c1babc2acaa5d92e3230382bf3dcfca2f874d5))
+- add AIO Subtitle addon to marketplace ([db191fd](https://github.com/Viren070/AIOStreams/commit/db191fd430b17b8452fc6e4a0b2f776f9463f3b3))
+- add fkstream to marketplace ([ee72f3a](https://github.com/Viren070/AIOStreams/commit/ee72f3a1ed4f137ba07a1e23c381b257acaa2bde)), closes [#260](https://github.com/Viren070/AIOStreams/issues/260)
+- add statistics position option to control where statistic streams appear ([47656d0](https://github.com/Viren070/AIOStreams/commit/47656d0413996ae475b6c25d9503fb60595f8429))
+- add subhero to the marketplace ([e70920a](https://github.com/Viren070/AIOStreams/commit/e70920a2701db19796146c486558a59939e616cd))
+- extract episode count during precaching to automatically precache next season when necessary ([6f0e79a](https://github.com/Viren070/AIOStreams/commit/6f0e79a5d9a8951e882251dc7a48d7a70046a0d8))
+- **frontend:** move tmdb access token setting to services menu ([9101acb](https://github.com/Viren070/AIOStreams/commit/9101acb72f02ec5d5573e41e138797040ef39c0a))
+- **webstreamr:** update provider list and automatically provide mediaflow details if possible ([dbde122](https://github.com/Viren070/AIOStreams/commit/dbde1225e4b7c3505009b97e1454fd3f09840625))
 
 ### Bug Fixes
 
-* add fkstream, subhero, aio subtitle to startup logs and sample .env ([130be7d](https://github.com/Viren070/AIOStreams/commit/130be7dc16ce2e4e37d59d7ff3c66afe5b08f5b6))
-* add socials option to ai search ([28f7863](https://github.com/Viren070/AIOStreams/commit/28f786339e12b182856764d31605c76610a75335))
-* adjust extras schema to allow more than 1 extra ([7ba880e](https://github.com/Viren070/AIOStreams/commit/7ba880e9a74b5f6e7b49b2bcff8dbda6b13a159d)), closes [#263](https://github.com/Viren070/AIOStreams/issues/263)
-* **aiosubtitle:** rename language option to languages and use correct default timeout ([603af9a](https://github.com/Viren070/AIOStreams/commit/603af9a7e97226272300377f5ac6dc2bb62e816b))
-* allow any string for thumbnail ([4652eb6](https://github.com/Viren070/AIOStreams/commit/4652eb650273f780cb77e42c8aaab34e63ce90a0))
-* **core:** set groups to undefined during precaching ([02d4cf7](https://github.com/Viren070/AIOStreams/commit/02d4cf742b0d6be75b4cf281b47ef7dd75a9affb))
-* **core:** use structuredClone for cache item values to ensure immutability ([465b7a4](https://github.com/Viren070/AIOStreams/commit/465b7a40a34909bc84290da37cefbe82f3131ea4))
-* correct spelling of ALLEDEBRID_SERVICE to ALLDEBRID_SERVICE ([b67f38a](https://github.com/Viren070/AIOStreams/commit/b67f38ac85033f48efea412f90945f7f15802ee0))
-* **debridio-tv:** update channel list ([67509a4](https://github.com/Viren070/AIOStreams/commit/67509a43def9e01250beaa62bddb6207d399b5be))
-* ensure number types always have integer step of at least 1 ([ac4d209](https://github.com/Viren070/AIOStreams/commit/ac4d209879b64a64d7df600a2b01c8164fe726c5))
-* ensure string validations are carried out against password type ([66d4a96](https://github.com/Viren070/AIOStreams/commit/66d4a96ad20cea105cc23c19945febdf4cf10e56))
-* **frontend:** revert 3a82b796c56627d21ede53b91f47315cbb46c1e4 and clean options before processing ([880817a](https://github.com/Viren070/AIOStreams/commit/880817a1ad100799826dbde10e87c303b74b958e))
-* **frontend:** show puzzle icon for addons without logo ([f74fbb2](https://github.com/Viren070/AIOStreams/commit/f74fbb289b208f1ea082e74675b7bd274153d5f4))
-* **frontend:** strictly rely on value during selection ([3a82b79](https://github.com/Viren070/AIOStreams/commit/3a82b796c56627d21ede53b91f47315cbb46c1e4))
-* improve parsing for debridio watchtower, nuviostreams, and webstreamr ([9febeeb](https://github.com/Viren070/AIOStreams/commit/9febeeb86af023fed32dc25dc89dfdad09406886))
-* **nuviostreams:** add animepahe provider ([00862c0](https://github.com/Viren070/AIOStreams/commit/00862c05926a18766592bc3a177075b14ced90a4))
-* only move to next season when it exists and correct logs ([3050b41](https://github.com/Viren070/AIOStreams/commit/3050b41e937fa24dcfb146a953862c4054cf4a0f))
-* remove unnecessary debug logs ([0e24a6a](https://github.com/Viren070/AIOStreams/commit/0e24a6aa961c0dee200ea018caec06b23134d6cb))
-* replace discover deep links where possible ([aa084d3](https://github.com/Viren070/AIOStreams/commit/aa084d35d646f05cc2dea7111ad34ba5d1a6d661)), closes [#264](https://github.com/Viren070/AIOStreams/issues/264)
-
+- add fkstream, subhero, aio subtitle to startup logs and sample .env ([130be7d](https://github.com/Viren070/AIOStreams/commit/130be7dc16ce2e4e37d59d7ff3c66afe5b08f5b6))
+- add socials option to ai search ([28f7863](https://github.com/Viren070/AIOStreams/commit/28f786339e12b182856764d31605c76610a75335))
+- adjust extras schema to allow more than 1 extra ([7ba880e](https://github.com/Viren070/AIOStreams/commit/7ba880e9a74b5f6e7b49b2bcff8dbda6b13a159d)), closes [#263](https://github.com/Viren070/AIOStreams/issues/263)
+- **aiosubtitle:** rename language option to languages and use correct default timeout ([603af9a](https://github.com/Viren070/AIOStreams/commit/603af9a7e97226272300377f5ac6dc2bb62e816b))
+- allow any string for thumbnail ([4652eb6](https://github.com/Viren070/AIOStreams/commit/4652eb650273f780cb77e42c8aaab34e63ce90a0))
+- **core:** set groups to undefined during precaching ([02d4cf7](https://github.com/Viren070/AIOStreams/commit/02d4cf742b0d6be75b4cf281b47ef7dd75a9affb))
+- **core:** use structuredClone for cache item values to ensure immutability ([465b7a4](https://github.com/Viren070/AIOStreams/commit/465b7a40a34909bc84290da37cefbe82f3131ea4))
+- correct spelling of ALLEDEBRID_SERVICE to ALLDEBRID_SERVICE ([b67f38a](https://github.com/Viren070/AIOStreams/commit/b67f38ac85033f48efea412f90945f7f15802ee0))
+- **debridio-tv:** update channel list ([67509a4](https://github.com/Viren070/AIOStreams/commit/67509a43def9e01250beaa62bddb6207d399b5be))
+- ensure number types always have integer step of at least 1 ([ac4d209](https://github.com/Viren070/AIOStreams/commit/ac4d209879b64a64d7df600a2b01c8164fe726c5))
+- ensure string validations are carried out against password type ([66d4a96](https://github.com/Viren070/AIOStreams/commit/66d4a96ad20cea105cc23c19945febdf4cf10e56))
+- **frontend:** revert 3a82b796c56627d21ede53b91f47315cbb46c1e4 and clean options before processing ([880817a](https://github.com/Viren070/AIOStreams/commit/880817a1ad100799826dbde10e87c303b74b958e))
+- **frontend:** show puzzle icon for addons without logo ([f74fbb2](https://github.com/Viren070/AIOStreams/commit/f74fbb289b208f1ea082e74675b7bd274153d5f4))
+- **frontend:** strictly rely on value during selection ([3a82b79](https://github.com/Viren070/AIOStreams/commit/3a82b796c56627d21ede53b91f47315cbb46c1e4))
+- improve parsing for debridio watchtower, nuviostreams, and webstreamr ([9febeeb](https://github.com/Viren070/AIOStreams/commit/9febeeb86af023fed32dc25dc89dfdad09406886))
+- **nuviostreams:** add animepahe provider ([00862c0](https://github.com/Viren070/AIOStreams/commit/00862c05926a18766592bc3a177075b14ced90a4))
+- only move to next season when it exists and correct logs ([3050b41](https://github.com/Viren070/AIOStreams/commit/3050b41e937fa24dcfb146a953862c4054cf4a0f))
+- remove unnecessary debug logs ([0e24a6a](https://github.com/Viren070/AIOStreams/commit/0e24a6aa961c0dee200ea018caec06b23134d6cb))
+- replace discover deep links where possible ([aa084d3](https://github.com/Viren070/AIOStreams/commit/aa084d35d646f05cc2dea7111ad34ba5d1a6d661)), closes [#264](https://github.com/Viren070/AIOStreams/issues/264)
 
 ### Performance Improvements
 
-* always fetch from all groups in parallel ([0ce1338](https://github.com/Viren070/AIOStreams/commit/0ce13389a066a05184bc1aaea0b2806b22d01a1f))
+- always fetch from all groups in parallel ([0ce1338](https://github.com/Viren070/AIOStreams/commit/0ce13389a066a05184bc1aaea0b2806b22d01a1f))
 
 ## [2.5.4](https://github.com/Viren070/AIOStreams/compare/v2.5.3...v2.5.4) (2025-07-12)
 
-
 ### Bug Fixes
 
-* ensure catalog.extra is initialised before pushing new genre options ([dc9c8a4](https://github.com/Viren070/AIOStreams/commit/dc9c8a40775ba13d66ff7a762147b50e4b414974))
+- ensure catalog.extra is initialised before pushing new genre options ([dc9c8a4](https://github.com/Viren070/AIOStreams/commit/dc9c8a40775ba13d66ff7a762147b50e4b414974))
 
 ## [2.5.3](https://github.com/Viren070/AIOStreams/compare/v2.5.2...v2.5.3) (2025-07-11)
 
-
 ### Bug Fixes
 
-* only add aiostreamserror to idPrefixes if already defined ([ebe46d7](https://github.com/Viren070/AIOStreams/commit/ebe46d7c43acc70fdb52f7aeca41aeda27bf7df7))
-* only log warning for missing idPrefixes when needed ([08ec779](https://github.com/Viren070/AIOStreams/commit/08ec779be3bd307e0fda9766301d80fdc39a8f3e))
+- only add aiostreamserror to idPrefixes if already defined ([ebe46d7](https://github.com/Viren070/AIOStreams/commit/ebe46d7c43acc70fdb52f7aeca41aeda27bf7df7))
+- only log warning for missing idPrefixes when needed ([08ec779](https://github.com/Viren070/AIOStreams/commit/08ec779be3bd307e0fda9766301d80fdc39a8f3e))
 
 ## [2.5.2](https://github.com/Viren070/AIOStreams/compare/v2.5.1...v2.5.2) (2025-07-11)
 
-
 ### Features
 
-* add statistic stream options to see statistics in stremio ([261b878](https://github.com/Viren070/AIOStreams/commit/261b87872a2882886ec26970614a504dc2f7cd97))
-
+- add statistic stream options to see statistics in stremio ([261b878](https://github.com/Viren070/AIOStreams/commit/261b87872a2882886ec26970614a504dc2f7cd97))
 
 ### Bug Fixes
 
-* account for query parameters in manifest urls for custom addons during validation ([3ad1e7c](https://github.com/Viren070/AIOStreams/commit/3ad1e7c61f36d12dfb046c676a401b0e3f97604b))
-* add skipReasons logging for seeder ranges ([a06ac34](https://github.com/Viren070/AIOStreams/commit/a06ac34061e571fe7599eeca5a0fce6d9607b37f))
-* correct spelling of 'Crunchyroll' in streaming catalogs preset ([cb423d1](https://github.com/Viren070/AIOStreams/commit/cb423d152dc015b37b3d317c80907b357f7ee154))
-* **debridio-watchtower:** ensure resolution is always parsed ([6a0bf09](https://github.com/Viren070/AIOStreams/commit/6a0bf09de660198cd317bcd97ec8777aa4723e74))
-* **debridio-watchtower:** update stream parser ([542863e](https://github.com/Viren070/AIOStreams/commit/542863e2a807d18cd6d32c7ba8fa111a711ec37a))
-* forward manifest parsing errors ([9748ecb](https://github.com/Viren070/AIOStreams/commit/9748ecb576320db85c3a5c81a9d67e8f80dd5a4c))
-* **frontend:** remove menu query param on start/'about' menu ([275a2de](https://github.com/Viren070/AIOStreams/commit/275a2de9605c01911714574a040d27f2c3977c76))
-* only log warning for missing idPrefixes for non 'catlaog' resources ([f8065c9](https://github.com/Viren070/AIOStreams/commit/f8065c9e9ad6959c51f664f377ee75a221a92c32))
-* only standardise upon valdiation ([e980c1e](https://github.com/Viren070/AIOStreams/commit/e980c1e0b3a5026b5efdfd8bd812b6bfef90bc45))
-* pass fileIdx through for p2p streams ([0076339](https://github.com/Viren070/AIOStreams/commit/00763397a1b2952f2a99c2e57e8c275863d5aa54))
-* provide meta for catalog errors ([f4050d6](https://github.com/Viren070/AIOStreams/commit/f4050d6f388a774751412f89a1e1ff1210aa76c0))
-* set customised logo to undefined when empty ([7d0b60e](https://github.com/Viren070/AIOStreams/commit/7d0b60efa1f4ec1fc2de6402ffe8b2f6b2c9d2ca))
-* set loading to false in the case of an error upon fetching the new manifest URL ([707a1f3](https://github.com/Viren070/AIOStreams/commit/707a1f3fecb781650078d5c3ca7db3842c102869))
-* standardise manifest URL during validation for custom addon updates ([8314cae](https://github.com/Viren070/AIOStreams/commit/8314cae4811d7e2307498dc0cda12b7822518708))
-* update director to allow string ([2c924ba](https://github.com/Viren070/AIOStreams/commit/2c924bac56e2a3d81cc1fe6ae380286e7fe93b58))
-* update publicIp schema to allow empty string in addition to valid IP ([0539fe4](https://github.com/Viren070/AIOStreams/commit/0539fe49a8cfe8d18525262256388a60691b8e23)), closes [#250](https://github.com/Viren070/AIOStreams/issues/250)
-* use correct property in skipReasons for seeder ranges ([c54b2b6](https://github.com/Viren070/AIOStreams/commit/c54b2b66f050827b6e41db1bf486da3140683487))
+- account for query parameters in manifest urls for custom addons during validation ([3ad1e7c](https://github.com/Viren070/AIOStreams/commit/3ad1e7c61f36d12dfb046c676a401b0e3f97604b))
+- add skipReasons logging for seeder ranges ([a06ac34](https://github.com/Viren070/AIOStreams/commit/a06ac34061e571fe7599eeca5a0fce6d9607b37f))
+- correct spelling of 'Crunchyroll' in streaming catalogs preset ([cb423d1](https://github.com/Viren070/AIOStreams/commit/cb423d152dc015b37b3d317c80907b357f7ee154))
+- **debridio-watchtower:** ensure resolution is always parsed ([6a0bf09](https://github.com/Viren070/AIOStreams/commit/6a0bf09de660198cd317bcd97ec8777aa4723e74))
+- **debridio-watchtower:** update stream parser ([542863e](https://github.com/Viren070/AIOStreams/commit/542863e2a807d18cd6d32c7ba8fa111a711ec37a))
+- forward manifest parsing errors ([9748ecb](https://github.com/Viren070/AIOStreams/commit/9748ecb576320db85c3a5c81a9d67e8f80dd5a4c))
+- **frontend:** remove menu query param on start/'about' menu ([275a2de](https://github.com/Viren070/AIOStreams/commit/275a2de9605c01911714574a040d27f2c3977c76))
+- only log warning for missing idPrefixes for non 'catlaog' resources ([f8065c9](https://github.com/Viren070/AIOStreams/commit/f8065c9e9ad6959c51f664f377ee75a221a92c32))
+- only standardise upon valdiation ([e980c1e](https://github.com/Viren070/AIOStreams/commit/e980c1e0b3a5026b5efdfd8bd812b6bfef90bc45))
+- pass fileIdx through for p2p streams ([0076339](https://github.com/Viren070/AIOStreams/commit/00763397a1b2952f2a99c2e57e8c275863d5aa54))
+- provide meta for catalog errors ([f4050d6](https://github.com/Viren070/AIOStreams/commit/f4050d6f388a774751412f89a1e1ff1210aa76c0))
+- set customised logo to undefined when empty ([7d0b60e](https://github.com/Viren070/AIOStreams/commit/7d0b60efa1f4ec1fc2de6402ffe8b2f6b2c9d2ca))
+- set loading to false in the case of an error upon fetching the new manifest URL ([707a1f3](https://github.com/Viren070/AIOStreams/commit/707a1f3fecb781650078d5c3ca7db3842c102869))
+- standardise manifest URL during validation for custom addon updates ([8314cae](https://github.com/Viren070/AIOStreams/commit/8314cae4811d7e2307498dc0cda12b7822518708))
+- update director to allow string ([2c924ba](https://github.com/Viren070/AIOStreams/commit/2c924bac56e2a3d81cc1fe6ae380286e7fe93b58))
+- update publicIp schema to allow empty string in addition to valid IP ([0539fe4](https://github.com/Viren070/AIOStreams/commit/0539fe49a8cfe8d18525262256388a60691b8e23)), closes [#250](https://github.com/Viren070/AIOStreams/issues/250)
+- use correct property in skipReasons for seeder ranges ([c54b2b6](https://github.com/Viren070/AIOStreams/commit/c54b2b66f050827b6e41db1bf486da3140683487))
 
 ## [2.5.1](https://github.com/Viren070/AIOStreams/compare/v2.5.0...v2.5.1) (2025-07-04)
 
-
 ### Bug Fixes
 
-* ensure proxy IP is only used when enabled ([12434b2](https://github.com/Viren070/AIOStreams/commit/12434b29decb55deb6a99d99e727fc3750ab25f3))
-* ensure searchable is false when no extras are defined ([ff5c9b2](https://github.com/Viren070/AIOStreams/commit/ff5c9b28cb19e89171254d832a53989d4474f6e9))
-* support configuring custom addons with stremio:// protocol ([5040980](https://github.com/Viren070/AIOStreams/commit/5040980c82f019fa8543a7f74a1ac153430620b0))
+- ensure proxy IP is only used when enabled ([12434b2](https://github.com/Viren070/AIOStreams/commit/12434b29decb55deb6a99d99e727fc3750ab25f3))
+- ensure searchable is false when no extras are defined ([ff5c9b2](https://github.com/Viren070/AIOStreams/commit/ff5c9b28cb19e89171254d832a53989d4474f6e9))
+- support configuring custom addons with stremio:// protocol ([5040980](https://github.com/Viren070/AIOStreams/commit/5040980c82f019fa8543a7f74a1ac153430620b0))
 
 ## [2.5.0](https://github.com/Viren070/AIOStreams/compare/v2.4.2...v2.5.0) (2025-07-03)
 
-
 ### Features
 
-* add 'donate' option to social icons ([bcbc793](https://github.com/Viren070/AIOStreams/commit/bcbc7936e5049fc7d42a183298b473c2bd324509))
-* add configurable minimum interval for precaching same episode by same user ([dd9b476](https://github.com/Viren070/AIOStreams/commit/dd9b476fd1ec9210cb0f1566894b6af6faf39ee2))
-* add configure button for custom addons ([4ebd110](https://github.com/Viren070/AIOStreams/commit/4ebd1107737080bbe561b7e7e5735c6fb7d58a00))
-* add disable search catalog modifier ([7a824d0](https://github.com/Viren070/AIOStreams/commit/7a824d0d2d525ac7d10ca5f4efc8b47e9dbec754))
-* add included stream expression filters ([102c71f](https://github.com/Viren070/AIOStreams/commit/102c71f53164b950bba03e30571f8a2432b8aafd))
-* add OpenSubtitles V3 +/Pro ([64e0d4d](https://github.com/Viren070/AIOStreams/commit/64e0d4df39c2405d72a5c14fde93070e55b30708))
-* add separate configurable timeouts for different resource requests ([be18508](https://github.com/Viren070/AIOStreams/commit/be18508174d416826e31dc50c434c3a6e283503f))
-* add SubDL addon ([5245a7a](https://github.com/Viren070/AIOStreams/commit/5245a7a9b862b78104b616b2ae5fdb197d4a49c1))
-* add subsource ([98d890b](https://github.com/Viren070/AIOStreams/commit/98d890bae81509f5eaa106e17841c4ba6cf5c26e))
-* add validation for min/max constraints in multi-select options ([e9d74bd](https://github.com/Viren070/AIOStreams/commit/e9d74bd1177f8d8ecc1a1f89fd0a12419d2d3417))
-* allow hiding all catalogs from home and preserve 'None' option ([a82edc0](https://github.com/Viren070/AIOStreams/commit/a82edc0911cdea46cca306ad97abc39ad48ac67f))
-* allow setting headers for specific domains ([160d9a7](https://github.com/Viren070/AIOStreams/commit/160d9a72a9e734bb2bd209b281448eb2dab83873))
-* expose value of LOG_SENSITIVE_INFO through status API ([e8183aa](https://github.com/Viren070/AIOStreams/commit/e8183aa7255c0f5baf2ec2929359a7782f90cb90))
-* implement SkipStreamError to handle external download streams from wrapped AIOs ([3631ff6](https://github.com/Viren070/AIOStreams/commit/3631ff6ab55e1fdd5b8c574ac261d4cc1d54636b))
-* improve ui consistency for type input in edit modal for catalgos ([e913bd7](https://github.com/Viren070/AIOStreams/commit/e913bd7ea6ca5eb0e0fc0f72a30b600e15868788))
-* lower default timeout to 10000 ([4a2998e](https://github.com/Viren070/AIOStreams/commit/4a2998e30ad459d1a6434bfdc11d7eb340c1c112))
-* **mediafusion:** add 'Contributor Streams' option and parsing ([838f031](https://github.com/Viren070/AIOStreams/commit/838f0318d49f150acee7f28c2032593d2325f19b))
-* perform deduplication on each group fetch ([8d02554](https://github.com/Viren070/AIOStreams/commit/8d02554351ae34c2450bffbe90d72125cc7764f0))
-* swap addon name and type position for each catalog ([efc99ab](https://github.com/Viren070/AIOStreams/commit/efc99abb9e02008eebc43f392509ae82197a60d8))
-* update .env.sample and startup logging ([16c9958](https://github.com/Viren070/AIOStreams/commit/16c9958162ac897e31165e191790250ff6659f74))
-* update OpenSubtitles V3 Pro description ([cfa9cfc](https://github.com/Viren070/AIOStreams/commit/cfa9cfcfefe65f735ea916d73f37ffe552d710a8))
-
+- add 'donate' option to social icons ([bcbc793](https://github.com/Viren070/AIOStreams/commit/bcbc7936e5049fc7d42a183298b473c2bd324509))
+- add configurable minimum interval for precaching same episode by same user ([dd9b476](https://github.com/Viren070/AIOStreams/commit/dd9b476fd1ec9210cb0f1566894b6af6faf39ee2))
+- add configure button for custom addons ([4ebd110](https://github.com/Viren070/AIOStreams/commit/4ebd1107737080bbe561b7e7e5735c6fb7d58a00))
+- add disable search catalog modifier ([7a824d0](https://github.com/Viren070/AIOStreams/commit/7a824d0d2d525ac7d10ca5f4efc8b47e9dbec754))
+- add included stream expression filters ([102c71f](https://github.com/Viren070/AIOStreams/commit/102c71f53164b950bba03e30571f8a2432b8aafd))
+- add OpenSubtitles V3 +/Pro ([64e0d4d](https://github.com/Viren070/AIOStreams/commit/64e0d4df39c2405d72a5c14fde93070e55b30708))
+- add separate configurable timeouts for different resource requests ([be18508](https://github.com/Viren070/AIOStreams/commit/be18508174d416826e31dc50c434c3a6e283503f))
+- add SubDL addon ([5245a7a](https://github.com/Viren070/AIOStreams/commit/5245a7a9b862b78104b616b2ae5fdb197d4a49c1))
+- add subsource ([98d890b](https://github.com/Viren070/AIOStreams/commit/98d890bae81509f5eaa106e17841c4ba6cf5c26e))
+- add validation for min/max constraints in multi-select options ([e9d74bd](https://github.com/Viren070/AIOStreams/commit/e9d74bd1177f8d8ecc1a1f89fd0a12419d2d3417))
+- allow hiding all catalogs from home and preserve 'None' option ([a82edc0](https://github.com/Viren070/AIOStreams/commit/a82edc0911cdea46cca306ad97abc39ad48ac67f))
+- allow setting headers for specific domains ([160d9a7](https://github.com/Viren070/AIOStreams/commit/160d9a72a9e734bb2bd209b281448eb2dab83873))
+- expose value of LOG_SENSITIVE_INFO through status API ([e8183aa](https://github.com/Viren070/AIOStreams/commit/e8183aa7255c0f5baf2ec2929359a7782f90cb90))
+- implement SkipStreamError to handle external download streams from wrapped AIOs ([3631ff6](https://github.com/Viren070/AIOStreams/commit/3631ff6ab55e1fdd5b8c574ac261d4cc1d54636b))
+- improve ui consistency for type input in edit modal for catalgos ([e913bd7](https://github.com/Viren070/AIOStreams/commit/e913bd7ea6ca5eb0e0fc0f72a30b600e15868788))
+- lower default timeout to 10000 ([4a2998e](https://github.com/Viren070/AIOStreams/commit/4a2998e30ad459d1a6434bfdc11d7eb340c1c112))
+- **mediafusion:** add 'Contributor Streams' option and parsing ([838f031](https://github.com/Viren070/AIOStreams/commit/838f0318d49f150acee7f28c2032593d2325f19b))
+- perform deduplication on each group fetch ([8d02554](https://github.com/Viren070/AIOStreams/commit/8d02554351ae34c2450bffbe90d72125cc7764f0))
+- swap addon name and type position for each catalog ([efc99ab](https://github.com/Viren070/AIOStreams/commit/efc99abb9e02008eebc43f392509ae82197a60d8))
+- update .env.sample and startup logging ([16c9958](https://github.com/Viren070/AIOStreams/commit/16c9958162ac897e31165e191790250ff6659f74))
+- update OpenSubtitles V3 Pro description ([cfa9cfc](https://github.com/Viren070/AIOStreams/commit/cfa9cfcfefe65f735ea916d73f37ffe552d710a8))
 
 ### Bug Fixes
 
-* add space after link in AddonGroupCard for improved readability ([b9ef30c](https://github.com/Viren070/AIOStreams/commit/b9ef30cc519d2c095f0019e72b406eacf3d646a8))
-* add validation for all stream expression filters ([6039a57](https://github.com/Viren070/AIOStreams/commit/6039a57e90a11411649990d646b2bc96723ea8bf))
-* correctly log headers ([5e2053a](https://github.com/Viren070/AIOStreams/commit/5e2053a73b5b8a60d81d56d1867cd45ad214c759))
-* increase maximum length for stream expression filters ([e2d75b4](https://github.com/Viren070/AIOStreams/commit/e2d75b4d311b9ad72cfcf832ec346219489ac860))
-* **mediafusion:** ensure contributor streams are only included for one instance ([0e5dd95](https://github.com/Viren070/AIOStreams/commit/0e5dd95980e0efc0bc903d1f7becfe7681540848))
-* **nuviostreams:** update provider list ([2867d03](https://github.com/Viren070/AIOStreams/commit/2867d035370854d06ac1984e04685d9cc1285375))
-* only allow hiding catalogs that don't have any extra requirement ([6997f1c](https://github.com/Viren070/AIOStreams/commit/6997f1c2eeea1fb63b86528b43b2ad58b920c35e))
-* remove addon name and regex matched from external download links ([11e5fec](https://github.com/Viren070/AIOStreams/commit/11e5fecf9d524fe6f3cf7ecd613f83f1496fcb65))
-* return an empty array when no included stream expressions are provided ([74c764c](https://github.com/Viren070/AIOStreams/commit/74c764cdac87e15982d0d395c7dc7fa40b2f8c59))
-* support selecting unknown visual tags, audio tags, audio channels, and languages in SEL ([735a326](https://github.com/Viren070/AIOStreams/commit/735a326aa4a882667741f7b5773aaa0e54a67978))
-* use correct env var name for stream expression limit in startup logs ([e7709e7](https://github.com/Viren070/AIOStreams/commit/e7709e73ab414c0325c9d055d648f9103aff9a05))
-* use correct env var name in sample .env for ST Torz/Store URL adjustments ([322a5e1](https://github.com/Viren070/AIOStreams/commit/322a5e14ac1a26428ea12a351a30e12bc621a779))
+- add space after link in AddonGroupCard for improved readability ([b9ef30c](https://github.com/Viren070/AIOStreams/commit/b9ef30cc519d2c095f0019e72b406eacf3d646a8))
+- add validation for all stream expression filters ([6039a57](https://github.com/Viren070/AIOStreams/commit/6039a57e90a11411649990d646b2bc96723ea8bf))
+- correctly log headers ([5e2053a](https://github.com/Viren070/AIOStreams/commit/5e2053a73b5b8a60d81d56d1867cd45ad214c759))
+- increase maximum length for stream expression filters ([e2d75b4](https://github.com/Viren070/AIOStreams/commit/e2d75b4d311b9ad72cfcf832ec346219489ac860))
+- **mediafusion:** ensure contributor streams are only included for one instance ([0e5dd95](https://github.com/Viren070/AIOStreams/commit/0e5dd95980e0efc0bc903d1f7becfe7681540848))
+- **nuviostreams:** update provider list ([2867d03](https://github.com/Viren070/AIOStreams/commit/2867d035370854d06ac1984e04685d9cc1285375))
+- only allow hiding catalogs that don't have any extra requirement ([6997f1c](https://github.com/Viren070/AIOStreams/commit/6997f1c2eeea1fb63b86528b43b2ad58b920c35e))
+- remove addon name and regex matched from external download links ([11e5fec](https://github.com/Viren070/AIOStreams/commit/11e5fecf9d524fe6f3cf7ecd613f83f1496fcb65))
+- return an empty array when no included stream expressions are provided ([74c764c](https://github.com/Viren070/AIOStreams/commit/74c764cdac87e15982d0d395c7dc7fa40b2f8c59))
+- support selecting unknown visual tags, audio tags, audio channels, and languages in SEL ([735a326](https://github.com/Viren070/AIOStreams/commit/735a326aa4a882667741f7b5773aaa0e54a67978))
+- use correct env var name for stream expression limit in startup logs ([e7709e7](https://github.com/Viren070/AIOStreams/commit/e7709e73ab414c0325c9d055d648f9103aff9a05))
+- use correct env var name in sample .env for ST Torz/Store URL adjustments ([322a5e1](https://github.com/Viren070/AIOStreams/commit/322a5e14ac1a26428ea12a351a30e12bc621a779))
 
 ## [2.4.2](https://github.com/Viren070/AIOStreams/compare/v2.4.1...v2.4.2) (2025-06-27)
 
-
 ### Bug Fixes
 
-* **debridio:** add Italy option ([7774310](https://github.com/Viren070/AIOStreams/commit/77743105de53e5de76ef4f4224883d57cc559bee))
+- **debridio:** add Italy option ([7774310](https://github.com/Viren070/AIOStreams/commit/77743105de53e5de76ef4f4224883d57cc559bee))
 
 ## [2.4.1](https://github.com/Viren070/AIOStreams/compare/v2.4.0...v2.4.1) (2025-06-27)
 
-
 ### Bug Fixes
 
-* add 'Clip' as valid type for Trailer ([025f622](https://github.com/Viren070/AIOStreams/commit/025f622002c1409ed6d0e997ac4ee3d857bf10ba))
-* adjust defaults ([78d4d60](https://github.com/Viren070/AIOStreams/commit/78d4d604ca732d4f96ba9927724c7935e9a956d8))
+- add 'Clip' as valid type for Trailer ([025f622](https://github.com/Viren070/AIOStreams/commit/025f622002c1409ed6d0e997ac4ee3d857bf10ba))
+- adjust defaults ([78d4d60](https://github.com/Viren070/AIOStreams/commit/78d4d604ca732d4f96ba9927724c7935e9a956d8))
 
 ## [2.4.0](https://github.com/Viren070/AIOStreams/compare/v2.3.2...v2.4.0) (2025-06-27)
 
-
 ### Features
 
-* add always precache option ([d4ff4a2](https://github.com/Viren070/AIOStreams/commit/d4ff4a2c0c913e7c6e3754ecb9fd72b45b1f864d))
-* add slice function to stream expression ([321b325](https://github.com/Viren070/AIOStreams/commit/321b32584014d20d8e78f66b4cef313d0cd22f0c))
-* add USA TV and Argentina TV ([e29800a](https://github.com/Viren070/AIOStreams/commit/e29800a0ab159940cafa11f0d69d4bc3f46c918c))
-* allow disabling user agent ([305ebd8](https://github.com/Viren070/AIOStreams/commit/305ebd84c8040866fc45fe1879921e3a7bb93997))
-
+- add always precache option ([d4ff4a2](https://github.com/Viren070/AIOStreams/commit/d4ff4a2c0c913e7c6e3754ecb9fd72b45b1f864d))
+- add slice function to stream expression ([321b325](https://github.com/Viren070/AIOStreams/commit/321b32584014d20d8e78f66b4cef313d0cd22f0c))
+- add USA TV and Argentina TV ([e29800a](https://github.com/Viren070/AIOStreams/commit/e29800a0ab159940cafa11f0d69d4bc3f46c918c))
+- allow disabling user agent ([305ebd8](https://github.com/Viren070/AIOStreams/commit/305ebd84c8040866fc45fe1879921e3a7bb93997))
 
 ### Bug Fixes
 
-* apply filters and precomputation to streams after each group fetch ([78144d0](https://github.com/Viren070/AIOStreams/commit/78144d02135072681237eae8bd5b11bf8fc3f991))
-* fix filtering ([32b1c3c](https://github.com/Viren070/AIOStreams/commit/32b1c3c3b384fad4109520c5730e8076cb2c6ebc))
-* include headers in logs ([4b9f268](https://github.com/Viren070/AIOStreams/commit/4b9f268b8f399a30f47d2140ecd9afd2856f284a))
-* pass specified services in DebridioPreset ([e264db6](https://github.com/Viren070/AIOStreams/commit/e264db6fc57ce58da476deadef5b3684228eba73))
-* set excludeUncached to false during pre-caching ([62aed42](https://github.com/Viren070/AIOStreams/commit/62aed42b07adf24c42cd5ac6c3a43d323e210890))
-* skip failed addons on manifest fetch ([cada0de](https://github.com/Viren070/AIOStreams/commit/cada0de63ac8602adabd2af2b04015f87697668e))
-* **streamfusion:** remove service requirement, enable torrent providers, lower limits ([3d856a2](https://github.com/Viren070/AIOStreams/commit/3d856a252dd77d27c81d4539ad848af95f1ca0dd))
+- apply filters and precomputation to streams after each group fetch ([78144d0](https://github.com/Viren070/AIOStreams/commit/78144d02135072681237eae8bd5b11bf8fc3f991))
+- fix filtering ([32b1c3c](https://github.com/Viren070/AIOStreams/commit/32b1c3c3b384fad4109520c5730e8076cb2c6ebc))
+- include headers in logs ([4b9f268](https://github.com/Viren070/AIOStreams/commit/4b9f268b8f399a30f47d2140ecd9afd2856f284a))
+- pass specified services in DebridioPreset ([e264db6](https://github.com/Viren070/AIOStreams/commit/e264db6fc57ce58da476deadef5b3684228eba73))
+- set excludeUncached to false during pre-caching ([62aed42](https://github.com/Viren070/AIOStreams/commit/62aed42b07adf24c42cd5ac6c3a43d323e210890))
+- skip failed addons on manifest fetch ([cada0de](https://github.com/Viren070/AIOStreams/commit/cada0de63ac8602adabd2af2b04015f87697668e))
+- **streamfusion:** remove service requirement, enable torrent providers, lower limits ([3d856a2](https://github.com/Viren070/AIOStreams/commit/3d856a252dd77d27c81d4539ad848af95f1ca0dd))
 
 ## [2.3.2](https://github.com/Viren070/AIOStreams/compare/v2.3.1...v2.3.2) (2025-06-24)
 
-
 ### Bug Fixes
 
-* only show warning when no idPrefixes are given ([832deae](https://github.com/Viren070/AIOStreams/commit/832deaed64ea977d493d3815a58f7528aa7b03e1))
-* remove folderSize from downloadable streams ([baf4c46](https://github.com/Viren070/AIOStreams/commit/baf4c461682fae5dd30e809897498f5d5a62482b))
-* remove length requirement for string properties in ManifestSchema ([b009511](https://github.com/Viren070/AIOStreams/commit/b00951144925f174a30b0e2858f963c6cbee3837))
+- only show warning when no idPrefixes are given ([832deae](https://github.com/Viren070/AIOStreams/commit/832deaed64ea977d493d3815a58f7528aa7b03e1))
+- remove folderSize from downloadable streams ([baf4c46](https://github.com/Viren070/AIOStreams/commit/baf4c461682fae5dd30e809897498f5d5a62482b))
+- remove length requirement for string properties in ManifestSchema ([b009511](https://github.com/Viren070/AIOStreams/commit/b00951144925f174a30b0e2858f963c6cbee3837))
 
 ## [2.3.1](https://github.com/Viren070/AIOStreams/compare/v2.3.0...v2.3.1) (2025-06-24)
 
-
 ### Bug Fixes
 
-* set idPrefixes to undefined for new resources too ([97894be](https://github.com/Viren070/AIOStreams/commit/97894be562ef28a4ddd3887093481f60d4e6b3f1))
+- set idPrefixes to undefined for new resources too ([97894be](https://github.com/Viren070/AIOStreams/commit/97894be562ef28a4ddd3887093481f60d4e6b3f1))
 
 ## [2.3.0](https://github.com/Viren070/AIOStreams/compare/v2.2.1...v2.3.0) (2025-06-24)
 
-
 ### Features
 
-* add `EXPOSE_USER_COUNT` set to false by default ([3e9820b](https://github.com/Viren070/AIOStreams/commit/3e9820bc3de6bca391259026523a07d63e8c90e7))
-* add more fields to bingeGroup ([f53c8ca](https://github.com/Viren070/AIOStreams/commit/f53c8cab1f3465ebf639e035824b7b3c2e069203))
-* add tmdb addon ([96bf1de](https://github.com/Viren070/AIOStreams/commit/96bf1de8bd5a44b10bc3ada6dd8e1cd5c11b1d2e))
-* add torrentsdb ([aebef33](https://github.com/Viren070/AIOStreams/commit/aebef33432d9d21c5c90577da73fc21803432b83))
-* improve parsing for debridio tv ([320dbb2](https://github.com/Viren070/AIOStreams/commit/320dbb29020cc499c4d806f904feb0f4d45730d3))
-
+- add `EXPOSE_USER_COUNT` set to false by default ([3e9820b](https://github.com/Viren070/AIOStreams/commit/3e9820bc3de6bca391259026523a07d63e8c90e7))
+- add more fields to bingeGroup ([f53c8ca](https://github.com/Viren070/AIOStreams/commit/f53c8cab1f3465ebf639e035824b7b3c2e069203))
+- add tmdb addon ([96bf1de](https://github.com/Viren070/AIOStreams/commit/96bf1de8bd5a44b10bc3ada6dd8e1cd5c11b1d2e))
+- add torrentsdb ([aebef33](https://github.com/Viren070/AIOStreams/commit/aebef33432d9d21c5c90577da73fc21803432b83))
+- improve parsing for debridio tv ([320dbb2](https://github.com/Viren070/AIOStreams/commit/320dbb29020cc499c4d806f904feb0f4d45730d3))
 
 ### Bug Fixes
 
-* add discovery+ option to streaming catalogs ([3b47339](https://github.com/Viren070/AIOStreams/commit/3b473393e201c32afbe5301a1d5ff9026b1f5718))
-* make sorting in deduplicator consistent ([b15efd5](https://github.com/Viren070/AIOStreams/commit/b15efd5529d1246e538b25797930bcbab874b73b))
-* only extract folder size if difference is large enough ([3d7808b](https://github.com/Viren070/AIOStreams/commit/3d7808b92cde840dac242ad8f52fd671a02199fb))
-* set idPrefixes to undefined when an addon for that resource doesn't provide it ([f3ff7c5](https://github.com/Viren070/AIOStreams/commit/f3ff7c53d2ad4d6c809c1f27d5be3177969f4841))
+- add discovery+ option to streaming catalogs ([3b47339](https://github.com/Viren070/AIOStreams/commit/3b473393e201c32afbe5301a1d5ff9026b1f5718))
+- make sorting in deduplicator consistent ([b15efd5](https://github.com/Viren070/AIOStreams/commit/b15efd5529d1246e538b25797930bcbab874b73b))
+- only extract folder size if difference is large enough ([3d7808b](https://github.com/Viren070/AIOStreams/commit/3d7808b92cde840dac242ad8f52fd671a02199fb))
+- set idPrefixes to undefined when an addon for that resource doesn't provide it ([f3ff7c5](https://github.com/Viren070/AIOStreams/commit/f3ff7c53d2ad4d6c809c1f27d5be3177969f4841))
 
 ## [2.2.1](https://github.com/Viren070/AIOStreams/compare/v2.2.0...v2.2.1) (2025-06-22)
 
-
 ### Bug Fixes
 
-* add catalog and meta resources to mediafusion preset ([ee492e2](https://github.com/Viren070/AIOStreams/commit/ee492e2b218bbad813426368ec7f30ecedc79e59))
-* add min and max constraints validation for options in config ([675eaf0](https://github.com/Viren070/AIOStreams/commit/675eaf0b6340ed52b2d0267442a24448048b04cb))
-* allow null values in options array for manifest extras ([99d66e8](https://github.com/Viren070/AIOStreams/commit/99d66e835c421af0ad6c86500dc38f93b8d85ca3))
-* correct property name from 'seeders' to 'seeder' in includedReasons ([912fa49](https://github.com/Viren070/AIOStreams/commit/912fa4910e097c2ec1424ac360482d56b51e6022))
-* **frontend:** add sensible steps and remove min max constraint in NumberInput for TemplateOption ([1119721](https://github.com/Viren070/AIOStreams/commit/1119721054d77cf7729ed27cf7b4593237bc3675))
+- add catalog and meta resources to mediafusion preset ([ee492e2](https://github.com/Viren070/AIOStreams/commit/ee492e2b218bbad813426368ec7f30ecedc79e59))
+- add min and max constraints validation for options in config ([675eaf0](https://github.com/Viren070/AIOStreams/commit/675eaf0b6340ed52b2d0267442a24448048b04cb))
+- allow null values in options array for manifest extras ([99d66e8](https://github.com/Viren070/AIOStreams/commit/99d66e835c421af0ad6c86500dc38f93b8d85ca3))
+- correct property name from 'seeders' to 'seeder' in includedReasons ([912fa49](https://github.com/Viren070/AIOStreams/commit/912fa4910e097c2ec1424ac360482d56b51e6022))
+- **frontend:** add sensible steps and remove min max constraint in NumberInput for TemplateOption ([1119721](https://github.com/Viren070/AIOStreams/commit/1119721054d77cf7729ed27cf7b4593237bc3675))
 
 ## [2.2.0](https://github.com/Viren070/AIOStreams/compare/v2.1.0...v2.2.0) (2025-06-22)
 
-
 ### Features
 
-* add 'not' function to BaseConditionParser for filtering streams ([44d2c4c](https://github.com/Viren070/AIOStreams/commit/44d2c4c8708dae8c07370b16d6ca5e7750369ddb))
-* add logging for include details/reasons during filtering ([9de901d](https://github.com/Viren070/AIOStreams/commit/9de901d22b6e3c8ae515f41fccb63447283492b8))
-* add merge function in BaseConditionParser ([f223368](https://github.com/Viren070/AIOStreams/commit/f22336800ae952b6f3e703006075b4360da94524))
-* add regexMatchedInRange function to BaseConditionParser ([cc2f5f7](https://github.com/Viren070/AIOStreams/commit/cc2f5f7608f8dbd3f9d52031e0e6da377d9031b0))
-* add support for required and preferred filter conditions ([d9281bd](https://github.com/Viren070/AIOStreams/commit/d9281bd978f186a50f04ead98c6fcca41bb32bfb))
-* adjust wording and naming of expression/condition parser ([a06aea9](https://github.com/Viren070/AIOStreams/commit/a06aea923cdad1540d2edb858ce1de1412d5dd11))
-* apply filter conditions last ([41d507a](https://github.com/Viren070/AIOStreams/commit/41d507a679af598fbfb4e9391688f1dc70613a5c))
-* enable addition and subtraction in base Parser ([c4e65f8](https://github.com/Viren070/AIOStreams/commit/c4e65f83b3a0157ec87b775d8967017bfd425ee8))
-* handle missing debridio api key for clear errors ([ad4a51c](https://github.com/Viren070/AIOStreams/commit/ad4a51caa11c4447cff59ce6f07cf2a870d8f297))
-* improve condition parser functions to support multiple parameters ([110146c](https://github.com/Viren070/AIOStreams/commit/110146c088ceebc1472eb8f5442d966faabb0278))
-* loop through optionMetas to ensure new options are validated too and ignore individual errors from presets when necessary ([2ffc82c](https://github.com/Viren070/AIOStreams/commit/2ffc82c864878e0d212bbfa6582044555ba6fc78))
-* support multiple regex names in regexMatched function ([455f430](https://github.com/Viren070/AIOStreams/commit/455f4307fdee14098c9b3766322dd47682e7d270))
-* use title modifier for title in light gdrive formatter ([e542989](https://github.com/Viren070/AIOStreams/commit/e542989038ad253a098cce41e9480a2927c7514a))
-
+- add 'not' function to BaseConditionParser for filtering streams ([44d2c4c](https://github.com/Viren070/AIOStreams/commit/44d2c4c8708dae8c07370b16d6ca5e7750369ddb))
+- add logging for include details/reasons during filtering ([9de901d](https://github.com/Viren070/AIOStreams/commit/9de901d22b6e3c8ae515f41fccb63447283492b8))
+- add merge function in BaseConditionParser ([f223368](https://github.com/Viren070/AIOStreams/commit/f22336800ae952b6f3e703006075b4360da94524))
+- add regexMatchedInRange function to BaseConditionParser ([cc2f5f7](https://github.com/Viren070/AIOStreams/commit/cc2f5f7608f8dbd3f9d52031e0e6da377d9031b0))
+- add support for required and preferred filter conditions ([d9281bd](https://github.com/Viren070/AIOStreams/commit/d9281bd978f186a50f04ead98c6fcca41bb32bfb))
+- adjust wording and naming of expression/condition parser ([a06aea9](https://github.com/Viren070/AIOStreams/commit/a06aea923cdad1540d2edb858ce1de1412d5dd11))
+- apply filter conditions last ([41d507a](https://github.com/Viren070/AIOStreams/commit/41d507a679af598fbfb4e9391688f1dc70613a5c))
+- enable addition and subtraction in base Parser ([c4e65f8](https://github.com/Viren070/AIOStreams/commit/c4e65f83b3a0157ec87b775d8967017bfd425ee8))
+- handle missing debridio api key for clear errors ([ad4a51c](https://github.com/Viren070/AIOStreams/commit/ad4a51caa11c4447cff59ce6f07cf2a870d8f297))
+- improve condition parser functions to support multiple parameters ([110146c](https://github.com/Viren070/AIOStreams/commit/110146c088ceebc1472eb8f5442d966faabb0278))
+- loop through optionMetas to ensure new options are validated too and ignore individual errors from presets when necessary ([2ffc82c](https://github.com/Viren070/AIOStreams/commit/2ffc82c864878e0d212bbfa6582044555ba6fc78))
+- support multiple regex names in regexMatched function ([455f430](https://github.com/Viren070/AIOStreams/commit/455f4307fdee14098c9b3766322dd47682e7d270))
+- use title modifier for title in light gdrive formatter ([e542989](https://github.com/Viren070/AIOStreams/commit/e542989038ad253a098cce41e9480a2927c7514a))
 
 ### Bug Fixes
 
-* actually use the streams after applying filter conditions ([4bc0259](https://github.com/Viren070/AIOStreams/commit/4bc0259dad92d636f338aae4b0b4af0cb0666d2a))
-* allow empty regex names in ParsedStreamSchema and AIOStream ([cf39cdf](https://github.com/Viren070/AIOStreams/commit/cf39cdfee14d41bb67e9a8bff2d720e7d33cffc5))
-* **debridio:** update preset to support new version ([#213](https://github.com/Viren070/AIOStreams/issues/213)) ([23e8078](https://github.com/Viren070/AIOStreams/commit/23e8078b3f5aaa7554857e3fefd0a49ba4d2f6b7))
-* ensure comparison checks for deduplications are carried out when needed ([c7bb0c8](https://github.com/Viren070/AIOStreams/commit/c7bb0c8bee69b82688f08e005985b3a8e6436048))
-* extract streamExpressionMatched from AIOStream parser ([7e65738](https://github.com/Viren070/AIOStreams/commit/7e657380d7f0c2cfd01b3367e9bd876465a710d8))
-* fallback to parent get filename method when filename not found in description for mediafusion ([cfb5977](https://github.com/Viren070/AIOStreams/commit/cfb59771fc9bc23b3b982bfbfce75436ca4f37fa))
-* fallback to using parsed properties from folder when undefined in file and correctly merge array properties ([8eb9b7a](https://github.com/Viren070/AIOStreams/commit/8eb9b7a92efbbf76991d532b828ab48070f13b6d))
-* filter out uuid in filtered export ([bd21b36](https://github.com/Viren070/AIOStreams/commit/bd21b364d27cbcc72a464c14eb372ffbd8e33a51))
-* **formatters:** make title modifier return consistent cases with each word titled ([3e6b45a](https://github.com/Viren070/AIOStreams/commit/3e6b45a554bdc15c473e64bc22cee5d0b8c7de7f))
-* handle invalid addon password error separately for catalog API to be more clear ([a2275cc](https://github.com/Viren070/AIOStreams/commit/a2275cce1bcdf37ba7dd65016a544b222e8ee3a4))
-* ignore port in host check ([e73be92](https://github.com/Viren070/AIOStreams/commit/e73be9298d82dbb2a9b492cb636c5bd5d82fd1e0))
-* normalize case sensitivity in condition parser filters for resolutions, qualities, encodes, types, visualTags, audioTags, audioChannels, and languages ([87d2ffb](https://github.com/Viren070/AIOStreams/commit/87d2ffba7f8b8fc3e7ce70372e4f4932aa86bbc5))
-* only form keyword patterns when length of array is greater than 0 ([9136694](https://github.com/Viren070/AIOStreams/commit/91366943bb813fd99cd6c4775952c8bc5af9d54f))
-* rename 'not' function to 'negate' to avoid conflicts ([8477584](https://github.com/Viren070/AIOStreams/commit/8477584f9e65aae796c7aa432ffdbc36212f3260))
-* update credentials field to allow empty strings ([c006321](https://github.com/Viren070/AIOStreams/commit/c00632146d4980ec5a640b54eeb3bbd63f999189))
+- actually use the streams after applying filter conditions ([4bc0259](https://github.com/Viren070/AIOStreams/commit/4bc0259dad92d636f338aae4b0b4af0cb0666d2a))
+- allow empty regex names in ParsedStreamSchema and AIOStream ([cf39cdf](https://github.com/Viren070/AIOStreams/commit/cf39cdfee14d41bb67e9a8bff2d720e7d33cffc5))
+- **debridio:** update preset to support new version ([#213](https://github.com/Viren070/AIOStreams/issues/213)) ([23e8078](https://github.com/Viren070/AIOStreams/commit/23e8078b3f5aaa7554857e3fefd0a49ba4d2f6b7))
+- ensure comparison checks for deduplications are carried out when needed ([c7bb0c8](https://github.com/Viren070/AIOStreams/commit/c7bb0c8bee69b82688f08e005985b3a8e6436048))
+- extract streamExpressionMatched from AIOStream parser ([7e65738](https://github.com/Viren070/AIOStreams/commit/7e657380d7f0c2cfd01b3367e9bd876465a710d8))
+- fallback to parent get filename method when filename not found in description for mediafusion ([cfb5977](https://github.com/Viren070/AIOStreams/commit/cfb59771fc9bc23b3b982bfbfce75436ca4f37fa))
+- fallback to using parsed properties from folder when undefined in file and correctly merge array properties ([8eb9b7a](https://github.com/Viren070/AIOStreams/commit/8eb9b7a92efbbf76991d532b828ab48070f13b6d))
+- filter out uuid in filtered export ([bd21b36](https://github.com/Viren070/AIOStreams/commit/bd21b364d27cbcc72a464c14eb372ffbd8e33a51))
+- **formatters:** make title modifier return consistent cases with each word titled ([3e6b45a](https://github.com/Viren070/AIOStreams/commit/3e6b45a554bdc15c473e64bc22cee5d0b8c7de7f))
+- handle invalid addon password error separately for catalog API to be more clear ([a2275cc](https://github.com/Viren070/AIOStreams/commit/a2275cce1bcdf37ba7dd65016a544b222e8ee3a4))
+- ignore port in host check ([e73be92](https://github.com/Viren070/AIOStreams/commit/e73be9298d82dbb2a9b492cb636c5bd5d82fd1e0))
+- normalize case sensitivity in condition parser filters for resolutions, qualities, encodes, types, visualTags, audioTags, audioChannels, and languages ([87d2ffb](https://github.com/Viren070/AIOStreams/commit/87d2ffba7f8b8fc3e7ce70372e4f4932aa86bbc5))
+- only form keyword patterns when length of array is greater than 0 ([9136694](https://github.com/Viren070/AIOStreams/commit/91366943bb813fd99cd6c4775952c8bc5af9d54f))
+- rename 'not' function to 'negate' to avoid conflicts ([8477584](https://github.com/Viren070/AIOStreams/commit/8477584f9e65aae796c7aa432ffdbc36212f3260))
+- update credentials field to allow empty strings ([c006321](https://github.com/Viren070/AIOStreams/commit/c00632146d4980ec5a640b54eeb3bbd63f999189))
 
 ## [2.1.0](https://github.com/Viren070/AIOStreams/compare/v2.0.1...v2.1.0) (2025-06-20)
 
-
 ### Features
 
-* allow disabling pruning and disable it by default ([85c0ec1](https://github.com/Viren070/AIOStreams/commit/85c0ec1b5436af1115f97149f87b41aba41fe3ff))
-* allow specifying providers in torrentio ([8e5f4b5](https://github.com/Viren070/AIOStreams/commit/8e5f4b520cbcf472598a955039dc33bdda676bd5))
-* enable conditional operators in parser, allowing ternary statements in filter conditions ([eb6edfc](https://github.com/Viren070/AIOStreams/commit/eb6edfc3f1cb1c6a79400d2311cbe8811f1d284c))
-* extract folder size for stremthru torz ([e775562](https://github.com/Viren070/AIOStreams/commit/e775562e3c736fb4d652a161a7e29f3fcd28be1f))
-* improve cache stats logging ([d47eee0](https://github.com/Viren070/AIOStreams/commit/d47eee002112f6330d1b74920199bface0105eed))
-* improve save install page ([a115e59](https://github.com/Viren070/AIOStreams/commit/a115e5906f568b630425276cf321a931b37aadf1))
-* only add foldername if different and parse info from both folder and filename ([6eed23f](https://github.com/Viren070/AIOStreams/commit/6eed23f445d017ae6d18e9874978a8874350d006))
-
+- allow disabling pruning and disable it by default ([85c0ec1](https://github.com/Viren070/AIOStreams/commit/85c0ec1b5436af1115f97149f87b41aba41fe3ff))
+- allow specifying providers in torrentio ([8e5f4b5](https://github.com/Viren070/AIOStreams/commit/8e5f4b520cbcf472598a955039dc33bdda676bd5))
+- enable conditional operators in parser, allowing ternary statements in filter conditions ([eb6edfc](https://github.com/Viren070/AIOStreams/commit/eb6edfc3f1cb1c6a79400d2311cbe8811f1d284c))
+- extract folder size for stremthru torz ([e775562](https://github.com/Viren070/AIOStreams/commit/e775562e3c736fb4d652a161a7e29f3fcd28be1f))
+- improve cache stats logging ([d47eee0](https://github.com/Viren070/AIOStreams/commit/d47eee002112f6330d1b74920199bface0105eed))
+- improve save install page ([a115e59](https://github.com/Viren070/AIOStreams/commit/a115e5906f568b630425276cf321a931b37aadf1))
+- only add foldername if different and parse info from both folder and filename ([6eed23f](https://github.com/Viren070/AIOStreams/commit/6eed23f445d017ae6d18e9874978a8874350d006))
 
 ### Bug Fixes
 
-* add enableCollectionFromMovie option to TMDB Collections ([71d9fe0](https://github.com/Viren070/AIOStreams/commit/71d9fe093cad1566172206d0a87662358bd446a6)), closes [#194](https://github.com/Viren070/AIOStreams/issues/194)
-* add stream as supported resource for TMDB Collections ([d2ef215](https://github.com/Viren070/AIOStreams/commit/d2ef2154fda902900751c47527ff52390506bd54))
-* add validation to pruneUsers method to ensure negative maxDays input is not used ([6b597b3](https://github.com/Viren070/AIOStreams/commit/6b597b31306fbe42d4104a71f9f330db32d9cda5))
-* adjust idPrefixes handling to improve compatibility in most cases ([7fa8ba7](https://github.com/Viren070/AIOStreams/commit/7fa8ba71fbb682d077fb5c8ccfbadfb0050bea80))
-* change all debrid service name to AllDebrid ([a89cdca](https://github.com/Viren070/AIOStreams/commit/a89cdca583e50c3bf66432bbb721797954323ba6)), closes [#208](https://github.com/Viren070/AIOStreams/issues/208)
-* convert live types to http for webstreamr ([64977ca](https://github.com/Viren070/AIOStreams/commit/64977caeffe2cb6b95714916c14bfa006502c386))
-* don't pass encoded_user_data header if URL is overriden ([ed2c0f5](https://github.com/Viren070/AIOStreams/commit/ed2c0f5800592c6bf140dc1f9ea8bdb9057d1d55))
-* exit auto prune when max days is less than 0 ([ee1ddc0](https://github.com/Viren070/AIOStreams/commit/ee1ddc07389d01b382f19fa46e434ca93f41d3e8))
-* explicitly check for unknown in version and default to 0.0.0 for manifest response ([8664e00](https://github.com/Viren070/AIOStreams/commit/8664e004e2553ffb675131488a4c4eab70ede7b3)), closes [#198](https://github.com/Viren070/AIOStreams/issues/198)
-* extract size for nuviostreams ([ebbd7ec](https://github.com/Viren070/AIOStreams/commit/ebbd7ec3b24d11abc2806e9edbd2aeaee45faa09))
-* fix error handling in config modal ([5182a07](https://github.com/Viren070/AIOStreams/commit/5182a07ac49d1aa79f515d72c71c7494a27866dd))
-* **frontend:** filter out proxy credentials and url in export when exclude credentials is true ([3c31939](https://github.com/Viren070/AIOStreams/commit/3c319391b86e6efa530aab5b8cd04ad9341867d1))
-* handle empty addon name in stream results and update description for addon name field ([5612140](https://github.com/Viren070/AIOStreams/commit/5612140ffee8b8e8804d36efdfd22e6f110b32ef))
-* handle pikpak credentials for mediafusion ([eee444f](https://github.com/Viren070/AIOStreams/commit/eee444f376136ed04257187c4bb1ddc05f05a3f5))
-* include addon name in error messages for invalid manifest URLs ([abf99c1](https://github.com/Viren070/AIOStreams/commit/abf99c1768f3cf86d6f58ec256705ae235f9d8f9))
-* make types optional in ManifestSchema ([5281756](https://github.com/Viren070/AIOStreams/commit/5281756c78e362d3c48cc4469c07c17df9350d9c))
-* make types required and provide array based on resources object array ([01cf37f](https://github.com/Viren070/AIOStreams/commit/01cf37f8340a9fd130ecb19c93dc7a9863eab012))
-* manually override type to http for watchtower and nuviostreams ([1fb00a4](https://github.com/Viren070/AIOStreams/commit/1fb00a4317605ee9a5d0da73a4b363bf08b9bf6f))
-* map defaultProviders to their values in TorrentioPreset configuration ([9b04403](https://github.com/Viren070/AIOStreams/commit/9b044037d38b46270e23172914d1e35f72f51e1f))
-* normalize version check ([#206](https://github.com/Viren070/AIOStreams/issues/206)) ([05cc116](https://github.com/Viren070/AIOStreams/commit/05cc116fafc9ba6d0f40b7e10938e2505085ea10))
-* only add to idPrefixes if not null ([6fb5f7b](https://github.com/Viren070/AIOStreams/commit/6fb5f7b841872b0261023766c2472c7f5201be95))
-* overlapping snippets modal ([#202](https://github.com/Viren070/AIOStreams/issues/202)) ([195da69](https://github.com/Viren070/AIOStreams/commit/195da69f19ca8e15acd000420c1187fd4116de1f))
-* prevent title from being parsed for info ([f8b2e2d](https://github.com/Viren070/AIOStreams/commit/f8b2e2d66ce07ae4342db974ed6f169c0474d1d2))
-* remove idPrefixes from top level manifest ([908b4ff](https://github.com/Viren070/AIOStreams/commit/908b4ffa399439ab3f9428357b30a6ae7bc0f29d))
-* remove outdated decoding of credentials causing issues with some credentials ([609931e](https://github.com/Viren070/AIOStreams/commit/609931e5318c8b6d782cc04cf6a6691269bba287))
-* remove timestamp from cache stats ([509e3bd](https://github.com/Viren070/AIOStreams/commit/509e3bd2098f10d041a2a776d9b4099567fe4370))
-* remove unused method handler for unsupported HTTP methods ([7405d27](https://github.com/Viren070/AIOStreams/commit/7405d272ab79321d8b1e97ee4bcd1a2b2f8c12a5))
-* rename web_dl to webdl in stremthru store ([3fb57c5](https://github.com/Viren070/AIOStreams/commit/3fb57c5d04e23585e71a5e9f0643735f675671c7))
-* simplify and fix configuration generation for services and providers in TorrentioPreset ([cfafeec](https://github.com/Viren070/AIOStreams/commit/cfafeecda3591c342d5f2aeb756fde4adc536024))
-* try explicitly setting idPrefixes to an empty array ([c16060f](https://github.com/Viren070/AIOStreams/commit/c16060f7a5ffa5b5142fe5a0753046748f682f0a))
-* try removing types ([10c4e2d](https://github.com/Viren070/AIOStreams/commit/10c4e2d51f7a0ba05d6214da1c848b66ec9237ca))
-* try setting idPrefixes to null ([a5f32df](https://github.com/Viren070/AIOStreams/commit/a5f32df451c7ba73438322c217ffa431e9a84125))
-* update descriptions for filtering options in menu component to clarify behavior ([67bb204](https://github.com/Viren070/AIOStreams/commit/67bb204362951ef3998c690ba1c0055c1a4cc12b))
-* use password type where necessary ([0a12d33](https://github.com/Viren070/AIOStreams/commit/0a12d335c34b8181c9ac849bed623ea77b43a84c))
+- add enableCollectionFromMovie option to TMDB Collections ([71d9fe0](https://github.com/Viren070/AIOStreams/commit/71d9fe093cad1566172206d0a87662358bd446a6)), closes [#194](https://github.com/Viren070/AIOStreams/issues/194)
+- add stream as supported resource for TMDB Collections ([d2ef215](https://github.com/Viren070/AIOStreams/commit/d2ef2154fda902900751c47527ff52390506bd54))
+- add validation to pruneUsers method to ensure negative maxDays input is not used ([6b597b3](https://github.com/Viren070/AIOStreams/commit/6b597b31306fbe42d4104a71f9f330db32d9cda5))
+- adjust idPrefixes handling to improve compatibility in most cases ([7fa8ba7](https://github.com/Viren070/AIOStreams/commit/7fa8ba71fbb682d077fb5c8ccfbadfb0050bea80))
+- change all debrid service name to AllDebrid ([a89cdca](https://github.com/Viren070/AIOStreams/commit/a89cdca583e50c3bf66432bbb721797954323ba6)), closes [#208](https://github.com/Viren070/AIOStreams/issues/208)
+- convert live types to http for webstreamr ([64977ca](https://github.com/Viren070/AIOStreams/commit/64977caeffe2cb6b95714916c14bfa006502c386))
+- don't pass encoded_user_data header if URL is overriden ([ed2c0f5](https://github.com/Viren070/AIOStreams/commit/ed2c0f5800592c6bf140dc1f9ea8bdb9057d1d55))
+- exit auto prune when max days is less than 0 ([ee1ddc0](https://github.com/Viren070/AIOStreams/commit/ee1ddc07389d01b382f19fa46e434ca93f41d3e8))
+- explicitly check for unknown in version and default to 0.0.0 for manifest response ([8664e00](https://github.com/Viren070/AIOStreams/commit/8664e004e2553ffb675131488a4c4eab70ede7b3)), closes [#198](https://github.com/Viren070/AIOStreams/issues/198)
+- extract size for nuviostreams ([ebbd7ec](https://github.com/Viren070/AIOStreams/commit/ebbd7ec3b24d11abc2806e9edbd2aeaee45faa09))
+- fix error handling in config modal ([5182a07](https://github.com/Viren070/AIOStreams/commit/5182a07ac49d1aa79f515d72c71c7494a27866dd))
+- **frontend:** filter out proxy credentials and url in export when exclude credentials is true ([3c31939](https://github.com/Viren070/AIOStreams/commit/3c319391b86e6efa530aab5b8cd04ad9341867d1))
+- handle empty addon name in stream results and update description for addon name field ([5612140](https://github.com/Viren070/AIOStreams/commit/5612140ffee8b8e8804d36efdfd22e6f110b32ef))
+- handle pikpak credentials for mediafusion ([eee444f](https://github.com/Viren070/AIOStreams/commit/eee444f376136ed04257187c4bb1ddc05f05a3f5))
+- include addon name in error messages for invalid manifest URLs ([abf99c1](https://github.com/Viren070/AIOStreams/commit/abf99c1768f3cf86d6f58ec256705ae235f9d8f9))
+- make types optional in ManifestSchema ([5281756](https://github.com/Viren070/AIOStreams/commit/5281756c78e362d3c48cc4469c07c17df9350d9c))
+- make types required and provide array based on resources object array ([01cf37f](https://github.com/Viren070/AIOStreams/commit/01cf37f8340a9fd130ecb19c93dc7a9863eab012))
+- manually override type to http for watchtower and nuviostreams ([1fb00a4](https://github.com/Viren070/AIOStreams/commit/1fb00a4317605ee9a5d0da73a4b363bf08b9bf6f))
+- map defaultProviders to their values in TorrentioPreset configuration ([9b04403](https://github.com/Viren070/AIOStreams/commit/9b044037d38b46270e23172914d1e35f72f51e1f))
+- normalize version check ([#206](https://github.com/Viren070/AIOStreams/issues/206)) ([05cc116](https://github.com/Viren070/AIOStreams/commit/05cc116fafc9ba6d0f40b7e10938e2505085ea10))
+- only add to idPrefixes if not null ([6fb5f7b](https://github.com/Viren070/AIOStreams/commit/6fb5f7b841872b0261023766c2472c7f5201be95))
+- overlapping snippets modal ([#202](https://github.com/Viren070/AIOStreams/issues/202)) ([195da69](https://github.com/Viren070/AIOStreams/commit/195da69f19ca8e15acd000420c1187fd4116de1f))
+- prevent title from being parsed for info ([f8b2e2d](https://github.com/Viren070/AIOStreams/commit/f8b2e2d66ce07ae4342db974ed6f169c0474d1d2))
+- remove idPrefixes from top level manifest ([908b4ff](https://github.com/Viren070/AIOStreams/commit/908b4ffa399439ab3f9428357b30a6ae7bc0f29d))
+- remove outdated decoding of credentials causing issues with some credentials ([609931e](https://github.com/Viren070/AIOStreams/commit/609931e5318c8b6d782cc04cf6a6691269bba287))
+- remove timestamp from cache stats ([509e3bd](https://github.com/Viren070/AIOStreams/commit/509e3bd2098f10d041a2a776d9b4099567fe4370))
+- remove unused method handler for unsupported HTTP methods ([7405d27](https://github.com/Viren070/AIOStreams/commit/7405d272ab79321d8b1e97ee4bcd1a2b2f8c12a5))
+- rename web_dl to webdl in stremthru store ([3fb57c5](https://github.com/Viren070/AIOStreams/commit/3fb57c5d04e23585e71a5e9f0643735f675671c7))
+- simplify and fix configuration generation for services and providers in TorrentioPreset ([cfafeec](https://github.com/Viren070/AIOStreams/commit/cfafeecda3591c342d5f2aeb756fde4adc536024))
+- try explicitly setting idPrefixes to an empty array ([c16060f](https://github.com/Viren070/AIOStreams/commit/c16060f7a5ffa5b5142fe5a0753046748f682f0a))
+- try removing types ([10c4e2d](https://github.com/Viren070/AIOStreams/commit/10c4e2d51f7a0ba05d6214da1c848b66ec9237ca))
+- try setting idPrefixes to null ([a5f32df](https://github.com/Viren070/AIOStreams/commit/a5f32df451c7ba73438322c217ffa431e9a84125))
+- update descriptions for filtering options in menu component to clarify behavior ([67bb204](https://github.com/Viren070/AIOStreams/commit/67bb204362951ef3998c690ba1c0055c1a4cc12b))
+- use password type where necessary ([0a12d33](https://github.com/Viren070/AIOStreams/commit/0a12d335c34b8181c9ac849bed623ea77b43a84c))
 
 ## [2.0.1](https://github.com/Viren070/AIOStreams/compare/v2.0.0...v2.0.1) (2025-06-19)
 
-
 ### Bug Fixes
 
-* add audio channel to skipReasons ([ef1763c](https://github.com/Viren070/AIOStreams/commit/ef1763cbe60fe5c279138a152e1a8d677f30f0ce))
-* correctly handle overriding URL for mediafusion ([9bf3838](https://github.com/Viren070/AIOStreams/commit/9bf3838732542c5cac1ef189cd5afefc13fe0204))
-* ensure instances is defined ([7e00e32](https://github.com/Viren070/AIOStreams/commit/7e00e32bbe93a5610d4f94bc3d78a78e48d32c6b))
+- add audio channel to skipReasons ([ef1763c](https://github.com/Viren070/AIOStreams/commit/ef1763cbe60fe5c279138a152e1a8d677f30f0ce))
+- correctly handle overriding URL for mediafusion ([9bf3838](https://github.com/Viren070/AIOStreams/commit/9bf3838732542c5cac1ef189cd5afefc13fe0204))
+- ensure instances is defined ([7e00e32](https://github.com/Viren070/AIOStreams/commit/7e00e32bbe93a5610d4f94bc3d78a78e48d32c6b))
 
 ## [2.0.0](https://github.com/Viren070/AIOStreams/compare/v1.22.0...v2.0.0) (2025-06-18)
 

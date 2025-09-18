@@ -280,7 +280,8 @@ pre {
 
 .halo:after {
   opacity: 0.1;
-  background-image: radial-gradient(at 27% 37%, #fd3a67 0, transparent 50%),
+  background-image:
+    radial-gradient(at 27% 37%, #fd3a67 0, transparent 50%),
     radial-gradient(at 97% 21%, #9772fe 0, transparent 70%),
     radial-gradient(at 52% 99%, #fd3a4e 0, transparent 50%),
     radial-gradient(at 10% 29%, #fc5ab0 0, transparent 50%),
@@ -300,7 +301,8 @@ pre {
 
 .halo-2:after {
   opacity: 0.1;
-  background-image: radial-gradient(at 27% 37%, #fd3a67 0, transparent 30%),
+  background-image:
+    radial-gradient(at 27% 37%, #fd3a67 0, transparent 30%),
     radial-gradient(at 97% 21%, #9772fe 0, transparent 70%),
     radial-gradient(at 52% 99%, #fd3a4e 0, transparent 20%),
     radial-gradient(at 10% 29%, #fc5ab0 0, transparent 20%),

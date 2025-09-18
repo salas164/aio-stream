@@ -40,7 +40,7 @@ body:
       required: true
   - type: input
     id: 'deviceInfo'
-    attributes: 
+    attributes:
       label: Device/Browser/OS/Stremio Version
       description: Details about the device this issue occurs on. Leave blank if not applicable (e.g. error within addon)
       placeholder: Windows on Stremio 5 Beta
@@ -48,7 +48,7 @@ body:
     id: 'bugDescription'
     attributes:
       label: Bug Description / Steps to Reproduce
-      description: Precisely describe the bug you encountered and the steps to reproduce it. Avoid vague descriptions. Include relevant details - such as if you were using MediaFlow. 
+      description: Precisely describe the bug you encountered and the steps to reproduce it. Avoid vague descriptions. Include relevant details - such as if you were using MediaFlow.
     validations:
       required: true
   - type: textarea
@@ -77,7 +77,7 @@ body:
       description: Confirm you have included at least some of the following debugging information. If you haven't, please do so before submitting the issue.
       options:
         - label: >-
-            If applicable, I have included server logs 
+            If applicable, I have included server logs
           required: false
         - label: >-
             If applicable, I have included MediaFlow logs
@@ -91,17 +91,15 @@ body:
         - label: >-
             I have written a short but informative title that clearly describes the issue.
           required: true
-        - label: >- 
+        - label: >-
             I have given clear and descriptive steps to reproduce the issue.
           required: true
-        - label: >- 
+        - label: >-
             I have checked open and closed issues and confirmed that this is not a duplicate of another issue.
           required: true
-        - label: >- 
-            I have filled out all of the requested information adequately. 
+        - label: >-
+            I have filled out all of the requested information adequately.
           required: true
-        - label: >- 
-            I am using the [latest version](https://github.com/Viren070/AIOStreams/releases/latest). 
+        - label: >-
+            I am using the [latest version](https://github.com/Viren070/AIOStreams/releases/latest).
           required: true
-            
-
