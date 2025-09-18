@@ -837,10 +837,10 @@ class ModifierConstants {
   };
 
 	static hardcodedModifiersForRegexMatching = {
-		"replace('.*?','.*?')": null,
-		"replace(\".*?\",'.*?')": null,
-		"replace('.*?',\".*?\")": null,
-		'replace(".*?",".*?")': null,
+		"replace('.*?'\\s*?,\\s*?'.*?')": null,
+		"replace(\".*?\"\\s*?,\\s*?'.*?')": null,
+		"replace('.*?'\\s*?,\\s*?\".*?\")": null,
+		'replace(".*?"\\s*?,\\s*?\".*?\")': null,
     "join('.*?')": null,
     'join(".*?")': null,
     '$.*?': null,
