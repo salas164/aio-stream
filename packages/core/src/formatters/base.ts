@@ -326,6 +326,8 @@ export abstract class BaseFormatter {
       );
     }
 
+    const placeHolder = " ";
+
     // Iterate through all {...} matches
     while ((matches = re.exec(str))) {
       if (!matches.groups) continue;
@@ -418,28 +420,27 @@ export abstract class BaseFormatter {
         };
       } // end of CHECK TRUE/FALSE logic
 
-      str = str.slice(0, index) + str.slice(re.lastIndex);
-      re.lastIndex = index;
+      str = str.slice(0, index) +placeHolder+ str.slice(re.lastIndex);
+      re.lastIndex = index+placeHolder.length;
       compiledMatchTemplateFns.push({
         resultFn: precompiledResolvedVariableFn,
         insertIndex: index,
       });
-    } // end of while loop
-
+		} // end of while loop
+		
+		compiledMatchTemplateFns = compiledMatchTemplateFns.sort((a, b) => (b.insertIndex - a.insertIndex ));
     return (parseValue: ParseValue) => {
       let resultStr = str;
 
       // Sort by startIndex to process in reverse order
-      for (const { resultFn, insertIndex } of compiledMatchTemplateFns.sort(
-        (a, b) => b.insertIndex - a.insertIndex
-      )) {
-        const resolvedResult = resultFn(parseValue);
+      for (const { resultFn, insertIndex } of compiledMatchTemplateFns) {
+				const resolvedResult = resultFn(parseValue);
         const replacement =
           resolvedResult.error ?? resolvedResult.result?.toString() ?? '';
         resultStr =
           resultStr.slice(0, insertIndex) +
           replacement +
-          resultStr.slice(insertIndex);
+          resultStr.slice(insertIndex+placeHolder.length);
       }
 
       return resultStr
