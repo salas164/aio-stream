@@ -311,7 +311,22 @@ export abstract class BaseFormatter {
   }
 
   protected async compileTemplate(str: string): Promise<CompiledParseFunction> {
-    if (!str) return () => '';
+    const compiledHelper = await this.compileTemplateHelper(str);
+    return (parseValue: ParseValue) => {
+      const resultStr = compiledHelper(parseValue);
+      // final post-processing of the result string
+      return resultStr
+        .replace(/\\n/g, '\n')
+        .split('\n')
+        .filter(
+          (line) => line.trim() !== '' && !line.includes('{tools.removeLine}')
+        )
+        .join('\n')
+        .replace(/\{tools.newLine\}/g, '\n');
+    }
+  }
+
+    protected async compileTemplateHelper(str: string): Promise<CompiledParseFunction> {
     const re = this.regexBuilder.buildRegexExpression();
     let matches: RegExpExecArray | null;
 
@@ -395,10 +410,10 @@ export abstract class BaseFormatter {
 
       // CHECK TRUE/FALSE logic: compile the true/false templates and apply them to the resolved variable
       if (matches.groups.mod_check !== undefined) {
-        const check_trueFn = await this.compileTemplate(
+        const check_trueFn = await this.compileTemplateHelper(
           matches?.groups?.mod_check_true ?? ''
         );
-        const check_falseFn = await this.compileTemplate(
+        const check_falseFn = await this.compileTemplateHelper(
           matches?.groups?.mod_check_false ?? ''
         );
 
@@ -444,13 +459,6 @@ export abstract class BaseFormatter {
       }
 
       return resultStr
-        .replace(/\\n/g, '\n')
-        .split('\n')
-        .filter(
-          (line) => line.trim() !== '' && !line.includes('{tools.removeLine}')
-        )
-        .join('\n')
-        .replace(/\{tools.newLine\}/g, '\n');
     };
   }
 
