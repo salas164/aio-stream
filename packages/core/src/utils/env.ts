@@ -421,11 +421,11 @@ export const Env = cleanEnv(process.env, {
   }),
   // logging settings
   LOG_SENSITIVE_INFO: bool({
-    default: true,
+    default: false,
     desc: 'Log sensitive information',
   }),
   LOG_LEVEL: str({
-    default: 'debug',
+    default: 'info',
     desc: 'Log level for the addon',
     choices: ['info', 'debug', 'warn', 'error', 'verbose', 'silly', 'http'],
   }),
@@ -435,7 +435,7 @@ export const Env = cleanEnv(process.env, {
     choices: ['text', 'json'],
   }),
   LOG_TIMEZONE: str({
-    default: 'America/New_York',
+    default: 'UTC',
     desc: 'Timezone for log timestamps (e.g., America/New_York, Europe/London)',
   }),
   LOG_CACHE_STATS_INTERVAL: num({
