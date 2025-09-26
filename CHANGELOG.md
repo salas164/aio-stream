@@ -1,5 +1,16 @@
 # Changelog
 
+## [2.13.1](https://github.com/Viren070/AIOStreams/compare/v2.13.0...v2.13.1) (2025-09-26)
+
+
+### Bug Fixes
+
+* **debrid/stremthru:** handle undefined data ([9aa2303](https://github.com/Viren070/AIOStreams/commit/9aa230397f4a147efcb035a6d4263fa12349d65a))
+* **http:** ensure proxyIndex defaults to 0 when no config is defined ([68196ae](https://github.com/Viren070/AIOStreams/commit/68196ae321d7e8fab9bf2893d77c59ed832330b1))
+* **metadata/tvdb:** handle episode result in remote id search and choose first correct media type ([51878ce](https://github.com/Viren070/AIOStreams/commit/51878cec35a1c45644582456a4692049785ee9a2))
+* only add stats when enabled ([36c07f0](https://github.com/Viren070/AIOStreams/commit/36c07f08b872c3d8a841338c6d8611345ca9f5dd))
+* prefix magnet check cache key with service name ([4a6ab81](https://github.com/Viren070/AIOStreams/commit/4a6ab81ff310fa8ed31cc816132df997df36ece8))
+
 ## [2.13.0](https://github.com/Viren070/AIOStreams/compare/v2.12.2...v2.13.0) (2025-09-26)
 
 
