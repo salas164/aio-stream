@@ -1,5 +1,14 @@
 # Changelog
 
+## [2.13.3](https://github.com/Viren070/AIOStreams/compare/v2.13.2...v2.13.3) (2025-09-26)
+
+
+### Bug Fixes
+
+* **debrid/utils:** allow season 1 with correct absolute episode to pass validation ([bd05313](https://github.com/Viren070/AIOStreams/commit/bd0531388897767507fad9265b2a8a9f0b059554))
+* **metadata:** adjust timeouts ([7ec4774](https://github.com/Viren070/AIOStreams/commit/7ec4774151ee2aa6ca4fe2c1e1c3c864bebc9053))
+* **presets/nzbhydra:** add force query search option to nzbhydra preset ([ab38242](https://github.com/Viren070/AIOStreams/commit/ab38242812124bda6004829accdd5d6b0c3f0166))
+
 ## [2.13.2](https://github.com/Viren070/AIOStreams/compare/v2.13.1...v2.13.2) (2025-09-26)
 
 
