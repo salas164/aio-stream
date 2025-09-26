@@ -1,5 +1,17 @@
 # Changelog
 
+## [2.13.2](https://github.com/Viren070/AIOStreams/compare/v2.13.1...v2.13.2) (2025-09-26)
+
+
+### Bug Fixes
+
+* **builtins/znab:** make link field optional item schemas ([af4ce46](https://github.com/Viren070/AIOStreams/commit/af4ce46bbe4899e0841d71f45d15f46571e7397c))
+* correct default value of STREMTHRU_STORE URL ([b5e1538](https://github.com/Viren070/AIOStreams/commit/b5e1538c466bcee16a98f132a86ce950d4330b3e))
+* **debrid/stremthru:** add error handling and logging for no data response ([4b48fef](https://github.com/Viren070/AIOStreams/commit/4b48fef27b014b6fe49c3bff6e57a0efc252228e))
+* don't filter out result with season of 1 if absolute episode matches ([85d1a14](https://github.com/Viren070/AIOStreams/commit/85d1a149986885b17688a67d5a594c06ec69c513))
+* improve lock mechanism ([f6d5425](https://github.com/Viren070/AIOStreams/commit/f6d54254d13d4a7b848ace882793eefb6f7960dd))
+* update English name for Romanian language entry ([a745ff2](https://github.com/Viren070/AIOStreams/commit/a745ff25da498412ca4f1c521cfa252002e7e166))
+
 ## [2.13.1](https://github.com/Viren070/AIOStreams/compare/v2.13.0...v2.13.1) (2025-09-26)
 
 
