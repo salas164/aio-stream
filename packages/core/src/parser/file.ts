@@ -54,7 +54,7 @@ class FileParser {
     const getPaddedNumber = (number: number, length: number) =>
       number.toString().padStart(length, '0');
 
-    const releaseGroup = parsed.group;
+    const releaseGroup = filename.match(PARSE_REGEX.releaseGroup)?.[1] ?? parsed.group;
     const title = parsed.title;
     const year = parsed.year ? parsed.year.toString() : undefined;
     const season = parsed.season;
