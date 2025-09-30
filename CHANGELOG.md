@@ -1,5 +1,14 @@
 # Changelog
 
+## [2.14.1](https://github.com/Viren070/AIOStreams/compare/v2.14.0...v2.14.1) (2025-09-30)
+
+
+### Features
+
+* add debug logs to ip middleware ([36d0464](https://github.com/Viren070/AIOStreams/commit/36d04644efaa1f808bcebd9735b97dcdae8e3b2b))
+* add use multiple instances option to built-in addons ([d400db8](https://github.com/Viren070/AIOStreams/commit/d400db8c40a42b77fdb62ddc1bf9444ccc5b3a24))
+* allow customising playback link validity and store ([a31c160](https://github.com/Viren070/AIOStreams/commit/a31c1600049d3f99d29d148108b8953b4eb40100))
+
 ## [2.14.0](https://github.com/Viren070/AIOStreams/compare/v2.13.3...v2.14.0) (2025-09-29)
 
 
