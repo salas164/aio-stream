@@ -1,5 +1,15 @@
 # Changelog
 
+## [2.14.2](https://github.com/Viren070/AIOStreams/compare/v2.14.1...v2.14.2) (2025-10-02)
+
+
+### Bug Fixes
+
+* add mediaTypes to more stream addons ([2aa2886](https://github.com/Viren070/AIOStreams/commit/2aa2886ba5692f71f2be938e46cbb5207635fd27))
+* **debrid:** improve error handling and file selection ([9b84e89](https://github.com/Viren070/AIOStreams/commit/9b84e89cc1e90424b3e445cce214a1cedc347c3c))
+* increase Redis timeout ([b8ad764](https://github.com/Viren070/AIOStreams/commit/b8ad7641b0a4bfabf9ca869c6c62793987273cba))
+* **presets/torbox:** adjust extraction of cache status and infohash ([309e655](https://github.com/Viren070/AIOStreams/commit/309e6556dd50a6d5d95fc90c901c3dbc0c6f150c))
+
 ## [2.14.1](https://github.com/Viren070/AIOStreams/compare/v2.14.0...v2.14.1) (2025-09-30)
 
 
