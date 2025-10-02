@@ -63,7 +63,7 @@ export const PARSE_REGEX: PARSE_REGEX = {
     BluRay: createRegex(
       '(?<!remux.*)(blu[ .\\-_]?ray|((bd|br)[ .\\-_]?rip))(?!.*remux)'
     ),
-    'WEB-DL': createRegex('web[ .\\-_]?(dl)?(?![ .\\-_]?(DLRip|cam))'),
+    'WEB-DL': createRegex('web[ .\\-_]?(dl)?(?![ .\\-_]?(rip|DLRip|cam))'),
     WEBRip: createRegex('web[ .\\-_]?rip'),
     HDRip: createRegex('hd[ .\\-_]?rip|web[ .\\-_]?dl[ .\\-_]?rip'),
     'HC HD-Rip': createRegex('hc|hd[ .\\-_]?rip'),
@@ -130,7 +130,7 @@ export const PARSE_REGEX: PARSE_REGEX = {
     'Dual Audio': createLanguageRegex(
       'dual[ .\\-_]?(audio|lang(uage)?|flac|ac3|aac2?)'
     ),
-    Dubbed: createLanguageRegex('dub(bed)?'),
+    Dubbed: createLanguageRegex('dub(s|bed|bing)?'),
     English: createLanguageRegex('english|eng'),
     Japanese: createLanguageRegex('japanese|jap|jpn'),
     Chinese: createLanguageRegex('chinese|chi'),
