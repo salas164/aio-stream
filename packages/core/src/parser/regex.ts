@@ -92,7 +92,7 @@ export const PARSE_REGEX: PARSE_REGEX = {
   audioTags: {
     Atmos: createRegex('atmos'),
     'DD+': createRegex(
-      '(d(olby)?[ .\\-_]?d(igital)?[ .\\-_]?(p(lus)?|\\+)(?:[ .\\-_]?(5[ .\\-_]?1|7[ .\\-_]?1))?)|e[ .\\-_]?ac[ .\\-_]?3'
+      '(d(olby)?[ .\\-_]?d(igital)?[ .\\-_]?(p(lus)?|\\+)(?:[ .\\-_]?(2[ .\\-_]?0|5[ .\\-_]?1|7[ .\\-_]?1))?)|e[ .\\-_]?ac[ .\\-_]?3'
     ),
     DD: createRegex(
       '(d(olby)?[ .\\-_]?d(igital)?(?:[ .\\-_]?(5[ .\\-_]?1|7[ .\\-_]?1|2[ .\\-_]?0?))?)|(?<!e[ .\\-_]?)ac[ .\\-_]?3'
@@ -180,5 +180,5 @@ export const PARSE_REGEX: PARSE_REGEX = {
     Latino: createLanguageRegex('latino|lat'),
   },
   releaseGroup:
-    /-[. ]?(?!\d+$|S\d+|\d+x|ep?\d+|[^[]+]$)([^\-. []+[^\-. [)\]\d][^\-. [)\]]*)(?:\[[\w.-]+])?(?=\)|\.\w{2,4}$|$)/i,
+    /-[. ]?(?!\d+$|S\d+|\d+x|ep?\d+|[^[]+]$)([^\-. []+[^\-. [)\]\d][^\-. [)\]]*)(?:\[[\w.-]+])?(?=\)|[.-]+\w{2,4}$|$)/i,
 };
