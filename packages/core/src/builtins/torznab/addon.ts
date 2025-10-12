@@ -18,76 +18,55 @@ const logger = createLogger('torznab');
 
 const TorznabAddonConfigSchema = NabAddonConfigSchema.extend({
   timeout: z.number(),
-  adminUsername: z.string().optional(),
-  adminPassword: z.string().optional(),
 });
 type TorznabAddonConfig = z.infer<typeof TorznabAddonConfigSchema>;
 
+// MODIFIED: Added schemas to validate the indexer list from Jackett
 const JackettIndexerSchema = z.object({
   id: z.string(),
-  name: z.string(), // Changed to match admin API response
+  title: z.string(),
   configured: z.boolean(),
   type: z.enum(['private', 'public']),
 });
-const JackettIndexersSchema = z.array(JackettIndexerSchema); // Direct array for admin API
+const JackettIndexersSchema = z.object({
+  indexer: z.array(JackettIndexerSchema),
+});
 type JackettIndexer = z.infer<typeof JackettIndexerSchema>;
 
 class TorznabApi extends BaseNabApi<'torznab'> {
   private readonly internalBaseUrl: string;
   private readonly internalApiKey?: string;
   private readonly internalApiPath?: string;
-  private readonly adminUsername?: string;
-  private readonly adminPassword?: string;
 
-  constructor(baseUrl: string, apiKey?: string, apiPath?: string, adminUsername?: string, adminPassword?: string) {
+  constructor(baseUrl: string, apiKey?: string, apiPath?: string) {
     super('torznab', logger, baseUrl, apiKey, apiPath);
     this.internalBaseUrl = baseUrl;
     this.internalApiKey = apiKey;
     this.internalApiPath = apiPath;
-    this.adminUsername = adminUsername;
-    this.adminPassword = adminPassword;
   }
 
+  // MODIFIED: Added method to fetch all configured indexers
   async getIndexers(): Promise<JackettIndexer[]> {
     const url = new URL(this.internalBaseUrl);
-    url.pathname = '/api/v2.0/indexers'; // Use admin API for JSON
+    if (this.internalApiPath) {
+      url.pathname += this.internalApiPath;
+    }
+    url.searchParams.set('t', 'indexers');
     url.searchParams.set('configured', 'true');
-
-    let headers: Record<string, string> = { 'Accept': 'application/json' };
-
-    // Optional login if credentials are provided
-    if (this.adminUsername && this.adminPassword) {
-      const loginUrl = new URL(this.internalBaseUrl);
-      loginUrl.pathname = '/UI/Login';
-      const loginResponse = await makeRequest(loginUrl.toString(), {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/x-www-form-urlencoded',
-        },
-        body: `username=${encodeURIComponent(this.adminUsername)}&password=${encodeURIComponent(this.adminPassword)}`,
-        timeout: 5000,
-      });
-
-      if (!loginResponse.ok) {
-        throw new Error(`Failed to login to Jackett: ${loginResponse.status} ${loginResponse.statusText}`);
-      }
-
-      const cookies = loginResponse.headers.get('set-cookie');
-      if (cookies) {
-        headers['Cookie'] = cookies;
-      } else {
-        logger.warn('No session cookie received from Jackett login');
-      }
+    if (this.internalApiKey) {
+      url.searchParams.set('apikey', this.internalApiKey);
     }
 
     const response = await makeRequest(url.toString(), {
       method: 'GET',
-      headers,
+      headers: {
+        'Accept': 'application/json',
+      },
       timeout: 5000,
     });
-
+    
     if (!response.ok) {
-      throw new Error(`Failed to fetch Jackett indexers: ${response.status} ${response.statusText}`);
+        throw new Error(`Failed to fetch Jackett indexers: ${response.status} ${response.statusText}`);
     }
 
     const parsed = JackettIndexersSchema.safeParse(await response.json());
@@ -95,9 +74,10 @@ class TorznabApi extends BaseNabApi<'torznab'> {
       logger.error('Failed to parse Jackett indexers', parsed.error);
       return [];
     }
-    return parsed.data.filter((idx) => idx.configured);
+    return parsed.data.indexer.filter((idx) => idx.configured);
   }
 
+  // MODIFIED: Added method to search a single, specific indexer
   async searchIndexer(
     indexerId: string,
     functionName: string,
@@ -112,7 +92,7 @@ class TorznabApi extends BaseNabApi<'torznab'> {
       this.internalApiKey,
       this.internalApiPath
     );
-    return tempApi.search(functionName, { ...params, o: 'json' }); // Ensure JSON output
+    return tempApi.search(functionName, params);
   }
 }
 
@@ -128,9 +108,7 @@ export class TorznabAddon extends BaseNabAddon<TorznabAddonConfig, TorznabApi> {
     this.api = new TorznabApi(
       this.userData.url,
       this.userData.apiKey,
-      this.userData.apiPath,
-      this.userData.adminUsername,
-      this.userData.adminPassword
+      this.userData.apiPath
     );
   }
 
@@ -138,9 +116,9 @@ export class TorznabAddon extends BaseNabAddon<TorznabAddonConfig, TorznabApi> {
     parsedId: ParsedId,
     metadata: SearchMetadata
   ): Promise<UnprocessedTorrent[]> {
-    const searchDeadline = Math.max(1000, this.userData.timeout - 500); // 500ms before timeout
+    const searchDeadline = Math.max(1000, this.userData.timeout - 500);
 
-    // Fetch indexers
+    // MODIFIED: Fetch indexers first
     let indexers: JackettIndexer[];
     try {
       indexers = await this.api.getIndexers();
@@ -157,26 +135,29 @@ export class TorznabAddon extends BaseNabAddon<TorznabAddonConfig, TorznabApi> {
     const torrents: UnprocessedTorrent[] = [];
     const seenTorrents = new Set<string>();
 
-    // Create tasks for each indexer-query pair
+    // MODIFIED: Create a task for each query AND each indexer
     const searchTasks = queries.flatMap((query) =>
       indexers.map((indexer) => ({ query, indexer }))
-    ).map(({ query, indexer }) => async () => {
+    );
+
+    const searchPromises = searchTasks.map(({ query, indexer }) => async () => {
       const start = Date.now();
       try {
-        const params: Record<string, string | number | boolean> = { q: query };
+        const params: Record<string, string | number | boolean> = { q: query, o: 'json' };
         if (parsedId.season) params.season = parsedId.season;
         if (parsedId.episode) params.ep = parsedId.episode;
 
+        // MODIFIED: Call the new method to search a single indexer
         const results = await this.api.searchIndexer(indexer.id, 'search', params);
 
         this.logger.info(
-          `Jackett search for "${query}" on [${indexer.name}] took ${getTimeTakenSincePoint(start)}`,
+          `Jackett search for "${query}" on [${indexer.title}] took ${getTimeTakenSincePoint(start)}`,
           { results: results.length }
         );
-
+        
         for (const result of results) {
           const infoHash = this.extractInfoHash(result);
-          const downloadUrl = result.enclosure?.find(
+          const downloadUrl = result.enclosure.find(
             (e: any) =>
               e.type === 'application/x-bittorrent' && !e.url.includes('magnet:')
           )?.url;
@@ -196,7 +177,8 @@ export class TorznabAddon extends BaseNabAddon<TorznabAddonConfig, TorznabApi> {
               ![-1, 999].includes(result.torznab.seeders)
                 ? result.torznab.seeders
                 : undefined,
-            indexer: result.jackettindexer?.name ?? indexer.name,
+            // MODIFIED: Use the indexer title from our loop for clarity
+            indexer: result.jackettindexer?.name ?? indexer.title,
             title: result.title,
             size:
               result.size ??
@@ -206,13 +188,12 @@ export class TorznabAddon extends BaseNabAddon<TorznabAddonConfig, TorznabApi> {
         }
       } catch (error) {
         this.logger.warn(
-          `Jackett search for "${query}" on [${indexer.name}] failed after ${getTimeTakenSincePoint(start)}: ${error instanceof Error ? error.message : String(error)}`
+          `Jackett search for "${query}" on [${indexer.title}] failed after ${getTimeTakenSincePoint(start)}: ${error instanceof Error ? error.message : String(error)}`
         );
       }
     });
 
-    // Run tasks in parallel, stop 500ms before timeout
-    const allSearchesPromise = Promise.allSettled(searchTasks.map((p) => p()));
+    const allSearchesPromise = Promise.all(searchPromises.map((p) => p()));
     const timeoutPromise = new Promise((_, reject) =>
       setTimeout(() => reject(new Error('Search deadline reached')), searchDeadline)
     );
@@ -223,11 +204,10 @@ export class TorznabAddon extends BaseNabAddon<TorznabAddonConfig, TorznabApi> {
       this.logger.info(`Search deadline of ${searchDeadline}ms reached. Returning ${torrents.length} results found so far.`);
     }
 
-    // Only throw error if no results were found
     if (torrents.length === 0) {
       throw new Error(`The operation was aborted due to timeout and no results were found.`);
     }
-
+    
     return torrents;
   }
 
@@ -243,7 +223,7 @@ export class TorznabAddon extends BaseNabAddon<TorznabAddonConfig, TorznabApi> {
       result.torznab?.infohash?.toString() ||
       (
         result.torznab?.magneturl ||
-        result.enclosure?.find(
+        result.enclosure.find(
           (e: any) =>
             e.type === 'application/x-bittorrent' && e.url.includes('magnet:')
         )?.url
