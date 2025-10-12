@@ -1,5 +1,55 @@
 # Changelog
 
+## [2.15.0](https://github.com/Viren070/AIOStreams/compare/v2.14.3...v2.15.0) (2025-10-12)
+
+
+### Features
+
+* add built-in proxy ([4fdc691](https://github.com/Viren070/AIOStreams/commit/4fdc691362d9629307452153e0c8aaf3399fe2ba))
+* add cache and play ([c11583e](https://github.com/Viren070/AIOStreams/commit/c11583e14aefc9c77b20fe86497985132e258186))
+* add similarity threshold setting for title matching ([c5c10c1](https://github.com/Viren070/AIOStreams/commit/c5c10c12fff09adf16a89d9324300e8908495487))
+* adjust default sort order ([c820ff5](https://github.com/Viren070/AIOStreams/commit/c820ff5bfa1ef0fb006da629eec85be135f05813))
+* allow built-in addons to bypass title matching when needed ([19c4ca1](https://github.com/Viren070/AIOStreams/commit/19c4ca10aa5b4b004a38f72b7cabf19a9cd636cf))
+* **frontend:** redesign about menu ([750ebc1](https://github.com/Viren070/AIOStreams/commit/750ebc1f42c03e4bbbfc3f4f7e1dca20e55ad06c))
+* **frontend:** show proxy menu in simple mode but remove proxy controls ([01f1c4f](https://github.com/Viren070/AIOStreams/commit/01f1c4f6d90bde7dfbfc4eba124acbc18df38b20))
+* **prowlarr:** add indexer env var to limit indexer options and only use torrent protocol indexers ([cc37356](https://github.com/Viren070/AIOStreams/commit/cc37356683e8d3b6735406e79aa5d06bba363dfe))
+* **prowlarr:** allow customising indexers in config, remove indexer env var ([6c4c87b](https://github.com/Viren070/AIOStreams/commit/6c4c87ba81da76108d5aa8ceee9fe326b6427ff3))
+* **proxy:** cache public IP and improve connection tracking accuracy ([0f575fb](https://github.com/Viren070/AIOStreams/commit/0f575fbc53c2a310941124b49561dd199029fdb5))
+* **proxy:** improve user connection tracking with active and historical stats and encryption ([e3dfa23](https://github.com/Viren070/AIOStreams/commit/e3dfa23cccd409a250b3be6604080ab9a138ef8d))
+* show unconfigured addons in marketplace with a disabled flag. ([079240b](https://github.com/Viren070/AIOStreams/commit/079240bb18eeed72c98940422b9fe746379a456c))
+* use lock during debrid resolve ([c038492](https://github.com/Viren070/AIOStreams/commit/c038492733fa757d383c7caac08af361f6f82f18))
+
+
+### Bug Fixes
+
+* add confirmed property to BaseFile ([4fc8475](https://github.com/Viren070/AIOStreams/commit/4fc8475722cdf8b120eaf1acd55d25594ace5005))
+* adjust timeouts for metadata ([8cc6399](https://github.com/Viren070/AIOStreams/commit/8cc639983bc4797c74d074d5bf843284cd85eb8c))
+* always use year from tmdb or tvdb ([b9a2f3c](https://github.com/Viren070/AIOStreams/commit/b9a2f3cd1473c4b10aa7e1a47ef1c11f0f7a1984))
+* **builtins/newznab:** make proxy auth optional ([3fb3014](https://github.com/Viren070/AIOStreams/commit/3fb301445a7eadbe2f1b1b8c8ad49d98092bb150))
+* **builtins/prowlarr:** add params to cache key ([a796a6c](https://github.com/Viren070/AIOStreams/commit/a796a6c8dc054b4235c2fac0d067984ded14c7d0))
+* **builtins/prowlarr:** use prefetched indexers for preconfigured instance ([8c12644](https://github.com/Viren070/AIOStreams/commit/8c12644e07220a18fed737797e4ec30f2929ddca))
+* change default timeout to 5000 ([d7e364a](https://github.com/Viren070/AIOStreams/commit/d7e364a09872c233a2e205b0cd2b8291f31e90d8))
+* handle empty seederRangeTypes ([727e42d](https://github.com/Viren070/AIOStreams/commit/727e42d873682d37eba92a9c0d919143d6fdb264))
+* **presets/debridio-tv:** add 24/7 to channel list ([3eae246](https://github.com/Viren070/AIOStreams/commit/3eae246e4121d45faad237149dbb9000b079e9c2))
+* **presets/jackett:** hide Jackett URL and API Key fields in simple mode when preconfigured ([8c2ffbd](https://github.com/Viren070/AIOStreams/commit/8c2ffbd69c0aa70f536354d1e3cd4755c4f23642))
+* **presets/newznab:** add series and anime to media types option and pass mediaTypes to Addon ([406d113](https://github.com/Viren070/AIOStreams/commit/406d1130d90022e5d6f55eca5ba77484265a7fd2))
+* **presets/opensubtitles-v3-plus:** update languages array to match upstream ([84dbede](https://github.com/Viren070/AIOStreams/commit/84dbede718ff4d79b76097d15a4c54c7e7a54382)), closes [#427](https://github.com/Viren070/AIOStreams/issues/427)
+* **presets/prowlarr:** hide custom url fields when preconfigured in simple mode ([f7abf12](https://github.com/Viren070/AIOStreams/commit/f7abf125bd2af770561e7bde0172d811ca159657))
+* **presets/prowlarr:** only use indexer option when its an array for preconfigured prowlarr instance ([ed852dd](https://github.com/Viren070/AIOStreams/commit/ed852dd925bbbf42d619011f6864fe82b88e48b6))
+* **presets/sootio:** update config generation with multi-service support, update supported services ([b2dbb84](https://github.com/Viren070/AIOStreams/commit/b2dbb8484e4beb7bfeef6066913c9de839edbcab))
+* **presets/sootio:** use undefined serviceIds for overriden URLs ([b9aa6f3](https://github.com/Viren070/AIOStreams/commit/b9aa6f39768065848a0987d97382857fef65aab0))
+* **presets/subsource:** add apiKey and types to config and manifest generation ([678fe5c](https://github.com/Viren070/AIOStreams/commit/678fe5c2ac30c1c4e0a5e03b13b5db0792fc26d1))
+* **presets/torbox:** improve parsing of your media catalogue streams ([a7c7012](https://github.com/Viren070/AIOStreams/commit/a7c701264948aadcb8119daf86a794a51e8d3bf2))
+* **presets/zilean:** hide url field in simple mode ([c74b56b](https://github.com/Viren070/AIOStreams/commit/c74b56b8daa948af8233243521d45b5167613338))
+* **prowlarr:** add debug logs and fetch after db init ([ef20218](https://github.com/Viren070/AIOStreams/commit/ef20218cd591436624323440fe5b2ae2d207f1aa))
+* **prowlarr:** use enum for protocol and add debug log ([cf767af](https://github.com/Viren070/AIOStreams/commit/cf767af645acced2428fe9a306cacd97fa6510e2))
+* **proxy:** follow redirects ([95b5201](https://github.com/Viren070/AIOStreams/commit/95b5201eb443cbb6d8914f031e7b669676b53457))
+* **proxy:** sanitise upstream headers ([078b41c](https://github.com/Viren070/AIOStreams/commit/078b41caaf4e989a57507cea2d4f81bb617d8536))
+* **proxy:** use correct url and improve logs ([7ae0ed6](https://github.com/Viren070/AIOStreams/commit/7ae0ed65d42da1bde0857afad30662f0f44eeb48))
+* rename showInNoobMode to showInSimpleMode ([8251171](https://github.com/Viren070/AIOStreams/commit/825117108072e357a8c918210ab0abd0c4ad5533))
+* update timeout field names to include units (ms) ([97da7c0](https://github.com/Viren070/AIOStreams/commit/97da7c00db0f47e79c70889797eb4761023cbcc6))
+* use partial_ratio scorer in builtin addon title matching ([1957def](https://github.com/Viren070/AIOStreams/commit/1957def81942c0c345db38b36d38e8e797b85717))
+
 ## [2.14.3](https://github.com/Viren070/AIOStreams/compare/v2.14.2...v2.14.3) (2025-10-04)
 
 
