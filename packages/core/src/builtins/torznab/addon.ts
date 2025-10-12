@@ -51,6 +51,8 @@ class TorznabApi extends BaseNabApi<'torznab'> {
     if (this.internalApiKey) {
       url.searchParams.set('apikey', this.internalApiKey);
     }
+    // **THE FIX: Tell Jackett to respond with JSON instead of XML.**
+    url.searchParams.set('o', 'json');
 
     const response = await makeRequest(url.toString(), {
       method: 'GET',
@@ -61,6 +63,7 @@ class TorznabApi extends BaseNabApi<'torznab'> {
         throw new Error(`Failed to fetch Jackett indexers: ${response.status} ${response.statusText}`);
     }
 
+    // This will now work because the response body is valid JSON.
     const parsed = JackettIndexersSchema.safeParse(await response.json());
     if (!parsed.success) {
       logger.error('Failed to parse Jackett indexers', parsed.error);
@@ -173,7 +176,6 @@ export class TorznabAddon extends BaseNabAddon<TorznabAddonConfig, TorznabApi> {
               type: 'torrent',
             });
         }
-      // **THE FIX: Replaced the typo 'catch (error)_' with the correct 'catch (error) {' and added the closing brace.**
       } catch (error) {
         this.logger.warn(
           `Jackett search for "${query}" on [${indexer.title}] failed after ${getTimeTakenSincePoint(start)}: ${error instanceof Error ? error.message : String(error)}`
