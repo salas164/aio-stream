@@ -1,6 +1,6 @@
 import { z } from 'zod';
 import { ParsedId } from '../../utils/id-parser.js';
-import { createLogger } from '../../utils/index.js';
+import { createLogger, getTimeTakenSincePoint } from '../../utils/index.js';
 import { Torrent, NZB, UnprocessedTorrent } from '../../debrid/index.js';
 import { SearchMetadata } from '../base/debrid';
 import {
@@ -16,10 +16,49 @@ import {
 
 const logger = createLogger('torznab');
 
+const JackettIndexerSchema = z.object({
+  id: z.string(),
+  title: z.string(),
+  configured: z.boolean(),
+  language: z.string(),
+  type: z.enum(['private', 'public']),
+});
+const JackettIndexersSchema = z.object({
+  indexer: z.array(JackettIndexerSchema),
+});
+type JackettIndexer = z.infer<typeof JackettIndexerSchema>;
+
 // API client is now just a thin wrapper
 class TorznabApi extends BaseNabApi<'torznab'> {
   constructor(baseUrl: string, apiKey?: string, apiPath?: string) {
     super('torznab', logger, baseUrl, apiKey, apiPath);
+  }
+
+  async getIndexers(): Promise<JackettIndexer[]> {
+    const response = await this.search('indexers', { configured: 'true' });
+    const parsed = JackettIndexersSchema.safeParse(response);
+    if (!parsed.success) {
+      logger.error('Failed to parse Jackett indexers', parsed.error);
+      return [];
+    }
+    return parsed.data.indexer.filter((idx) => idx.configured);
+  }
+
+  async searchIndexer(
+    indexerId: string,
+    functionName: string,
+    params: Record<string, string | number | undefined> = {}
+  ): Promise<any> {
+    const originalUrl = this.baseUrl;
+    const indexerUrl = originalUrl.replace('/all/', `/${indexerId}/`);
+    const tempApi = new BaseNabApi(
+      'torznab',
+      logger,
+      indexerUrl,
+      this.apiKey,
+      this.apiPath
+    );
+    return tempApi.search(functionName, params);
   }
 }
 
@@ -44,42 +83,100 @@ export class TorznabAddon extends BaseNabAddon<NabAddonConfig, TorznabApi> {
     parsedId: ParsedId,
     metadata: SearchMetadata
   ): Promise<UnprocessedTorrent[]> {
-    const results = await this.performSearch(parsedId, metadata);
-    const seenTorrents = new Set<string>();
+    // **KEY CHANGE: Use the user-defined timeout for the deadline.**
+    // We leave a 500ms buffer to ensure we return before the hard cutoff.
+    const searchDeadline = Math.max(1000, this.userData.timeout - 500);
 
-    const torrents: UnprocessedTorrent[] = [];
-
-    for (const result of results) {
-      const infoHash = this.extractInfoHash(result);
-      const downloadUrl = result.enclosure.find(
-        (e: any) =>
-          e.type === 'application/x-bittorrent' && !e.url.includes('magnet:')
-      )?.url;
-
-      if (!infoHash && !downloadUrl) continue;
-      if (seenTorrents.has(infoHash ?? downloadUrl!)) continue;
-      seenTorrents.add(infoHash ?? downloadUrl!);
-
-      torrents.push({
-        hash: infoHash,
-        downloadUrl,
-        sources: result.torznab?.magneturl?.toString()
-          ? extractTrackersFromMagnet(result.torznab.magneturl.toString())
-          : [],
-        seeders:
-          typeof result.torznab?.seeders === 'number' &&
-          ![-1, 999].includes(result.torznab.seeders)
-            ? result.torznab.seeders
-            : undefined,
-        indexer: result.jackettindexer?.name ?? undefined,
-        title: result.title,
-        size:
-          result.size ??
-          (result.torznab?.size ? Number(result.torznab.size) : 0),
-        type: 'torrent',
-      });
+    let indexers: JackettIndexer[];
+    try {
+      indexers = await this.api.getIndexers();
+      this.logger.info(`Found ${indexers.length} configured indexers in Jackett`);
+    } catch (error) {
+      throw new Error(`Failed to get Jackett indexers: ${error}`);
     }
 
+    if (indexers.length === 0) return [];
+    
+    const queries = this.buildQueries(parsedId, metadata, { useAllTitles: false });
+    if (queries.length === 0) return [];
+
+    const torrents: UnprocessedTorrent[] = [];
+    const seenTorrents = new Set<string>();
+
+    const searchTasks = queries.flatMap((query) =>
+      indexers.map((indexer) => ({ query, indexer }))
+    );
+
+    const searchPromises = searchTasks.map(({ query, indexer }) => async () => {
+      const start = Date.now();
+      try {
+        const results = await this.api.searchIndexer(indexer.id, 'search', {
+          q: query,
+          ...(parsedId.season &&
+            parsedId.episode && {
+              season: parsedId.season,
+              ep: parsedId.episode,
+            }),
+        });
+
+        this.logger.info(
+          `Jackett search for "${query}" on [${indexer.title}] took ${getTimeTakenSincePoint(start)}`,
+          { results: results.length }
+        );
+        
+        for (const result of results) {
+            const infoHash = this.extractInfoHash(result);
+            const downloadUrl = result.enclosure.find(
+              (e: any) =>
+                e.type === 'application/x-bittorrent' && !e.url.includes('magnet:')
+            )?.url;
+
+            if (!infoHash && !downloadUrl) continue;
+            if (seenTorrents.has(infoHash ?? downloadUrl!)) continue;
+            seenTorrents.add(infoHash ?? downloadUrl!);
+
+            torrents.push({
+              hash: infoHash,
+              downloadUrl,
+              sources: result.torznab?.magneturl?.toString()
+                ? extractTrackersFromMagnet(result.torznab.magneturl.toString())
+                : [],
+              seeders:
+                typeof result.torznab?.seeders === 'number' &&
+                ![-1, 999].includes(result.torznab.seeders)
+                  ? result.torznab.seeders
+                  : undefined,
+              indexer: result.jackettindexer?.name ?? indexer.title,
+              title: result.title,
+              size:
+                result.size ??
+                (result.torznab?.size ? Number(result.torznab.size) : 0),
+              type: 'torrent',
+            });
+        }
+
+      } catch (error) {
+        this.logger.warn(
+          `Jackett search for "${query}" on [${indexer.title}] failed after ${getTimeTakenSincePoint(start)}: ${error instanceof Error ? error.message : String(error)}`
+        );
+      }
+    });
+
+    const allSearchesPromise = Promise.all(searchPromises.map((p) => p()));
+    const timeoutPromise = new Promise((_, reject) =>
+      setTimeout(() => reject(new Error('Search deadline reached')), searchDeadline)
+    );
+
+    try {
+      await Promise.race([allSearchesPromise, timeoutPromise]);
+    } catch (error) {
+      this.logger.info(`Search deadline of ${searchDeadline}ms reached. Returning ${torrents.length} results found so far.`);
+    }
+
+    if (torrents.length === 0) {
+      throw new Error(`The operation was aborted due to timeout and no results were found.`);
+    }
+    
     return torrents;
   }
 
@@ -87,7 +184,6 @@ export class TorznabAddon extends BaseNabAddon<NabAddonConfig, TorznabApi> {
     parsedId: ParsedId,
     metadata: SearchMetadata
   ): Promise<NZB[]> {
-    // This addon does not support NZBs, so we return an empty array.
     return [];
   }
 
