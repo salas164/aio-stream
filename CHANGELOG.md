@@ -1,5 +1,16 @@
 # Changelog
 
+## [2.15.1](https://github.com/Viren070/AIOStreams/compare/v2.15.0...v2.15.1) (2025-10-12)
+
+
+### Bug Fixes
+
+* **frontend:** clear uuid and password on log out ([ed840bd](https://github.com/Viren070/AIOStreams/commit/ed840bd541bc6225ec12a3ff13a6f1dd8aedc84b))
+* improve zod error handling during stream selection ([98f3d02](https://github.com/Viren070/AIOStreams/commit/98f3d0203d559072ce5f55e3b7b50caeea1dbaf3))
+* **proxy:** improve auth validation during validity check ([29dd38d](https://github.com/Viren070/AIOStreams/commit/29dd38d4820004a49e8af47c68b131beafca9fb4))
+* **proxy:** trim ip response ([ba97977](https://github.com/Viren070/AIOStreams/commit/ba979778d284e07d735339f64dec26fac30630d6))
+* validate public IP response ([3d08959](https://github.com/Viren070/AIOStreams/commit/3d089591215c5c62132fd74f15b7c9106d23a52a))
+
 ## [2.15.0](https://github.com/Viren070/AIOStreams/compare/v2.14.3...v2.15.0) (2025-10-12)
 
 
