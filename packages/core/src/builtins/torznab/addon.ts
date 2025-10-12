@@ -16,7 +16,6 @@ import {
 
 const logger = createLogger('torznab');
 
-// FIX 3: Extend the base schema to include the 'timeout' property.
 const TorznabAddonConfigSchema = NabAddonConfigSchema.extend({
   timeout: z.number(),
 });
@@ -34,12 +33,15 @@ const JackettIndexersSchema = z.object({
 type JackettIndexer = z.infer<typeof JackettIndexerSchema>;
 
 class TorznabApi extends BaseNabApi<'torznab'> {
-  // FIX 1: Store credentials locally to use in new methods.
+  // Store all necessary properties locally
+  private readonly internalBaseUrl: string;
   private readonly internalApiKey?: string;
   private readonly internalApiPath?: string;
 
   constructor(baseUrl: string, apiKey?: string, apiPath?: string) {
     super('torznab', logger, baseUrl, apiKey, apiPath);
+    // **THE FIX: Store baseUrl upon construction**
+    this.internalBaseUrl = baseUrl;
     this.internalApiKey = apiKey;
     this.internalApiPath = apiPath;
   }
@@ -57,17 +59,17 @@ class TorznabApi extends BaseNabApi<'torznab'> {
   async searchIndexer(
     indexerId: string,
     functionName: string,
-    // FIX 2: Ensure params match the expected type without 'undefined'.
     params: Record<string, string | number | boolean> = {}
   ): Promise<any> {
-    const originalUrl = this.baseUrl; // This is a public getter, safe to access.
+    // **THE FIX: Use the locally stored baseUrl**
+    const originalUrl = this.internalBaseUrl;
     const indexerUrl = originalUrl.replace('/all/', `/${indexerId}/`);
     const tempApi = new BaseNabApi(
       'torznab',
       logger,
       indexerUrl,
-      this.internalApiKey, // Use locally stored credentials
-      this.internalApiPath  // Use locally stored credentials
+      this.internalApiKey,
+      this.internalApiPath
     );
     return tempApi.search(functionName, params);
   }
@@ -81,7 +83,6 @@ export class TorznabAddon extends BaseNabAddon<TorznabAddonConfig, TorznabApi> {
   readonly api: TorznabApi;
 
   constructor(userData: TorznabAddonConfig, clientIp?: string) {
-    // FIX 3: Use the extended schema in the constructor.
     super(userData, TorznabAddonConfigSchema, clientIp);
     this.api = new TorznabApi(
       this.userData.url,
@@ -119,7 +120,6 @@ export class TorznabAddon extends BaseNabAddon<TorznabAddonConfig, TorznabApi> {
     const searchPromises = searchTasks.map(({ query, indexer }) => async () => {
       const start = Date.now();
       try {
-        // FIX 2: Build the params object safely, excluding undefined values.
         const params: Record<string, string | number | boolean> = { q: query };
         if (parsedId.season) params.season = parsedId.season;
         if (parsedId.episode) params.ep = parsedId.episode;
