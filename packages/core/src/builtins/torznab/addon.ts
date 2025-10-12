@@ -21,7 +21,6 @@ const TorznabAddonConfigSchema = NabAddonConfigSchema.extend({
 });
 type TorznabAddonConfig = z.infer<typeof TorznabAddonConfigSchema>;
 
-// MODIFIED: Added schemas to validate the indexer list from Jackett
 const JackettIndexerSchema = z.object({
   id: z.string(),
   title: z.string(),
@@ -29,7 +28,8 @@ const JackettIndexerSchema = z.object({
   type: z.enum(['private', 'public']),
 });
 const JackettIndexersSchema = z.object({
-  indexer: z.array(JackettIndexerSchema),
+  // MODIFIED: Jackett nests the indexers inside a root "Indexers" property
+  Indexers: z.array(JackettIndexerSchema),
 });
 type JackettIndexer = z.infer<typeof JackettIndexerSchema>;
 
@@ -45,14 +45,13 @@ class TorznabApi extends BaseNabApi<'torznab'> {
     this.internalApiPath = apiPath;
   }
 
-  // MODIFIED: Added method to fetch all configured indexers
+  // MODIFIED: Re-written to use the correct native Jackett API endpoint
   async getIndexers(): Promise<JackettIndexer[]> {
-    const url = new URL(this.internalBaseUrl);
-    if (this.internalApiPath) {
-      url.pathname += this.internalApiPath;
-    }
-    url.searchParams.set('t', 'indexers');
-    url.searchParams.set('configured', 'true');
+    // **THE FIX: Construct the URL from the base origin, not the full torznab path.**
+    const origin = new URL(this.internalBaseUrl).origin;
+    const url = new URL(`${origin}/api/v2.0/indexers`); // This is the correct endpoint for the indexer list
+
+    // Jackett uses a different parameter name for the API key on this endpoint
     if (this.internalApiKey) {
       url.searchParams.set('apikey', this.internalApiKey);
     }
@@ -74,16 +73,17 @@ class TorznabApi extends BaseNabApi<'torznab'> {
       logger.error('Failed to parse Jackett indexers', parsed.error);
       return [];
     }
-    return parsed.data.indexer.filter((idx) => idx.configured);
+    // MODIFIED: Return the nested array and filter for configured indexers
+    return parsed.data.Indexers.filter((idx) => idx.configured);
   }
 
-  // MODIFIED: Added method to search a single, specific indexer
   async searchIndexer(
     indexerId: string,
     functionName: string,
     params: Record<string, string | number | boolean> = {}
   ): Promise<any> {
     const originalUrl = this.internalBaseUrl;
+    // For searching, we still target the torznab path, replacing /all/ with the specific indexer
     const indexerUrl = originalUrl.replace('/all/', `/${indexerId}/`);
     const tempApi = new BaseNabApi(
       'torznab',
@@ -118,7 +118,6 @@ export class TorznabAddon extends BaseNabAddon<TorznabAddonConfig, TorznabApi> {
   ): Promise<UnprocessedTorrent[]> {
     const searchDeadline = Math.max(1000, this.userData.timeout - 500);
 
-    // MODIFIED: Fetch indexers first
     let indexers: JackettIndexer[];
     try {
       indexers = await this.api.getIndexers();
@@ -128,14 +127,13 @@ export class TorznabAddon extends BaseNabAddon<TorznabAddonConfig, TorznabApi> {
     }
 
     if (indexers.length === 0) return [];
-
+    
     const queries = this.buildQueries(parsedId, metadata, { useAllTitles: false });
     if (queries.length === 0) return [];
 
     const torrents: UnprocessedTorrent[] = [];
     const seenTorrents = new Set<string>();
 
-    // MODIFIED: Create a task for each query AND each indexer
     const searchTasks = queries.flatMap((query) =>
       indexers.map((indexer) => ({ query, indexer }))
     );
@@ -147,7 +145,6 @@ export class TorznabAddon extends BaseNabAddon<TorznabAddonConfig, TorznabApi> {
         if (parsedId.season) params.season = parsedId.season;
         if (parsedId.episode) params.ep = parsedId.episode;
 
-        // MODIFIED: Call the new method to search a single indexer
         const results = await this.api.searchIndexer(indexer.id, 'search', params);
 
         this.logger.info(
@@ -156,35 +153,34 @@ export class TorznabAddon extends BaseNabAddon<TorznabAddonConfig, TorznabApi> {
         );
         
         for (const result of results) {
-          const infoHash = this.extractInfoHash(result);
-          const downloadUrl = result.enclosure.find(
-            (e: any) =>
-              e.type === 'application/x-bittorrent' && !e.url.includes('magnet:')
-          )?.url;
+            const infoHash = this.extractInfoHash(result);
+            const downloadUrl = result.enclosure.find(
+              (e: any) =>
+                e.type === 'application/x-bittorrent' && !e.url.includes('magnet:')
+            )?.url;
 
-          if (!infoHash && !downloadUrl) continue;
-          if (seenTorrents.has(infoHash ?? downloadUrl!)) continue;
-          seenTorrents.add(infoHash ?? downloadUrl!);
+            if (!infoHash && !downloadUrl) continue;
+            if (seenTorrents.has(infoHash ?? downloadUrl!)) continue;
+            seenTorrents.add(infoHash ?? downloadUrl!);
 
-          torrents.push({
-            hash: infoHash,
-            downloadUrl,
-            sources: result.torznab?.magneturl?.toString()
-              ? extractTrackersFromMagnet(result.torznab.magneturl.toString())
-              : [],
-            seeders:
-              typeof result.torznab?.seeders === 'number' &&
-              ![-1, 999].includes(result.torznab.seeders)
-                ? result.torznab.seeders
-                : undefined,
-            // MODIFIED: Use the indexer title from our loop for clarity
-            indexer: result.jackettindexer?.name ?? indexer.title,
-            title: result.title,
-            size:
-              result.size ??
-              (result.torznab?.size ? Number(result.torznab.size) : 0),
-            type: 'torrent',
-          });
+            torrents.push({
+              hash: infoHash,
+              downloadUrl,
+              sources: result.torznab?.magneturl?.toString()
+                ? extractTrackersFromMagnet(result.torznab.magneturl.toString())
+                : [],
+              seeders:
+                typeof result.torznab?.seeders === 'number' &&
+                ![-1, 999].includes(result.torznab.seeders)
+                  ? result.torznab.seeders
+                  : undefined,
+              indexer: result.jackettindexer?.name ?? indexer.title,
+              title: result.title,
+              size:
+                result.size ??
+                (result.torznab?.size ? Number(result.torznab.size) : 0),
+              type: 'torrent',
+            });
         }
       } catch (error) {
         this.logger.warn(
