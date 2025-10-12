@@ -16,11 +16,16 @@ import {
 
 const logger = createLogger('torznab');
 
+// FIX 3: Extend the base schema to include the 'timeout' property.
+const TorznabAddonConfigSchema = NabAddonConfigSchema.extend({
+  timeout: z.number(),
+});
+type TorznabAddonConfig = z.infer<typeof TorznabAddonConfigSchema>;
+
 const JackettIndexerSchema = z.object({
   id: z.string(),
   title: z.string(),
   configured: z.boolean(),
-  language: z.string(),
   type: z.enum(['private', 'public']),
 });
 const JackettIndexersSchema = z.object({
@@ -28,10 +33,15 @@ const JackettIndexersSchema = z.object({
 });
 type JackettIndexer = z.infer<typeof JackettIndexerSchema>;
 
-// API client is now just a thin wrapper
 class TorznabApi extends BaseNabApi<'torznab'> {
+  // FIX 1: Store credentials locally to use in new methods.
+  private readonly internalApiKey?: string;
+  private readonly internalApiPath?: string;
+
   constructor(baseUrl: string, apiKey?: string, apiPath?: string) {
     super('torznab', logger, baseUrl, apiKey, apiPath);
+    this.internalApiKey = apiKey;
+    this.internalApiPath = apiPath;
   }
 
   async getIndexers(): Promise<JackettIndexer[]> {
@@ -47,31 +57,32 @@ class TorznabApi extends BaseNabApi<'torznab'> {
   async searchIndexer(
     indexerId: string,
     functionName: string,
-    params: Record<string, string | number | undefined> = {}
+    // FIX 2: Ensure params match the expected type without 'undefined'.
+    params: Record<string, string | number | boolean> = {}
   ): Promise<any> {
-    const originalUrl = this.baseUrl;
+    const originalUrl = this.baseUrl; // This is a public getter, safe to access.
     const indexerUrl = originalUrl.replace('/all/', `/${indexerId}/`);
     const tempApi = new BaseNabApi(
       'torznab',
       logger,
       indexerUrl,
-      this.apiKey,
-      this.apiPath
+      this.internalApiKey, // Use locally stored credentials
+      this.internalApiPath  // Use locally stored credentials
     );
     return tempApi.search(functionName, params);
   }
 }
 
-// Addon class
-export class TorznabAddon extends BaseNabAddon<NabAddonConfig, TorznabApi> {
+export class TorznabAddon extends BaseNabAddon<TorznabAddonConfig, TorznabApi> {
   readonly name = 'Torznab';
   readonly version = '1.0.0';
   readonly id = 'torznab';
   readonly logger = logger;
   readonly api: TorznabApi;
 
-  constructor(userData: NabAddonConfig, clientIp?: string) {
-    super(userData, NabAddonConfigSchema, clientIp);
+  constructor(userData: TorznabAddonConfig, clientIp?: string) {
+    // FIX 3: Use the extended schema in the constructor.
+    super(userData, TorznabAddonConfigSchema, clientIp);
     this.api = new TorznabApi(
       this.userData.url,
       this.userData.apiKey,
@@ -83,8 +94,6 @@ export class TorznabAddon extends BaseNabAddon<NabAddonConfig, TorznabApi> {
     parsedId: ParsedId,
     metadata: SearchMetadata
   ): Promise<UnprocessedTorrent[]> {
-    // **KEY CHANGE: Use the user-defined timeout for the deadline.**
-    // We leave a 500ms buffer to ensure we return before the hard cutoff.
     const searchDeadline = Math.max(1000, this.userData.timeout - 500);
 
     let indexers: JackettIndexer[];
@@ -110,14 +119,12 @@ export class TorznabAddon extends BaseNabAddon<NabAddonConfig, TorznabApi> {
     const searchPromises = searchTasks.map(({ query, indexer }) => async () => {
       const start = Date.now();
       try {
-        const results = await this.api.searchIndexer(indexer.id, 'search', {
-          q: query,
-          ...(parsedId.season &&
-            parsedId.episode && {
-              season: parsedId.season,
-              ep: parsedId.episode,
-            }),
-        });
+        // FIX 2: Build the params object safely, excluding undefined values.
+        const params: Record<string, string | number | boolean> = { q: query };
+        if (parsedId.season) params.season = parsedId.season;
+        if (parsedId.episode) params.ep = parsedId.episode;
+
+        const results = await this.api.searchIndexer(indexer.id, 'search', params);
 
         this.logger.info(
           `Jackett search for "${query}" on [${indexer.title}] took ${getTimeTakenSincePoint(start)}`,
@@ -154,7 +161,6 @@ export class TorznabAddon extends BaseNabAddon<NabAddonConfig, TorznabApi> {
               type: 'torrent',
             });
         }
-
       } catch (error) {
         this.logger.warn(
           `Jackett search for "${query}" on [${indexer.title}] failed after ${getTimeTakenSincePoint(start)}: ${error instanceof Error ? error.message : String(error)}`
