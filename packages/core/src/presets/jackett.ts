@@ -64,12 +64,12 @@ export class JackettPreset extends TorznabPreset {
         type: 'password',
         required: !Env.BUILTIN_JACKETT_URL || !Env.BUILTIN_JACKETT_API_KEY,
       },
-      // **THE FIX: Add a field for the user to provide indexer IDs.**
       {
         id: 'jackettIndexers',
         name: 'Jackett Indexer IDs (for parallel search)',
         description: 'Optional. A comma-separated list of the Indexer IDs from your Jackett dashboard (e.g., 1337x,eztv,yts). If provided, searches will be faster and more resilient. If left empty, a single, slower search will be performed.',
-        type: 'text',
+        // **THE FIX: Changed type from 'text' to 'string'**
+        type: 'string',
         required: false,
       },
       {
@@ -150,7 +150,6 @@ export class JackettPreset extends TorznabPreset {
       apiKey: jackettApiKey,
       forceQuerySearch: true,
       timeout: options.timeout,
-      // **THE FIX: Pass the user-provided indexer list to the addon.**
       indexers: options.jackettIndexers ? options.jackettIndexers.split(',').map((s: string) => s.trim()).filter(Boolean) : [],
     };
 
