@@ -130,10 +130,6 @@ export class TorznabAddon extends BaseNabAddon<TorznabAddonConfig, TorznabApi> {
   private processResults(results: any[], torrents: UnprocessedTorrent[], seenTorrents: Set<string>, indexerId?: string) {
     for (const result of results) {
         const infoHash = this.extractInfoHash(result);
-        
-        // **THE FIX: Prioritize the reliable infoHash over the unreliable downloadUrl.**
-        // If we have an infoHash, we don't need the downloadUrl. This prevents AIOStreams
-        // from wasting time on broken links.
         const downloadUrl = infoHash 
           ? undefined 
           : result.enclosure.find(
@@ -196,7 +192,7 @@ export class TorznabAddon extends BaseNabAddon<TorznabAddonConfig, TorznabApi> {
         )?.url
       )
       ?.toString()
-      // Corrected the regex to be valid
+      // **THE FIX: Corrected the regex from 'a-f0-y' to 'a-f0-9'.**
       ?.match(/(?:urn(?::|%3A)btih(?::|%3A))([a-f0-9]{40})/i)?.[1]
       ?.toLowerCase()
     );
