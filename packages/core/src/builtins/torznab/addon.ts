@@ -1,13 +1,14 @@
 import { z } from 'zod';
 import { ParsedId } from '../../utils/id-parser.js';
-import { createLogger, getTimeTakenSincePoint } from '../../utils/index.js';
+// **THE FIX: Import the generic 'makeRequest' utility**
+import { createLogger, getTimeTakenSincePoint, makeRequest } from '../../utils/index.js';
 import { Torrent, NZB, UnprocessedTorrent } from '../../debrid/index.js';
 import { SearchMetadata } from '../base/debrid';
 import {
   extractTrackersFromMagnet,
   validateInfoHash,
 } from '../utils/debrid.js';
-import { BaseNabApi, Capabilities } from '../base/nab/api.js';
+import { BaseNabApi } from '../base/nab/api.js';
 import {
   BaseNabAddon,
   NabAddonConfigSchema,
@@ -44,10 +45,25 @@ class TorznabApi extends BaseNabApi<'torznab'> {
     this.internalApiPath = apiPath;
   }
 
+  // **THE FIX: Create a new method that bypasses the specialized BaseNabApi.**
   async getIndexers(): Promise<JackettIndexer[]> {
-    // **THE FIX: Use the generic 'request' method for non-RSS responses.**
-    const response = await this.request('indexers', { configured: 'true' });
-    const parsed = JackettIndexersSchema.safeParse(response);
+    const url = new URL(this.internalBaseUrl);
+    url.searchParams.set('t', 'indexers');
+    url.searchParams.set('configured', 'true');
+    if (this.internalApiKey) {
+      url.searchParams.set('apikey', this.internalApiKey);
+    }
+
+    const response = await makeRequest(url.toString(), {
+      method: 'GET',
+      timeout: 5000, // A short, fixed timeout for this specific request.
+    });
+    
+    if (!response.ok) {
+        throw new Error(`Failed to fetch Jackett indexers: ${response.status} ${response.statusText}`);
+    }
+
+    const parsed = JackettIndexersSchema.safeParse(await response.json());
     if (!parsed.success) {
       logger.error('Failed to parse Jackett indexers', parsed.error);
       return [];
@@ -69,7 +85,7 @@ class TorznabApi extends BaseNabApi<'torznab'> {
       this.internalApiKey,
       this.internalApiPath
     );
-    // Use 'search' here because a search result IS an RSS feed.
+    // This part is correct: 'search' is used for actual searches.
     return tempApi.search(functionName, params);
   }
 }
@@ -98,6 +114,7 @@ export class TorznabAddon extends BaseNabAddon<TorznabAddonConfig, TorznabApi> {
 
     let indexers: JackettIndexer[];
     try {
+      // This now calls our new, robust getIndexers method.
       indexers = await this.api.getIndexers();
       this.logger.info(`Found ${indexers.length} configured indexers in Jackett`);
     } catch (error) {
@@ -160,7 +177,7 @@ export class TorznabAddon extends BaseNabAddon<TorznabAddonConfig, TorznabApi> {
               type: 'torrent',
             });
         }
-      } catch (error) {
+      } catch (error)_
         this.logger.warn(
           `Jackett search for "${query}" on [${indexer.title}] failed after ${getTimeTakenSincePoint(start)}: ${error instanceof Error ? error.message : String(error)}`
         );
