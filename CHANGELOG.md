@@ -1,5 +1,16 @@
 # Changelog
 
+## [2.15.2](https://github.com/Viren070/AIOStreams/compare/v2.15.1...v2.15.2) (2025-10-12)
+
+
+### Bug Fixes
+
+* add logging of headers ([65de9c6](https://github.com/Viren070/AIOStreams/commit/65de9c6089b04c71c8a7400cc7069ab2078cf345))
+* **presets/subsource:** use password type for api key ([27ab37b](https://github.com/Viren070/AIOStreams/commit/27ab37b0441ee0958a258caf82b4a8fcfaf065fa))
+* **proxy:** remove all hop-by-hop headers ([3d6f36c](https://github.com/Viren070/AIOStreams/commit/3d6f36cfcc57ba8c60d3d26bd2cdfed2992003e0))
+* **proxy:** remove certain headers ([bdb79ae](https://github.com/Viren070/AIOStreams/commit/bdb79aec000807468f4154c6299f9fc5819331de))
+* **proxy:** remove public url field for built-in proxy ([2569f70](https://github.com/Viren070/AIOStreams/commit/2569f70960149798acf7251c62bc0548431e3e9f))
+
 ## [2.15.1](https://github.com/Viren070/AIOStreams/compare/v2.15.0...v2.15.1) (2025-10-12)
 
 
