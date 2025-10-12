@@ -171,27 +171,40 @@ export class ProwlarrAddon extends BaseDebridAddon<ProwlarrAddonConfig> {
     const queries = this.buildQueries(parsedId, metadata, {
       useAllTitles: useAllTitles(this.userData.url),
     });
-    if (queries.length === 0) {
+    if (queries.length === 0 || chosenIndexers.length === 0) {
       return [];
     }
 
-    const searchPromises = queries.map((q) =>
+    const searchTasks: { query: string; indexer: ProwlarrApiIndexer }[] = [];
+    for (const q of queries) {
+      for (const indexer of chosenIndexers) {
+        searchTasks.push({ query: q, indexer: indexer });
+      }
+    }
+
+    const searchPromises = searchTasks.map(({ query, indexer }) =>
       queryLimit(async () => {
         const start = Date.now();
-        const { data } = await this.api.search({
-          query: q,
-          indexerIds: chosenIndexers.map((indexer) => indexer.id),
-          type: 'search',
-        });
-        this.logger.info(
-          `Prowlarr search for ${q} took ${getTimeTakenSincePoint(start)}`,
-          {
-            results: data.length,
-          }
-        );
-        return data;
+        try {
+          const { data } = await this.api.search({
+            query: query,
+            indexerIds: [indexer.id],
+            type: 'search',
+          });
+          this.logger.info(
+            `Prowlarr search for "${query}" on [${indexer.name}] took ${getTimeTakenSincePoint(start)}`,
+            { results: data.length }
+          );
+          return data;
+        } catch (error) {
+          this.logger.warn(
+            `Prowlarr search for "${query}" on [${indexer.name}] failed after ${getTimeTakenSincePoint(start)}: ${error instanceof Error ? error.message : String(error)}`
+          );
+          return [];
+        }
       })
     );
+
     const allResults = await Promise.all(searchPromises);
     const results = allResults.flat();
 
