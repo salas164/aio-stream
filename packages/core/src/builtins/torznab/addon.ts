@@ -1,6 +1,6 @@
 import { z } from 'zod';
 import { ParsedId } from '../../utils/id-parser.js';
-import { createLogger, getTimeTakenSincePoint, makeRequest } from '../../utils/index.js';
+import { createLogger, getTimeTakenSincePoint } from '../../utils/index.js';
 import { Torrent, NZB, UnprocessedTorrent } from '../../debrid/index.js';
 import { SearchMetadata } from '../base/debrid';
 import {
@@ -16,23 +16,14 @@ import {
 
 const logger = createLogger('torznab');
 
+// **THE FIX: The schema now expects the optional 'indexers' array from the config.**
 const TorznabAddonConfigSchema = NabAddonConfigSchema.extend({
   timeout: z.number(),
+  indexers: z.array(z.string()),
 });
 type TorznabAddonConfig = z.infer<typeof TorznabAddonConfigSchema>;
 
-const JackettIndexerSchema = z.object({
-  id: z.string(),
-  title: z.string(),
-  configured: z.boolean(),
-  type: z.enum(['private', 'public']),
-});
-const JackettIndexersSchema = z.object({
-  // MODIFIED: Jackett nests the indexers inside a root "Indexers" property
-  Indexers: z.array(JackettIndexerSchema),
-});
-type JackettIndexer = z.infer<typeof JackettIndexerSchema>;
-
+// **THE FIX: The API class only needs one extra method to search a specific indexer.**
 class TorznabApi extends BaseNabApi<'torznab'> {
   private readonly internalBaseUrl: string;
   private readonly internalApiKey?: string;
@@ -45,45 +36,12 @@ class TorznabApi extends BaseNabApi<'torznab'> {
     this.internalApiPath = apiPath;
   }
 
-  // MODIFIED: Re-written to use the correct native Jackett API endpoint
-  async getIndexers(): Promise<JackettIndexer[]> {
-    // **THE FIX: Construct the URL from the base origin, not the full torznab path.**
-    const origin = new URL(this.internalBaseUrl).origin;
-    const url = new URL(`${origin}/api/v2.0/indexers`); // This is the correct endpoint for the indexer list
-
-    // Jackett uses a different parameter name for the API key on this endpoint
-    if (this.internalApiKey) {
-      url.searchParams.set('apikey', this.internalApiKey);
-    }
-
-    const response = await makeRequest(url.toString(), {
-      method: 'GET',
-      headers: {
-        'Accept': 'application/json',
-      },
-      timeout: 5000,
-    });
-    
-    if (!response.ok) {
-        throw new Error(`Failed to fetch Jackett indexers: ${response.status} ${response.statusText}`);
-    }
-
-    const parsed = JackettIndexersSchema.safeParse(await response.json());
-    if (!parsed.success) {
-      logger.error('Failed to parse Jackett indexers', parsed.error);
-      return [];
-    }
-    // MODIFIED: Return the nested array and filter for configured indexers
-    return parsed.data.Indexers.filter((idx) => idx.configured);
-  }
-
   async searchIndexer(
     indexerId: string,
     functionName: string,
     params: Record<string, string | number | boolean> = {}
   ): Promise<any> {
     const originalUrl = this.internalBaseUrl;
-    // For searching, we still target the torznab path, replacing /all/ with the specific indexer
     const indexerUrl = originalUrl.replace('/all/', `/${indexerId}/`);
     const tempApi = new BaseNabApi(
       'torznab',
@@ -118,86 +76,53 @@ export class TorznabAddon extends BaseNabAddon<TorznabAddonConfig, TorznabApi> {
   ): Promise<UnprocessedTorrent[]> {
     const searchDeadline = Math.max(1000, this.userData.timeout - 500);
 
-    let indexers: JackettIndexer[];
-    try {
-      indexers = await this.api.getIndexers();
-      this.logger.info(`Found ${indexers.length} configured indexers in Jackett`);
-    } catch (error) {
-      throw new Error(`Failed to get Jackett indexers: ${error}`);
-    }
-
-    if (indexers.length === 0) return [];
-    
     const queries = this.buildQueries(parsedId, metadata, { useAllTitles: false });
     if (queries.length === 0) return [];
 
     const torrents: UnprocessedTorrent[] = [];
     const seenTorrents = new Set<string>();
+    
+    // **THE FIX: The entire search logic is now chosen based on the user's config.**
+    const indexerIds = this.userData.indexers;
 
-    const searchTasks = queries.flatMap((query) =>
-      indexers.map((indexer) => ({ query, indexer }))
-    );
+    // If the user provided indexer IDs, use the parallel search method.
+    if (indexerIds && indexerIds.length > 0) {
+      this.logger.info(`Performing parallel search on ${indexerIds.length} user-defined indexers.`);
+      const searchTasks = queries.flatMap((query) =>
+        indexerIds.map((indexerId) => ({ query, indexerId }))
+      );
 
-    const searchPromises = searchTasks.map(({ query, indexer }) => async () => {
-      const start = Date.now();
-      try {
-        const params: Record<string, string | number | boolean> = { q: query, o: 'json' };
-        if (parsedId.season) params.season = parsedId.season;
-        if (parsedId.episode) params.ep = parsedId.episode;
+      const searchPromises = searchTasks.map(({ query, indexerId }) => async () => {
+        const start = Date.now();
+        try {
+          const params: Record<string, string | number | boolean> = { q: query, o: 'json' };
+          if (parsedId.season) params.season = parsedId.season;
+          if (parsedId.episode) params.ep = parsedId.episode;
 
-        const results = await this.api.searchIndexer(indexer.id, 'search', params);
-
-        this.logger.info(
-          `Jackett search for "${query}" on [${indexer.title}] took ${getTimeTakenSincePoint(start)}`,
-          { results: results.length }
-        );
-        
-        for (const result of results) {
-            const infoHash = this.extractInfoHash(result);
-            const downloadUrl = result.enclosure.find(
-              (e: any) =>
-                e.type === 'application/x-bittorrent' && !e.url.includes('magnet:')
-            )?.url;
-
-            if (!infoHash && !downloadUrl) continue;
-            if (seenTorrents.has(infoHash ?? downloadUrl!)) continue;
-            seenTorrents.add(infoHash ?? downloadUrl!);
-
-            torrents.push({
-              hash: infoHash,
-              downloadUrl,
-              sources: result.torznab?.magneturl?.toString()
-                ? extractTrackersFromMagnet(result.torznab.magneturl.toString())
-                : [],
-              seeders:
-                typeof result.torznab?.seeders === 'number' &&
-                ![-1, 999].includes(result.torznab.seeders)
-                  ? result.torznab.seeders
-                  : undefined,
-              indexer: result.jackettindexer?.name ?? indexer.title,
-              title: result.title,
-              size:
-                result.size ??
-                (result.torznab?.size ? Number(result.torznab.size) : 0),
-              type: 'torrent',
-            });
+          const results = await this.api.searchIndexer(indexerId, 'search', params);
+          this.processResults(results, torrents, seenTorrents, indexerId);
+        } catch (error) {
+          this.logger.warn(
+            `Jackett search for "${query}" on [${indexerId}] failed after ${getTimeTakenSincePoint(start)}: ${error instanceof Error ? error.message : String(error)}`
+          );
         }
-      } catch (error) {
-        this.logger.warn(
-          `Jackett search for "${query}" on [${indexer.title}] failed after ${getTimeTakenSincePoint(start)}: ${error instanceof Error ? error.message : String(error)}`
-        );
-      }
-    });
-
-    const allSearchesPromise = Promise.all(searchPromises.map((p) => p()));
-    const timeoutPromise = new Promise((_, reject) =>
-      setTimeout(() => reject(new Error('Search deadline reached')), searchDeadline)
-    );
-
-    try {
-      await Promise.race([allSearchesPromise, timeoutPromise]);
-    } catch (error) {
-      this.logger.info(`Search deadline of ${searchDeadline}ms reached. Returning ${torrents.length} results found so far.`);
+      });
+      await this.runWithTimeout(searchPromises, searchDeadline);
+    } else {
+      // Otherwise, fall back to the reliable single-request method.
+      this.logger.info('Performing single search using Jackett\'s /all/ endpoint.');
+      const searchPromises = queries.map((query) => async () => {
+        try {
+          const params: Record<string, string | number | boolean> = { q: query, o: 'json' };
+          if (parsedId.season) params.season = parsedId.season;
+          if (parsedId.episode) params.ep = parsedId.episode;
+          const results = await this.api.search('search', params);
+          this.processResults(results, torrents, seenTorrents);
+        } catch (error) {
+           this.logger.warn(`Jackett /all/ search for "${query}" failed: ${error instanceof Error ? error.message : String(error)}`);
+        }
+      });
+      await this.runWithTimeout(searchPromises, searchDeadline);
     }
 
     if (torrents.length === 0) {
@@ -205,6 +130,53 @@ export class TorznabAddon extends BaseNabAddon<TorznabAddonConfig, TorznabApi> {
     }
     
     return torrents;
+  }
+
+  // **THE FIX: Extracted result processing into a reusable helper method.**
+  private processResults(results: any[], torrents: UnprocessedTorrent[], seenTorrents: Set<string>, indexerId?: string) {
+    for (const result of results) {
+        const infoHash = this.extractInfoHash(result);
+        const downloadUrl = result.enclosure.find(
+          (e: any) =>
+            e.type === 'application/x-bittorrent' && !e.url.includes('magnet:')
+        )?.url;
+
+        if (!infoHash && !downloadUrl) continue;
+        if (seenTorrents.has(infoHash ?? downloadUrl!)) continue;
+        seenTorrents.add(infoHash ?? downloadUrl!);
+
+        torrents.push({
+          hash: infoHash,
+          downloadUrl,
+          sources: result.torznab?.magneturl?.toString()
+            ? extractTrackersFromMagnet(result.torznab.magneturl.toString())
+            : [],
+          seeders:
+            typeof result.torznab?.seeders === 'number' &&
+            ![-1, 999].includes(result.torznab.seeders)
+              ? result.torznab.seeders
+              : undefined,
+          indexer: result.jackettindexer?.name ?? indexerId ?? 'unknown',
+          title: result.title,
+          size:
+            result.size ??
+            (result.torznab?.size ? Number(result.torznab.size) : 0),
+          type: 'torrent',
+        });
+    }
+  }
+
+  // **THE FIX: Extracted the timeout logic into a reusable helper method.**
+  private async runWithTimeout(searchPromises: (() => Promise<void>)[], deadline: number) {
+    const allSearchesPromise = Promise.all(searchPromises.map((p) => p()));
+    const timeoutPromise = new Promise((_, reject) =>
+      setTimeout(() => reject(new Error('Search deadline reached')), deadline)
+    );
+    try {
+      await Promise.race([allSearchesPromise, timeoutPromise]);
+    } catch (error) {
+      this.logger.info(`Search deadline of ${deadline}ms reached. Returning results found so far.`);
+    }
   }
 
   protected async _searchNzbs(
@@ -225,7 +197,7 @@ export class TorznabAddon extends BaseNabAddon<TorznabAddonConfig, TorznabApi> {
         )?.url
       )
       ?.toString()
-      ?.match(/(?:urn(?::|%3A)btih(?::|%3A))([a-f0-9]{40})/i)?.[1]
+      ?.match(/(?:urn(?::|%3A)btih(?::|%3A))([a-f0-y]{40})/i)?.[1]
       ?.toLowerCase()
     );
   }
