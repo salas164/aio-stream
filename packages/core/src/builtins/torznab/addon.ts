@@ -46,19 +46,21 @@ class TorznabApi extends BaseNabApi<'torznab'> {
 
   async getIndexers(): Promise<JackettIndexer[]> {
     const url = new URL(this.internalBaseUrl);
-    // **THE FIX: Append apiPath to route to the JSON-returning endpoint.**
+    // Append apiPath to route to the JSON-capable endpoint.
     if (this.internalApiPath) {
       url.pathname += this.internalApiPath;
     }
     url.searchParams.set('t', 'indexers');
     url.searchParams.set('configured', 'true');
+    // **THE FIX: Force JSON output with o=json (works for t=indexers in recent Jackett versions).**
+    url.searchParams.set('o', 'json');
     if (this.internalApiKey) {
       url.searchParams.set('apikey', this.internalApiKey);
     }
 
     const response = await makeRequest(url.toString(), {  
       method: 'GET',  
-      // Backup: Explicitly request JSON (combines with previous suggestion).
+      // Backup: Explicitly request JSON.
       headers: {  
         'Accept': 'application/json',  
       },  
