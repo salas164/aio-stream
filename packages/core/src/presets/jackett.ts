@@ -141,6 +141,8 @@ export class JackettPreset extends TorznabPreset {
       apiPath: '/api',
       apiKey: jackettApiKey,
       forceQuerySearch: true,
+      // **THE FIX: Add the timeout to the config object**
+      timeout: options.timeout,
     };
 
     const configString = this.base64EncodeJSON(config, 'urlSafe');
