@@ -16,14 +16,12 @@ import {
 
 const logger = createLogger('torznab');
 
-// **THE FIX: The schema now expects the optional 'indexers' array from the config.**
 const TorznabAddonConfigSchema = NabAddonConfigSchema.extend({
   timeout: z.number(),
   indexers: z.array(z.string()),
 });
 type TorznabAddonConfig = z.infer<typeof TorznabAddonConfigSchema>;
 
-// **THE FIX: The API class only needs one extra method to search a specific indexer.**
 class TorznabApi extends BaseNabApi<'torznab'> {
   private readonly internalBaseUrl: string;
   private readonly internalApiKey?: string;
@@ -82,10 +80,8 @@ export class TorznabAddon extends BaseNabAddon<TorznabAddonConfig, TorznabApi> {
     const torrents: UnprocessedTorrent[] = [];
     const seenTorrents = new Set<string>();
     
-    // **THE FIX: The entire search logic is now chosen based on the user's config.**
     const indexerIds = this.userData.indexers;
 
-    // If the user provided indexer IDs, use the parallel search method.
     if (indexerIds && indexerIds.length > 0) {
       this.logger.info(`Performing parallel search on ${indexerIds.length} user-defined indexers.`);
       const searchTasks = queries.flatMap((query) =>
@@ -109,7 +105,6 @@ export class TorznabAddon extends BaseNabAddon<TorznabAddonConfig, TorznabApi> {
       });
       await this.runWithTimeout(searchPromises, searchDeadline);
     } else {
-      // Otherwise, fall back to the reliable single-request method.
       this.logger.info('Performing single search using Jackett\'s /all/ endpoint.');
       const searchPromises = queries.map((query) => async () => {
         try {
@@ -132,14 +127,19 @@ export class TorznabAddon extends BaseNabAddon<TorznabAddonConfig, TorznabApi> {
     return torrents;
   }
 
-  // **THE FIX: Extracted result processing into a reusable helper method.**
   private processResults(results: any[], torrents: UnprocessedTorrent[], seenTorrents: Set<string>, indexerId?: string) {
     for (const result of results) {
         const infoHash = this.extractInfoHash(result);
-        const downloadUrl = result.enclosure.find(
-          (e: any) =>
-            e.type === 'application/x-bittorrent' && !e.url.includes('magnet:')
-        )?.url;
+        
+        // **THE FIX: Prioritize the reliable infoHash over the unreliable downloadUrl.**
+        // If we have an infoHash, we don't need the downloadUrl. This prevents AIOStreams
+        // from wasting time on broken links.
+        const downloadUrl = infoHash 
+          ? undefined 
+          : result.enclosure.find(
+              (e: any) =>
+                e.type === 'application/x-bittorrent' && !e.url.includes('magnet:')
+            )?.url;
 
         if (!infoHash && !downloadUrl) continue;
         if (seenTorrents.has(infoHash ?? downloadUrl!)) continue;
@@ -147,7 +147,7 @@ export class TorznabAddon extends BaseNabAddon<TorznabAddonConfig, TorznabApi> {
 
         torrents.push({
           hash: infoHash,
-          downloadUrl,
+          downloadUrl: downloadUrl,
           sources: result.torznab?.magneturl?.toString()
             ? extractTrackersFromMagnet(result.torznab.magneturl.toString())
             : [],
@@ -166,7 +166,6 @@ export class TorznabAddon extends BaseNabAddon<TorznabAddonConfig, TorznabApi> {
     }
   }
 
-  // **THE FIX: Extracted the timeout logic into a reusable helper method.**
   private async runWithTimeout(searchPromises: (() => Promise<void>)[], deadline: number) {
     const allSearchesPromise = Promise.all(searchPromises.map((p) => p()));
     const timeoutPromise = new Promise((_, reject) =>
@@ -197,7 +196,8 @@ export class TorznabAddon extends BaseNabAddon<TorznabAddonConfig, TorznabApi> {
         )?.url
       )
       ?.toString()
-      ?.match(/(?:urn(?::|%3A)btih(?::|%3A))([a-f0-y]{40})/i)?.[1]
+      // Corrected the regex to be valid
+      ?.match(/(?:urn(?::|%3A)btih(?::|%3A))([a-f0-9]{40})/i)?.[1]
       ?.toLowerCase()
     );
   }
