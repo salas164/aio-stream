@@ -32,6 +32,10 @@ export type ProwlarrAddonConfig = z.infer<typeof ProwlarrAddonConfigSchema>;
 
 const logger = createLogger('prowlarr');
 
+// **KEY CHANGE 1: Define a hard deadline for returning results.**
+// This should be less than the AIOStreams wrapper timeout (15s).
+const SEARCH_DEADLINE_MS = 10000; // 10 seconds
+
 export class ProwlarrAddon extends BaseDebridAddon<ProwlarrAddonConfig> {
   readonly id = 'prowlarr';
   readonly name = 'Prowlarr';
@@ -55,7 +59,7 @@ export class ProwlarrAddon extends BaseDebridAddon<ProwlarrAddonConfig> {
     this.api = new ProwlarrApi({
       baseUrl: config.url,
       apiKey: config.apiKey,
-      timeout: Env.BUILTIN_PROWLARR_SEARCH_TIMEOUT,
+      timeout: Env.BUILTIN_PROWLARR_SEARCH_TIMEOUT, // This is the timeout for each *individual* request
     });
   }
 
@@ -174,6 +178,10 @@ export class ProwlarrAddon extends BaseDebridAddon<ProwlarrAddonConfig> {
     if (queries.length === 0 || chosenIndexers.length === 0) {
       return [];
     }
+    
+    // **KEY CHANGE 2: Process results as they come in and race against a deadline.**
+    const torrents: UnprocessedTorrent[] = [];
+    const seenTorrents = new Set<string>();
 
     const searchTasks: { query: string; indexer: ProwlarrApiIndexer }[] = [];
     for (const q of queries) {
@@ -195,48 +203,57 @@ export class ProwlarrAddon extends BaseDebridAddon<ProwlarrAddonConfig> {
             `Prowlarr search for "${query}" on [${indexer.name}] took ${getTimeTakenSincePoint(start)}`,
             { results: data.length }
           );
-          return data;
+
+          // Process and add torrents to the main array immediately
+          for (const result of data) {
+            const magnetUrl = result.guid.includes('magnet:') ? result.guid : undefined;
+            const downloadUrl = result.magnetUrl?.startsWith('http') ? result.magnetUrl : result.downloadUrl;
+            const infoHash = validateInfoHash(result.infoHash || (magnetUrl ? extractInfoHashFromMagnet(magnetUrl) : undefined));
+            if (!infoHash && !downloadUrl) continue;
+            if (seenTorrents.has(infoHash ?? downloadUrl!)) continue;
+            seenTorrents.add(infoHash ?? downloadUrl!);
+
+            torrents.push({
+              hash: infoHash,
+              downloadUrl: downloadUrl,
+              sources: magnetUrl ? extractTrackersFromMagnet(magnetUrl) : [],
+              seeders: result.seeders,
+              title: result.title,
+              size: result.size,
+              indexer: result.indexer,
+              type: 'torrent',
+            });
+          }
         } catch (error) {
           this.logger.warn(
             `Prowlarr search for "${query}" on [${indexer.name}] failed after ${getTimeTakenSincePoint(start)}: ${error instanceof Error ? error.message : String(error)}`
           );
-          return [];
         }
       })
     );
 
-    const allResults = await Promise.all(searchPromises);
-    const results = allResults.flat();
+    // Create a promise that resolves when all searches are complete
+    const allSearchesPromise = Promise.all(searchPromises);
 
-    const seenTorrents = new Set<string>();
-    const torrents: UnprocessedTorrent[] = [];
+    // Create a timeout promise that rejects after our deadline
+    const timeoutPromise = new Promise((_, reject) =>
+      setTimeout(() => reject(new Error('Search deadline reached')), SEARCH_DEADLINE_MS)
+    );
 
-    for (const result of results) {
-      const magnetUrl = result.guid.includes('magnet:')
-        ? result.guid
-        : undefined;
-      const downloadUrl = result.magnetUrl?.startsWith('http')
-        ? result.magnetUrl
-        : result.downloadUrl;
-      const infoHash = validateInfoHash(
-        result.infoHash ||
-          (magnetUrl ? extractInfoHashFromMagnet(magnetUrl) : undefined)
-      );
-      if (!infoHash && !downloadUrl) continue;
-      if (seenTorrents.has(infoHash ?? downloadUrl!)) continue;
-      seenTorrents.add(infoHash ?? downloadUrl!);
-
-      torrents.push({
-        hash: infoHash,
-        downloadUrl: downloadUrl,
-        sources: magnetUrl ? extractTrackersFromMagnet(magnetUrl) : [],
-        seeders: result.seeders,
-        title: result.title,
-        size: result.size,
-        indexer: result.indexer,
-        type: 'torrent',
-      });
+    try {
+      // Race the search completion against the timeout
+      await Promise.race([allSearchesPromise, timeoutPromise]);
+    } catch (error) {
+      // This catch block will be triggered if the timeout wins the race
+      this.logger.info(`Search deadline of ${SEARCH_DEADLINE_MS}ms reached. Returning ${torrents.length} results found so far.`);
     }
+
+    // **KEY CHANGE 3: Only throw an error if we have NO results at the end.**
+    if (torrents.length === 0) {
+      // This preserves the "addon timeout" error behavior only when nothing is found.
+      throw new Error(`The operation was aborted due to timeout and no results were found.`);
+    }
+    
     return torrents;
   }
 
