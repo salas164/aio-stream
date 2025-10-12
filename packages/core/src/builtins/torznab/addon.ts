@@ -33,21 +33,20 @@ const JackettIndexersSchema = z.object({
 type JackettIndexer = z.infer<typeof JackettIndexerSchema>;
 
 class TorznabApi extends BaseNabApi<'torznab'> {
-  // Store all necessary properties locally
   private readonly internalBaseUrl: string;
   private readonly internalApiKey?: string;
   private readonly internalApiPath?: string;
 
   constructor(baseUrl: string, apiKey?: string, apiPath?: string) {
     super('torznab', logger, baseUrl, apiKey, apiPath);
-    // **THE FIX: Store baseUrl upon construction**
     this.internalBaseUrl = baseUrl;
     this.internalApiKey = apiKey;
     this.internalApiPath = apiPath;
   }
 
   async getIndexers(): Promise<JackettIndexer[]> {
-    const response = await this.search('indexers', { configured: 'true' });
+    // **THE FIX: Use the generic 'request' method for non-RSS responses.**
+    const response = await this.request('indexers', { configured: 'true' });
     const parsed = JackettIndexersSchema.safeParse(response);
     if (!parsed.success) {
       logger.error('Failed to parse Jackett indexers', parsed.error);
@@ -61,7 +60,6 @@ class TorznabApi extends BaseNabApi<'torznab'> {
     functionName: string,
     params: Record<string, string | number | boolean> = {}
   ): Promise<any> {
-    // **THE FIX: Use the locally stored baseUrl**
     const originalUrl = this.internalBaseUrl;
     const indexerUrl = originalUrl.replace('/all/', `/${indexerId}/`);
     const tempApi = new BaseNabApi(
@@ -71,6 +69,7 @@ class TorznabApi extends BaseNabApi<'torznab'> {
       this.internalApiKey,
       this.internalApiPath
     );
+    // Use 'search' here because a search result IS an RSS feed.
     return tempApi.search(functionName, params);
   }
 }
