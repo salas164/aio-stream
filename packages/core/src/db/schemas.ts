@@ -472,6 +472,13 @@ export const UserDataSchema = z.object({
       attributes: z.array(z.enum(constants.AUTO_PLAY_ATTRIBUTES)).optional(),
     })
     .optional(),
+  areYouStillThere: z
+    .object({
+      enabled: z.boolean().optional(),
+      episodesBeforeCheck: z.number().min(1).optional(),
+      cooldownMinutes: z.number().min(1).optional(),
+    })
+    .optional(),
   precacheNextEpisode: z.boolean().optional(),
   alwaysPrecache: z.boolean().optional(),
   services: ServiceList.optional(),

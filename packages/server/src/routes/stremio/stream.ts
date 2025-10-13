@@ -5,6 +5,7 @@ import {
   Env,
   createLogger,
   StremioTransformer,
+  Cache,
 } from '@aiostreams/core';
 import { stremioStreamRateLimiter } from '../../middlewares/ratelimit.js';
 
@@ -38,6 +39,40 @@ router.get(
 
     try {
       const { type, id } = req.params;
+
+      // Early gate: stop autoplay after N consecutive episodes within cooldown window
+      if (
+        req.userData?.areYouStillThere?.enabled &&
+        type === 'series' &&
+        req.uuid
+      ) {
+        const cfg = req.userData.areYouStillThere;
+        const threshold = cfg.episodesBeforeCheck ?? 3;
+        const cooldownMs = (cfg.cooldownMinutes ?? 60) * 60 * 1000;
+        const cache = Cache.getInstance<
+          string,
+          { count: number; lastAt: number }
+        >('areYouStillThere', 10000);
+        const key = `ays:${req.uuid}`;
+        const now = Date.now();
+        const prev = (await cache.get(key)) || { count: 0, lastAt: 0 };
+        const withinWindow = now - prev.lastAt <= cooldownMs;
+        const nextCount = withinWindow ? prev.count + 1 : 1;
+        if (nextCount >= threshold) {
+          await cache.set(
+            key,
+            { count: 0, lastAt: now },
+            Math.ceil(cooldownMs / 1000)
+          );
+          res.status(200).json({ streams: [] });
+          return;
+        }
+        await cache.set(
+          key,
+          { count: nextCount, lastAt: now },
+          Math.ceil(cooldownMs / 1000)
+        );
+      }
 
       res
         .status(200)

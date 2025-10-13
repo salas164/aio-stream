@@ -16,6 +16,7 @@ import {
 import { Select } from '../ui/select';
 import { Alert } from '../ui/alert';
 import { useMode } from '@/context/mode';
+import { NumberInput } from '../ui/number-input/number-input';
 
 export function MiscellaneousMenu() {
   return (
@@ -169,6 +170,61 @@ function Content() {
                 }}
               />
             )}
+          </SettingsCard>
+        )}
+        {mode === 'pro' && (
+          <SettingsCard
+            title="Are you still there?"
+            description="Stop autoplay after a number of consecutive episodes so the player returns to stream selection."
+          >
+            <Switch
+              label="Enable"
+              side="right"
+              value={userData.areYouStillThere?.enabled}
+              onValueChange={(value) => {
+                setUserData((prev) => ({
+                  ...prev,
+                  areYouStillThere: {
+                    ...prev.areYouStillThere,
+                    enabled: value,
+                  },
+                }));
+              }}
+            />
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              <NumberInput
+                label="Episodes before check"
+                min={1}
+                defaultValue={3}
+                disabled={!userData.areYouStillThere?.enabled}
+                value={userData.areYouStillThere?.episodesBeforeCheck ?? 3}
+                onValueChange={(value) => {
+                  setUserData((prev) => ({
+                    ...prev,
+                    areYouStillThere: {
+                      ...prev.areYouStillThere,
+                      episodesBeforeCheck: Math.max(1, Number(value || 3)),
+                    },
+                  }));
+                }}
+              />
+              <NumberInput
+                label="Cooldown (minutes)"
+                min={1}
+                defaultValue={60}
+                disabled={!userData.areYouStillThere?.enabled}
+                value={userData.areYouStillThere?.cooldownMinutes ?? 60}
+                onValueChange={(value) => {
+                  setUserData((prev) => ({
+                    ...prev,
+                    areYouStillThere: {
+                      ...prev.areYouStillThere,
+                      cooldownMinutes: Math.max(1, Number(value || 60)),
+                    },
+                  }));
+                }}
+              />
+            </div>
           </SettingsCard>
         )}
         {mode === 'pro' && (
