@@ -40,7 +40,8 @@ router.get(
     try {
       const { type, id } = req.params;
 
-      // Early gate: stop autoplay after N consecutive episodes within cooldown window
+      // Decide whether to disable autoplay (suppress bingeGroup) per user+show
+      let disableAutoplay = false;
       if (
         req.userData?.areYouStillThere?.enabled &&
         type === 'series' &&
@@ -53,25 +54,28 @@ router.get(
           string,
           { count: number; lastAt: number }
         >('areYouStillThere', 10000);
-        const key = `ays:${req.uuid}`;
+        // Use series identifier only (before first ':') so counts are per show
+        const seriesId = id.split(':')[0] || id;
+        const key = `ays:${req.uuid}:${seriesId}`;
         const now = Date.now();
         const prev = (await cache.get(key)) || { count: 0, lastAt: 0 };
         const withinWindow = now - prev.lastAt <= cooldownMs;
         const nextCount = withinWindow ? prev.count + 1 : 1;
         if (nextCount >= threshold) {
+          // Trigger: disable autoplay for this response and reset counter
+          disableAutoplay = true;
           await cache.set(
             key,
             { count: 0, lastAt: now },
             Math.ceil(cooldownMs / 1000)
           );
-          res.status(200).json({ streams: [] });
-          return;
+        } else {
+          await cache.set(
+            key,
+            { count: nextCount, lastAt: now },
+            Math.ceil(cooldownMs / 1000)
+          );
         }
-        await cache.set(
-          key,
-          { count: nextCount, lastAt: now },
-          Math.ceil(cooldownMs / 1000)
-        );
       }
 
       res
@@ -81,7 +85,7 @@ router.get(
             await (
               await new AIOStreams(req.userData).initialise()
             ).getStreams(id, type),
-            { provideStreamData }
+            { provideStreamData, disableAutoplay }
           )
         );
     } catch (error) {
