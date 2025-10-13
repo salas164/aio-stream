@@ -1,5 +1,12 @@
 # Changelog
 
+## [2.15.4](https://github.com/Viren070/AIOStreams/compare/v2.15.3...v2.15.4) (2025-10-13)
+
+
+### Bug Fixes
+
+* **builtins/prowlarr:** make guid optional ([b85b8ad](https://github.com/Viren070/AIOStreams/commit/b85b8adb7966f56b91b5055b5fc10db6ee843d64))
+
 ## [2.15.3](https://github.com/Viren070/AIOStreams/compare/v2.15.2...v2.15.3) (2025-10-13)
 
 
