@@ -1,4 +1,4 @@
-import { Router, Request, Response } from 'express';
+import { Router, Request, Response, NextFunction } from 'express';
 import {
   AIOStreams,
   AIOStreamResponse,
@@ -6,6 +6,7 @@ import {
   createLogger,
   StremioTransformer,
   Cache,
+  IdParser,
 } from '@aiostreams/core';
 import { stremioStreamRateLimiter } from '../../middlewares/ratelimit.js';
 
@@ -17,7 +18,11 @@ router.use(stremioStreamRateLimiter);
 
 router.get(
   '/:type/:id.json',
-  async (req: Request, res: Response<AIOStreamResponse>, next) => {
+  async (
+    req: Request,
+    res: Response<AIOStreamResponse>,
+    next: NextFunction
+  ) => {
     // Check if we have user data (set by middleware in authenticated routes)
     if (!req.userData) {
       // Return a response indicating configuration is needed
@@ -54,9 +59,12 @@ router.get(
           string,
           { count: number; lastAt: number }
         >('areYouStillThere', 10000);
-        // Use series identifier only (before first ':') so counts are per show
-        const seriesId = id.split(':')[0] || id;
-        const key = `ays:${req.uuid}:${seriesId}`;
+        // Use parsed series identifier (per show) via IdParser to avoid mis-parsing
+        const parsed = IdParser.parse(id, type);
+        const baseSeriesKey = parsed
+          ? `${parsed.type}:${parsed.value}`
+          : id.split(':')[0] || id;
+        const key = `ays:${req.uuid}:${baseSeriesKey}`;
         const now = Date.now();
         const prev = (await cache.get(key)) || { count: 0, lastAt: 0 };
         const withinWindow = now - prev.lastAt <= cooldownMs;
