@@ -62,7 +62,7 @@ export type ProwlarrApiIndexer = z.infer<typeof ProwlarrApiIndexerSchema>;
 const ProwlarrApiIndexersListSchema = z.array(ProwlarrApiIndexerSchema);
 
 const ProwlarrApiSearchItemSchema = z.object({
-  guid: z.string(), // can sometimes be the raw magnet url
+  guid: z.string().optional(), // can sometimes be the raw magnet url
   age: z.number(), // in days
   size: z.number(),
   indexerId: z.number(),
