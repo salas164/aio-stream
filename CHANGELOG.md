@@ -1,5 +1,14 @@
 # Changelog
 
+## [2.15.3](https://github.com/Viren070/AIOStreams/compare/v2.15.2...v2.15.3) (2025-10-13)
+
+
+### Bug Fixes
+
+* **debrid:** adjust scoring logic for file selection based on season and episode presence ([7f3faf7](https://github.com/Viren070/AIOStreams/commit/7f3faf70232e6f425de8a0e40acd31b433c45541))
+* **presets/newznab:** use correct env var name in proxyAuth description ([0790cf3](https://github.com/Viren070/AIOStreams/commit/0790cf327df641da6f0be485004bb978745f758c))
+* remove length requirement on addonPassword ([9cb2202](https://github.com/Viren070/AIOStreams/commit/9cb2202804028a3cce03a234fd940e7ed3db2086))
+
 ## [2.15.2](https://github.com/Viren070/AIOStreams/compare/v2.15.1...v2.15.2) (2025-10-12)
 
 
