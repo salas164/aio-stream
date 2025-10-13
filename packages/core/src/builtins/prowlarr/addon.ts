@@ -199,7 +199,7 @@ export class ProwlarrAddon extends BaseDebridAddon<ProwlarrAddonConfig> {
     const torrents: UnprocessedTorrent[] = [];
 
     for (const result of results) {
-      const magnetUrl = result.guid.includes('magnet:')
+      const magnetUrl = result.guid?.includes('magnet:')
         ? result.guid
         : undefined;
       const downloadUrl = result.magnetUrl?.startsWith('http')
