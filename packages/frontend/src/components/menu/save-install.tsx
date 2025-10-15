@@ -15,6 +15,7 @@ import { PageControls } from '../shared/page-controls';
 import { useDisclosure } from '@/hooks/disclosure';
 import { Modal } from '../ui/modal';
 import { Switch } from '../ui/switch';
+import { TemplateExportModal } from '../shared/template-export-modal';
 import {
   Accordion,
   AccordionContent,
@@ -66,6 +67,8 @@ function Content() {
   const [confirmDeletionPassword, setConfirmDeletionPassword] =
     React.useState('');
   const { setSelectedMenu, firstMenu } = useMenu();
+  const templateExportModal = useDisclosure(false);
+  const exportMenuModal = useDisclosure(false);
   const confirmResetProps = useConfirmationDialog({
     title: 'Confirm Reset',
     description: `Are you sure you want to reset your configuration? This will clear all your settings${uuid ? ` but keep your user account` : ''}. This action cannot be undone.`,
@@ -523,9 +526,9 @@ function Content() {
           title="Backups"
           description="Export your settings or restore from a backup file"
         >
-          <div className="flex gap-3">
+          <div className="flex flex-wrap gap-3">
             <Button
-              onClick={handleExport}
+              onClick={exportMenuModal.open}
               leftIcon={<UploadIcon />}
               intent="gray"
             >
@@ -649,6 +652,44 @@ function Content() {
         </Modal>
         <ConfirmationDialog {...confirmDelete} />
         <ConfirmationDialog {...confirmResetProps} />
+
+        <Modal
+          open={exportMenuModal.isOpen}
+          onOpenChange={exportMenuModal.toggle}
+          title="Export Configuration"
+          description="Choose how to export your configuration"
+        >
+          <div className="space-y-3">
+            <Button
+              onClick={() => {
+                handleExport();
+                exportMenuModal.close();
+              }}
+              intent="primary"
+              className="w-full"
+              leftIcon={<UploadIcon />}
+            >
+              Export
+            </Button>
+            <Button
+              onClick={() => {
+                exportMenuModal.close();
+                templateExportModal.open();
+              }}
+              intent="primary"
+              className="w-full"
+              leftIcon={<PlusIcon />}
+            >
+              Export as Template
+            </Button>
+          </div>
+        </Modal>
+
+        <TemplateExportModal
+          open={templateExportModal.isOpen}
+          onOpenChange={templateExportModal.toggle}
+          userData={userData}
+        />
       </div>
     </>
   );

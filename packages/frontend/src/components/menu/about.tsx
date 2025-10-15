@@ -13,6 +13,7 @@ import {
   CoffeeIcon,
   MessageCircleIcon,
   PencilIcon,
+  PlusIcon,
 } from 'lucide-react';
 import { FaGithub, FaDiscord, FaChevronRight } from 'react-icons/fa';
 import { BiDonateHeart, BiLogInCircle, BiLogOutCircle } from 'react-icons/bi';
@@ -33,6 +34,7 @@ import { DonationModal } from '../shared/donation-modal';
 import { ModeSwitch } from '../ui/mode-switch/mode-switch';
 import { ModeSelectModal } from '../shared/mode-select-modal';
 import { ConfigModal } from '../config-modal';
+import { ConfigTemplatesModal } from '../shared/config-templates-modal';
 import {
   ConfirmationDialog,
   useConfirmationDialog,
@@ -134,6 +136,7 @@ AIOStreams consolidates multiple Stremio addons and debrid services - including 
   const donationModal = useDisclosure(false);
   const customizeModal = useDisclosure(false);
   const signInModal = useDisclosure(false);
+  const templatesModal = useDisclosure(false);
   const customHtml = status?.settings?.customHtml;
 
   const confirmClearConfig = useConfirmationDialog({
@@ -337,6 +340,12 @@ AIOStreams consolidates multiple Stremio addons and debrid services - including 
                       GitHub
                     </QuickLink>
                     <QuickLink
+                      onClick={templatesModal.open}
+                      icon={<PlusIcon className="w-8 h-8" />}
+                    >
+                      Config Templates
+                    </QuickLink>
+                    <QuickLink
                       onClick={donationModal.open}
                       icon={<HeartIcon className="w-8 h-8" />}
                       className="bg-gradient-to-br from-red-500/20 to-pink-500/20 hover:from-red-500/30 hover:to-pink-500/30 border-red-400/30 hover:border-red-400/50"
@@ -403,6 +412,10 @@ AIOStreams consolidates multiple Stremio addons and debrid services - including 
         }}
       />
       <ConfirmationDialog {...confirmClearConfig} />
+      <ConfigTemplatesModal
+        open={templatesModal.isOpen}
+        onOpenChange={templatesModal.toggle}
+      />
     </>
   );
 }

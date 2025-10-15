@@ -11,6 +11,7 @@ import {
   searchApi,
   animeApi,
   proxyApi,
+  templatesApi,
 } from './routes/api/index.js';
 import {
   configure,
@@ -96,6 +97,7 @@ if (Env.ENABLE_SEARCH_API) {
 }
 apiRouter.use('/anime', animeApi);
 apiRouter.use('/proxy', proxyApi);
+apiRouter.use('/templates', templatesApi);
 app.use(`/api/v${constants.API_VERSION}`, apiRouter);
 
 // Stremio Routes
