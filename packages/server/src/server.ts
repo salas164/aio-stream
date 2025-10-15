@@ -1,4 +1,6 @@
 import app from './app.js';
+import fs from 'fs/promises';
+import path from 'path';
 
 import {
   Env,
@@ -66,9 +68,20 @@ async function initialiseProwlarr() {
   }
 }
 
+async function initialiseTemplatesDirectory() {
+  try {
+    const templatesDir = path.join(process.cwd(), 'data', 'templates');
+    await fs.mkdir(templatesDir, { recursive: true });
+    logger.info(`Templates directory initialised at: ${templatesDir}`);
+  } catch (error) {
+    logger.error('Failed to initialise templates directory:', error);
+  }
+}
+
 async function start() {
   try {
     logStartupInfo();
+    await initialiseTemplatesDirectory();
     await initialiseDatabase();
     await initialiseRedis();
     await initialisePTT();

@@ -7,9 +7,9 @@ import path from 'path';
 const router: Router = Router();
 const logger = createLogger('server');
 
-// Get templates directory from the workspace root
+// Get templates directory from the data directory
 // Use process.cwd() which returns the directory from where the process was started
-const TEMPLATES_DIR = path.join(process.cwd(), 'templates');
+const TEMPLATES_DIR = path.join(process.cwd(), 'data', 'templates');
 
 router.get('/', async (req: Request, res: Response, next: NextFunction) => {
   try {

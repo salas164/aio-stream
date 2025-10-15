@@ -137,6 +137,7 @@ AIOStreams consolidates multiple Stremio addons and debrid services - including 
   const customizeModal = useDisclosure(false);
   const signInModal = useDisclosure(false);
   const templatesModal = useDisclosure(false);
+  const setupChoiceModal = useDisclosure(false);
   const customHtml = status?.settings?.customHtml;
 
   const confirmClearConfig = useConfirmationDialog({
@@ -252,10 +253,8 @@ AIOStreams consolidates multiple Stremio addons and debrid services - including 
               intent="white"
               rounded
               leftIcon={<FaPlay />}
-              className="h-12 px-6 text-lg"
-              onClick={() => {
-                nextMenu();
-              }}
+              className="h-12 px-6 text-lg font-semibold"
+              onClick={setupChoiceModal.open}
             >
               START SETUP
             </Button>
@@ -340,12 +339,6 @@ AIOStreams consolidates multiple Stremio addons and debrid services - including 
                       GitHub
                     </QuickLink>
                     <QuickLink
-                      onClick={templatesModal.open}
-                      icon={<PlusIcon className="w-8 h-8" />}
-                    >
-                      Config Templates
-                    </QuickLink>
-                    <QuickLink
                       onClick={donationModal.open}
                       icon={<HeartIcon className="w-8 h-8" />}
                       className="bg-gradient-to-br from-red-500/20 to-pink-500/20 hover:from-red-500/30 hover:to-pink-500/30 border-red-400/30 hover:border-red-400/50"
@@ -415,6 +408,18 @@ AIOStreams consolidates multiple Stremio addons and debrid services - including 
       <ConfigTemplatesModal
         open={templatesModal.isOpen}
         onOpenChange={templatesModal.toggle}
+      />
+      <SetupChoiceModal
+        open={setupChoiceModal.isOpen}
+        onOpenChange={setupChoiceModal.toggle}
+        onStartFresh={() => {
+          setupChoiceModal.close();
+          nextMenu();
+        }}
+        onUseTemplate={() => {
+          setupChoiceModal.close();
+          templatesModal.open();
+        }}
       />
     </>
   );
@@ -958,6 +963,63 @@ function CustomizeModal({
           </div>
         </div>
       </form>
+    </Modal>
+  );
+}
+
+function SetupChoiceModal({
+  open,
+  onOpenChange,
+  onStartFresh,
+  onUseTemplate,
+}: {
+  open: boolean;
+  onOpenChange: (open: boolean) => void;
+  onStartFresh: () => void;
+  onUseTemplate: () => void;
+}) {
+  return (
+    <Modal
+      open={open}
+      onOpenChange={onOpenChange}
+      title="Get Started"
+      description="Choose how you'd like to set up AIOStreams"
+    >
+      <div className="space-y-4">
+        <button
+          onClick={onStartFresh}
+          className="w-full p-6 rounded-lg border-2 border-gray-700 bg-gray-800/50 hover:border-purple-500 hover:bg-purple-500/10 transition-all duration-200 text-left group"
+        >
+          <div className="flex items-start gap-4">
+            <div className="flex-shrink-0 w-12 h-12 rounded-full bg-purple-500/20 flex items-center justify-center group-hover:bg-purple-500/30 transition-colors">
+              <FaPlay className="w-5 h-5 text-purple-400" />
+            </div>
+            <div className="flex-1">
+              <h3 className="text-lg font-semibold text-white mb-2">Start Fresh</h3>
+              <p className="text-sm text-gray-400">
+                Build your configuration from scratch. Perfect if you want complete control over every setting.
+              </p>
+            </div>
+          </div>
+        </button>
+
+        <button
+          onClick={onUseTemplate}
+          className="w-full p-6 rounded-lg border-2 border-gray-700 bg-gray-800/50 hover:border-blue-500 hover:bg-blue-500/10 transition-all duration-200 text-left group"
+        >
+          <div className="flex items-start gap-4">
+            <div className="flex-shrink-0 w-12 h-12 rounded-full bg-blue-500/20 flex items-center justify-center group-hover:bg-blue-500/30 transition-colors">
+              <PlusIcon className="w-5 h-5 text-blue-400" />
+            </div>
+            <div className="flex-1">
+              <h3 className="text-lg font-semibold text-white mb-2">Use a Template</h3>
+              <p className="text-sm text-gray-400">
+                Start with a pre-configured template. Great for getting up and running quickly with recommended settings.
+              </p>
+            </div>
+          </div>
+        </button>
+      </div>
     </Modal>
   );
 }

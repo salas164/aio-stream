@@ -33,8 +33,9 @@ COPY scripts ./scripts
 # Reinstall to update symlinks after copying code
 RUN pnpm install --frozen-lockfile
 
-# Build the project.
-RUN pnpm run build
+# Build the project using tsc --build with --force for clean build
+RUN npx tsc --build --force
+RUN pnpm -F frontend run build
 
 # Remove development dependencies.
 RUN rm -rf node_modules

@@ -659,29 +659,44 @@ function Content() {
           title="Export Configuration"
           description="Choose how to export your configuration"
         >
-          <div className="space-y-3">
-            <Button
+          <div className="grid grid-cols-2 gap-4">
+            {/* Standard Export Option */}
+            <button
               onClick={() => {
                 handleExport();
                 exportMenuModal.close();
               }}
-              intent="primary"
-              className="w-full"
-              leftIcon={<UploadIcon />}
+              className="group relative flex flex-col items-center gap-4 rounded-xl border-2 border-gray-700 bg-gradient-to-br from-gray-800/50 to-gray-800/30 p-6 text-center transition-all hover:border-[#8b5cf6] hover:from-[#8b5cf6]/10 hover:to-[#8b5cf6]/5 hover:shadow-lg hover:shadow-[#8b5cf6]/20 hover:ring-1 hover:ring-[#8b5cf6] focus:outline-none focus-visible:ring-1 focus-visible:ring-[#8b5cf6]"
             >
-              Export
-            </Button>
-            <Button
+              <div className="flex h-16 w-16 items-center justify-center rounded-full bg-gradient-to-br from-primary-500 to-primary-600 text-white shadow-lg transition-transform group-hover:scale-110">
+                <UploadIcon className="h-8 w-8" />
+              </div>
+              <div>
+                <h3 className="text-lg font-bold text-white">Export</h3>
+                <p className="mt-2 text-sm leading-relaxed text-gray-400">
+                  Download as JSON file for backup or sharing
+                </p>
+              </div>
+            </button>
+
+            {/* Template Export Option */}
+            <button
               onClick={() => {
                 exportMenuModal.close();
                 templateExportModal.open();
               }}
-              intent="primary"
-              className="w-full"
-              leftIcon={<PlusIcon />}
+              className="group relative flex flex-col items-center gap-4 rounded-xl border-2 border-gray-700 bg-gradient-to-br from-gray-800/50 to-gray-800/30 p-6 text-center transition-all hover:border-[#8b5cf6] hover:from-[#8b5cf6]/10 hover:to-[#8b5cf6]/5 hover:shadow-lg hover:shadow-[#8b5cf6]/20 hover:ring-1 hover:ring-[#8b5cf6] focus:outline-none focus-visible:ring-1 focus-visible:ring-[#8b5cf6]"
             >
-              Export as Template
-            </Button>
+              <div className="flex h-16 w-16 items-center justify-center rounded-full bg-gradient-to-br from-primary-500 to-primary-600 text-white shadow-lg transition-transform group-hover:scale-110">
+                <PlusIcon className="h-8 w-8" />
+              </div>
+              <div>
+                <h3 className="text-lg font-bold text-white">Export as Template</h3>
+                <p className="mt-2 text-sm leading-relaxed text-gray-400">
+                  Create reusable template with custom metadata
+                </p>
+              </div>
+            </button>
           </div>
         </Modal>
 
