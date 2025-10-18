@@ -233,31 +233,46 @@ AIOStreams consolidates multiple Stremio addons and debrid services - including 
         )}
 
         {/* Setup Mode Row */}
-        <div className="flex flex-col md:flex-row items-center gap-4 w-full justify-start md:pl-6">
-          <div className="flex flex-col items-start md:items-start">
-            <span className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-2 self-start">
-              Setup Mode
-            </span>
-            <ModeSwitch
-              value={mode}
-              onChange={setMode}
-              className="w-[280px] h-12 text-base"
-            />
+        <div className="flex flex-col items-center md:items-start gap-4 w-full md:pl-6">
+          <div className="flex flex-col md:flex-row items-center gap-4 w-full justify-start">
+            <div className="flex flex-col items-start md:items-start">
+              <span className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-2 self-start">
+                Setup Mode
+              </span>
+              <ModeSwitch
+                value={mode}
+                onChange={setMode}
+                className="w-[280px] h-12 text-base"
+              />
+            </div>
+            <div className="text-gray-400 md:self-end md:pb-3">
+              <FaChevronRight className="hidden md:block text-2xl" />
+              <FaChevronRight className="md:hidden rotate-90 text-2xl" />
+            </div>
+            <div className="md:self-end">
+              <Button
+                intent="white"
+                rounded
+                leftIcon={<FaPlay />}
+                className="h-12 px-6 text-lg font-semibold"
+                onClick={setupChoiceModal.open}
+              >
+                START SETUP
+              </Button>
+            </div>
           </div>
-          <div className="text-gray-400 md:self-end md:pb-3">
-            <FaChevronRight className="hidden md:block text-2xl" />
-            <FaChevronRight className="md:hidden rotate-90 text-2xl" />
-          </div>
-          <div className="md:self-end">
-            <Button
-              intent="white"
-              rounded
-              leftIcon={<FaPlay />}
-              className="h-12 px-6 text-lg font-semibold"
-              onClick={setupChoiceModal.open}
+
+          {/* Template Wizard Link */}
+          <div className="text-center md:text-left text-sm text-gray-400 max-w-2xl">
+            New to AIOStreams? Try our{' '}
+            <button
+              onClick={templatesModal.open}
+              className="text-[--brand] hover:text-[--brand]/80 hover:underline font-medium"
             >
-              START SETUP
-            </Button>
+              Template Wizard
+            </button>{' '}
+            for a guided, step-by-step setup experience with pre-configured
+            settings.
           </div>
         </div>
 
@@ -995,9 +1010,12 @@ function SetupChoiceModal({
               <FaPlay className="w-5 h-5 text-purple-400" />
             </div>
             <div className="flex-1">
-              <h3 className="text-lg font-semibold text-white mb-2">Start Fresh</h3>
+              <h3 className="text-lg font-semibold text-white mb-2">
+                Start Fresh
+              </h3>
               <p className="text-sm text-gray-400">
-                Build your configuration from scratch. Perfect if you want complete control over every setting.
+                Build your configuration from scratch. Perfect if you want
+                complete control over every setting.
               </p>
             </div>
           </div>
@@ -1012,9 +1030,12 @@ function SetupChoiceModal({
               <PlusIcon className="w-5 h-5 text-blue-400" />
             </div>
             <div className="flex-1">
-              <h3 className="text-lg font-semibold text-white mb-2">Use a Template</h3>
+              <h3 className="text-lg font-semibold text-white mb-2">
+                Use a Template
+              </h3>
               <p className="text-sm text-gray-400">
-                Start with a pre-configured template. Great for getting up and running quickly with recommended settings.
+                Start with a pre-configured template. Great for getting up and
+                running quickly with recommended settings.
               </p>
             </div>
           </div>
