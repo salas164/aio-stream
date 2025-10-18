@@ -542,6 +542,35 @@ const SERVICE_DETAILS: Record<
   },
 };
 
+const TOP_LEVEL_OPTION_DETAILS: Record<
+  'tmdbApiKey' | 'tmdbAccessToken' | 'rpdbApiKey' | 'tvdbApiKey',
+  {
+    name: string;
+    description: string;
+  }
+> = {
+  tmdbApiKey: {
+    name: 'TMDB API Key',
+    description:
+      'Get your free API key from [here](https://www.themoviedb.org/settings/api). Make sure to copy the 32 character API Key and not the Read Access Token.',
+  },
+  tmdbAccessToken: {
+    name: 'TMDB Access Token',
+    description:
+      'Get your free access token from [here](https://www.themoviedb.org/settings/api). Make sure to copy the Read Access Token and not the 32 character API Key.',
+  },
+  rpdbApiKey: {
+    name: 'RPDB API Key',
+    description:
+      'Get your free API key from [here](https://ratingposterdb.com/api-key/) for posters with ratings.',
+  },
+  tvdbApiKey: {
+    name: 'TVDB API Key',
+    description:
+      'Sign up for a free API Key at [TVDB](https://www.thetvdb.com/api-information) and then get it from your [dashboard](https://www.thetvdb.com/dashboard/account/apikeys).',
+  },
+};
+
 export const DEDUPLICATOR_KEYS = [
   'filename',
   'infoHash',
@@ -1042,5 +1071,6 @@ export {
   SEEDR_SERVICE,
   EASYNEWS_SERVICE,
   SERVICE_DETAILS,
+  TOP_LEVEL_OPTION_DETAILS,
   HEADERS_FOR_IP_FORWARDING,
 };

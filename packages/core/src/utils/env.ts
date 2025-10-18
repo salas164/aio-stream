@@ -14,9 +14,9 @@ import {
   port,
   EnvMissingError,
 } from 'envalid';
-import { ResourceManager } from './resources.js';
 import * as constants from './constants.js';
 import { randomBytes } from 'crypto';
+import fs from 'fs';
 
 // Get __dirname equivalent in ESM
 const __filename = fileURLToPath(import.meta.url);
@@ -29,7 +29,19 @@ try {
 }
 let metadata: any = undefined;
 try {
-  metadata = ResourceManager.getResource('metadata.json') || {};
+  function getResource(resourceName: string) {
+    const filePath = path.join(
+      __dirname,
+      '../../../../',
+      'resources',
+      resourceName
+    );
+    if (!fs.existsSync(filePath)) {
+      throw new Error(`Resource ${resourceName} not found at ${filePath}`);
+    }
+    return JSON.parse(fs.readFileSync(filePath, 'utf8'));
+  }
+  metadata = getResource('metadata.json') || {};
 } catch (error) {
   console.error('Error loading metadata.json file', error);
 }

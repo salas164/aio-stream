@@ -29,13 +29,11 @@ COPY packages/server ./packages/server
 COPY packages/core ./packages/core
 COPY packages/frontend ./packages/frontend
 COPY scripts ./scripts
+COPY resources ./resources
 
-# Reinstall to update symlinks after copying code
-RUN pnpm install --frozen-lockfile
 
-# Build the project using tsc --build with --force for clean build
-RUN npx tsc --build --force
-RUN pnpm -F frontend run build
+# Build the project.
+RUN pnpm run build
 
 # Remove development dependencies.
 RUN rm -rf node_modules
@@ -65,6 +63,8 @@ COPY --from=builder /build/packages/core/dist ./packages/core/dist
 COPY --from=builder /build/packages/frontend/out ./packages/frontend/out
 COPY --from=builder /build/packages/server/dist ./packages/server/dist
 COPY --from=builder /build/packages/server/src/static ./packages/server/dist/static
+
+COPY --from=builder /build/resources ./resources
 
 COPY --from=builder /build/node_modules ./node_modules
 COPY --from=builder /build/packages/core/node_modules ./packages/core/node_modules

@@ -1,12 +1,18 @@
 import React from 'react';
+import { toast } from 'sonner';
 
 interface MarkdownLiteProps {
   children: string;
   className?: string;
+  stopPropagation?: boolean;
 }
 
 // Supports [text](url) and `code` only
-const MarkdownLite: React.FC<MarkdownLiteProps> = ({ children, className }) => {
+const MarkdownLite: React.FC<MarkdownLiteProps> = ({
+  children,
+  className,
+  stopPropagation = false,
+}) => {
   if (!children) return null;
   // Regex for [text](url) and `code`
   const regex = /(`[^`]+`|\[[^\]]+\]\([^\)]+\))/g;
@@ -29,6 +35,19 @@ const MarkdownLite: React.FC<MarkdownLiteProps> = ({ children, className }) => {
             return (
               <code
                 key={i}
+                onClick={async (e) => {
+                  if (stopPropagation) {
+                    e.stopPropagation();
+                  }
+                  // copy to clipboard
+                  try {
+                    await navigator.clipboard.writeText(match.slice(1, -1));
+                    toast.success('Copied to clipboard');
+                  } catch (error) {
+                    console.error('Failed to copy to clipboard:', error);
+                    toast.error('Failed to copy to clipboard');
+                  }
+                }}
                 className="bg-muted px-1 py-0.5 rounded text-[--brand] font-mono text-xs break-all"
               >
                 {match.slice(1, -1)}
@@ -46,6 +65,7 @@ const MarkdownLite: React.FC<MarkdownLiteProps> = ({ children, className }) => {
                   target="_blank"
                   rel="noopener noreferrer"
                   className="text-[--brand] hover:underline"
+                  onClick={(e) => stopPropagation && e.stopPropagation()}
                 >
                   {text}
                 </a>

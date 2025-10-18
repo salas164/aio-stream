@@ -14,6 +14,7 @@ import {
   PTT,
   AnimeDatabase,
   ProwlarrAddon,
+  TemplateManager,
 } from '@aiostreams/core';
 
 const logger = createLogger('server');
@@ -68,20 +69,26 @@ async function initialiseProwlarr() {
   }
 }
 
-async function initialiseTemplatesDirectory() {
+async function initialiseTemplates() {
   try {
-    const templatesDir = path.join(process.cwd(), 'data', 'templates');
-    await fs.mkdir(templatesDir, { recursive: true });
-    logger.info(`Templates directory initialised at: ${templatesDir}`);
+    const templates = TemplateManager.loadTemplates();
+    logger.info(
+      `Loaded ${templates.loaded} templates from ${templates.detected} detected templates. ${templates.errors.length} errors occurred.`
+    );
+    if (templates.errors.length > 0) {
+      logger.error(
+        `Errors loading templates: \n${templates.errors.map((error) => `- ${error.file}: ${error.error}`).join('\n')}`
+      );
+    }
   } catch (error) {
-    logger.error('Failed to initialise templates directory:', error);
+    logger.error('Failed to initialise templates:', error);
   }
 }
 
 async function start() {
   try {
     logStartupInfo();
-    await initialiseTemplatesDirectory();
+    await initialiseTemplates();
     await initialiseDatabase();
     await initialiseRedis();
     await initialisePTT();

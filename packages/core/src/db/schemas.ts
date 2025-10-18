@@ -993,3 +993,18 @@ export const RPDBIsValidResponse = z.object({
   valid: z.boolean(),
 });
 export type RPDBIsValidResponse = z.infer<typeof RPDBIsValidResponse>;
+
+export const TemplateSchema = z.object({
+  metadata: z.object({
+    name: z.string().min(1).max(20), // name of the template
+    description: z.string().min(1).max(500), // description of the template
+    author: z.string().min(1).max(20), // author of the template (predefined templates will have Vire)
+    predefined: z.boolean().optional(), // whether the template is predefined or not.
+    category: z.string().min(1).max(20), // category of the template
+    services: z.array(ServiceIds).optional(),
+    serviceRequired: z.boolean().optional(), // whether a service is required for this template or not.
+  }),
+  config: UserDataSchema, // config of the template
+});
+
+export type Template = z.infer<typeof TemplateSchema>;
