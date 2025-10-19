@@ -318,6 +318,10 @@ export const Env = cleanEnv(process.env, {
     desc: 'Who can use regex filters',
     choices: ['none', 'trusted', 'all'],
   }),
+  REGEX_TRUST_INSTANCE_TEMPLATES: bool({
+    default: true,
+    desc: 'Whether to automatically add regex patterns from instance owner templates to the allowed patterns list',
+  }),
   BASE_URL: url({
     desc: 'Base URL of the addon, including protocol, hostname, and optionally port',
     example: 'https://aiostreams.example.com',

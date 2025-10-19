@@ -297,6 +297,7 @@ export const UserDataSchema = z.object({
   uuid: z.string().uuid().optional(),
   encryptedPassword: z.string().min(1).optional(),
   trusted: z.boolean().optional(),
+  templateSource: z.enum(['builtin', 'custom', 'external']).optional(),
   addonPassword: z.string().optional(),
   ip: z.union([z.union([z.ipv4(), z.ipv6()])]).optional(),
   addonName: z.string().min(1).max(300).optional(),
@@ -939,6 +940,7 @@ const StatusResponseSchema = z.object({
     alternateDesign: z.boolean(),
     protected: z.boolean(),
     regexFilterAccess: z.enum(['none', 'trusted', 'all']),
+    regexTrustInstanceTemplates: z.boolean(),
     allowedRegexPatterns: z
       .object({
         patterns: z.array(z.string()),

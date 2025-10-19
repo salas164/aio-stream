@@ -444,7 +444,7 @@ export async function validateConfig(
     }
   }
 
-  await validateRegexes(config, options?.skipErrorsFromAddonsOrProxies);
+  await validateRegexes(config, options?.skipErrorsFromAddonsOrProxies, config.templateSource);
 
   await new AIOStreams(ensureDecrypted(config), {
     skipFailedAddons: options?.skipErrorsFromAddonsOrProxies ?? false,
@@ -567,12 +567,16 @@ export function applyMigrations(config: any): UserData {
   return config;
 }
 
-async function validateRegexes(config: UserData, skipErrors: boolean = false) {
+async function validateRegexes(config: UserData, skipErrors: boolean = false, templateSource?: 'builtin' | 'custom' | 'external') {
+  if (templateSource === 'builtin') {
+    return;
+  }
+
   const excludedRegexes = config.excludedRegexPatterns;
   const includedRegexes = config.includedRegexPatterns;
   const requiredRegexes = config.requiredRegexPatterns;
   const preferredRegexes = config.preferredRegexPatterns;
-  const regexAllowed = await FeatureControl.isRegexAllowed(config);
+  const regexAllowed = await FeatureControl.isRegexAllowed(config, undefined, templateSource);
 
   const regexes = [
     ...(excludedRegexes ?? []),

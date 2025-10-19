@@ -264,43 +264,42 @@ export function ConfigTemplatesModal({
       });
     }
 
-    // Check regex patterns against allowed patterns
-    const excludedRegexes = template.config.excludedRegexPatterns || [];
-    const includedRegexes = template.config.includedRegexPatterns || [];
-    const requiredRegexes = template.config.requiredRegexPatterns || [];
-    const preferredRegexes = (template.config.preferredRegexPatterns || []).map(
-      (r) => (typeof r === 'string' ? r : r.pattern)
-    );
+    if (template.metadata.source === 'external') {
+      const excludedRegexes = template.config.excludedRegexPatterns || [];
+      const includedRegexes = template.config.includedRegexPatterns || [];
+      const requiredRegexes = template.config.requiredRegexPatterns || [];
+      const preferredRegexes = (template.config.preferredRegexPatterns || []).map(
+        (r) => (typeof r === 'string' ? r : r.pattern)
+      );
 
-    const allRegexes = [
-      ...excludedRegexes,
-      ...includedRegexes,
-      ...requiredRegexes,
-      ...preferredRegexes,
-    ];
+      const allRegexes = [
+        ...excludedRegexes,
+        ...includedRegexes,
+        ...requiredRegexes,
+        ...preferredRegexes,
+      ];
 
-    if (allRegexes.length > 0) {
-      // Get allowed patterns from status
-      const allowedPatterns =
-        statusData.settings?.allowedRegexPatterns?.patterns || [];
+      if (allRegexes.length > 0) {
+        const allowedPatterns =
+          statusData.settings?.allowedRegexPatterns?.patterns || [];
 
-      // Check if regex access is restricted
-      if (
-        statusData.settings?.regexFilterAccess === 'none' &&
-        allowedPatterns.length === 0
-      ) {
-        warnings.push(
-          'Template uses regex patterns but regex access is disabled on this instance'
-        );
-      } else if (statusData.settings?.regexFilterAccess !== 'all') {
-        const unsupportedPatterns = allRegexes.filter(
-          (pattern) => !allowedPatterns.includes(pattern)
-        );
-
-        if (unsupportedPatterns.length > 0) {
+        if (
+          statusData.settings?.regexFilterAccess === 'none' &&
+          allowedPatterns.length === 0
+        ) {
           warnings.push(
-            `Template has ${unsupportedPatterns.length} regex patterns that are not trusted.`
+            'Template uses regex patterns but regex access is disabled on this instance'
           );
+        } else if (statusData.settings?.regexFilterAccess !== 'all') {
+          const unsupportedPatterns = allRegexes.filter(
+            (pattern) => !allowedPatterns.includes(pattern)
+          );
+
+          if (unsupportedPatterns.length > 0) {
+            warnings.push(
+              `Template has ${unsupportedPatterns.length} regex patterns that are not trusted.`
+            );
+          }
         }
       }
     }
@@ -979,6 +978,7 @@ export function ConfigTemplatesModal({
       setUserData((prev) => ({
         ...prev,
         ...migratedData,
+        templateSource: processedTemplate.template.metadata.source,
       }));
 
       // Check if there are any addons that need manual setup

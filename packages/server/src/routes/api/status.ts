@@ -43,6 +43,7 @@ const statusInfo = async (): Promise<StatusResponse> => {
       protected: Env.ADDON_PASSWORD.length > 0,
       tmdbApiAvailable: !!Env.TMDB_ACCESS_TOKEN,
       regexFilterAccess: Env.REGEX_FILTER_ACCESS,
+      regexTrustInstanceTemplates: Env.REGEX_TRUST_INSTANCE_TEMPLATES,
       allowedRegexPatterns:
         (await FeatureControl.allowedRegexPatterns()).patterns.length > 0
           ? {

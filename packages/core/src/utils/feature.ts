@@ -4,6 +4,7 @@ import { Env } from './env.js';
 import { makeRequest } from './http.js';
 import { createLogger } from './logger.js';
 import { Cache } from './cache.js';
+import { TemplateManager } from './templates.js';
 
 const DEFAULT_REASON = 'Disabled by owner of the instance';
 
@@ -126,34 +127,83 @@ export class FeatureControl {
   /**
    * Fetches patterns from all configured URLs and accumulates them.
    */
+  // Cache for custom template patterns
+  private static _customTemplateCache: { patterns: string[]; lastTemplateCount: number } | undefined;
+
   private static async _refreshPatterns(): Promise<void> {
+    let patternsToAdd: string[] = [];
+
     const urls = Env.ALLOWED_REGEX_PATTERNS_URLS;
-    if (!urls || urls.length === 0) {
-      return;
+    if (urls && urls.length > 0) {
+      logger.debug(`Refreshing regex patterns from ${urls.length} URLs...`);
+      const fetchPromises = await Promise.allSettled(
+        urls.map(fetchPatternsFromUrl)
+      );
+
+      const patternsFromUrls = fetchPromises
+        .filter(
+          (result): result is PromiseFulfilledResult<string[]> =>
+            result.status === 'fulfilled'
+        )
+        .flatMap((result) => result.value);
+
+      patternsToAdd = [...patternsToAdd, ...patternsFromUrls];
     }
 
-    logger.debug(`Refreshing regex patterns from ${urls.length} URLs...`);
-    const fetchPromises = await Promise.allSettled(
-      urls.map(fetchPatternsFromUrl)
-    );
+    if (Env.REGEX_TRUST_INSTANCE_TEMPLATES) {
+      // Cache for custom template patterns and a version to detect changes
+      if (!this._customTemplateCache) {
+        this._customTemplateCache = {
+          patterns: [],
+          lastTemplateCount: 0,
+        };
+      }
+      const customTemplates = TemplateManager.getTemplates().filter(
+        (t) => t.metadata.source === 'custom'
+      );
+      // Only recompute if the number of custom templates has changed
+      if (customTemplates.length !== this._customTemplateCache.lastTemplateCount) {
+        const customTemplatePatterns = customTemplates.flatMap((template) => {
+          const patterns: string[] = [];
+          if (template.config.excludedRegexPatterns) {
+            patterns.push(...template.config.excludedRegexPatterns);
+          }
+          if (template.config.includedRegexPatterns) {
+            patterns.push(...template.config.includedRegexPatterns);
+          }
+          if (template.config.requiredRegexPatterns) {
+            patterns.push(...template.config.requiredRegexPatterns);
+          }
+          if (template.config.preferredRegexPatterns) {
+            patterns.push(
+              ...template.config.preferredRegexPatterns.map((p) =>
+                typeof p === 'string' ? p : p.pattern
+              )
+            );
+          }
+          return patterns;
+        });
+        this._customTemplateCache.patterns = customTemplatePatterns;
+        this._customTemplateCache.lastTemplateCount = customTemplates.length;
+      }
+      if (this._customTemplateCache.patterns.length > 0) {
+        logger.debug(
+          `Adding ${this._customTemplateCache.patterns.length} regex patterns from ${customTemplates.length} custom templates`
+        );
+        patternsToAdd = [...patternsToAdd, ...this._customTemplateCache.patterns];
+      }
+    }
 
-    const patternsFromUrls = fetchPromises
-      .filter(
-        (result): result is PromiseFulfilledResult<string[]> =>
-          result.status === 'fulfilled'
-      )
-      .flatMap((result) => result.value);
-
-    if (patternsFromUrls.length > 0) {
+    if (patternsToAdd.length > 0) {
       const initialCount = this._patternState.patterns.length;
       const allPatterns = [
-        ...new Set([...this._patternState.patterns, ...patternsFromUrls]),
+        ...new Set([...this._patternState.patterns, ...patternsToAdd]),
       ];
       this._patternState.patterns = allPatterns;
       const newCount = allPatterns.length - initialCount;
       if (newCount > 0) {
         logger.info(
-          `Accumulated ${newCount} new regex patterns from URLs. Total: ${allPatterns.length}`
+          `Accumulated ${newCount} new regex patterns. Total: ${allPatterns.length}`
         );
       }
     }
@@ -212,7 +262,11 @@ export class FeatureControl {
     return this._patternState;
   }
 
-  public static async isRegexAllowed(userData: UserData, regexes?: string[]) {
+  public static async isRegexAllowed(userData: UserData, regexes?: string[], templateSource?: 'builtin' | 'custom' | 'external') {
+    if (templateSource === 'builtin') {
+      return true;
+    }
+
     const { patterns } = await this.allowedRegexPatterns();
     if (regexes && regexes.length > 0) {
       const areAllRegexesAllowed = regexes.every((regex) =>
