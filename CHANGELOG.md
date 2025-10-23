@@ -1,5 +1,30 @@
 # Changelog
 
+## [2.16.1](https://github.com/Viren070/AIOStreams/compare/v2.16.0...v2.16.1) (2025-10-23)
+
+
+### Features
+
+* add strict filtering option for year matching ([9818513](https://github.com/Viren070/AIOStreams/commit/98185137bae95676d1a8da2f15bcfdbfe2ff42c9))
+* add strict mode to season/episode matching ([703e284](https://github.com/Viren070/AIOStreams/commit/703e284e0a21e8fc43292a8524ff202f27c25a29))
+* **metadata/tmdb:** use original titles from response and refactor alternative title fetching ([3f97c6f](https://github.com/Viren070/AIOStreams/commit/3f97c6f1e81e46dd4ba42cca57475f52d6ecbf35)), closes [#442](https://github.com/Viren070/AIOStreams/issues/442)
+* **templates:** add auto updating of external templates, allow overriding builtin/custom templates through imports, caching ([d6b9657](https://github.com/Viren070/AIOStreams/commit/d6b965738755ab8fa91c3e487ca473f7cc58970f))
+
+
+### Bug Fixes
+
+* **builtins/newznab:** update url hash after proxying ([236935d](https://github.com/Viren070/AIOStreams/commit/236935d923e856212e5283ca20e8e8f8fff1b69b))
+* correctly handle fallback of seasonEpisode ([6a5e26d](https://github.com/Viren070/AIOStreams/commit/6a5e26dc29af5b5c9ea4c65f55078b586f5126f2))
+* handle & in title normalisation/cleaning ([e91307b](https://github.com/Viren070/AIOStreams/commit/e91307b39d6cf7c38c8f2f22b0ca24feb535af23))
+* improve detection of separators in title preprocessing ([90bbe8b](https://github.com/Viren070/AIOStreams/commit/90bbe8b5977487367f93d01810b5fc76f858ae16))
+* improve handling of title matching ([3fa7bc7](https://github.com/Viren070/AIOStreams/commit/3fa7bc757dd1f68c93a33da8298a5f7450570920)), closes [#441](https://github.com/Viren070/AIOStreams/issues/441)
+* improve logging of errors during public ip retrieval ([d29d268](https://github.com/Viren070/AIOStreams/commit/d29d268b869aaf9d8a2b7f03e12fc95ca18a5314))
+* improve tmdb validation behaviour ([cb3c143](https://github.com/Viren070/AIOStreams/commit/cb3c14348af894118c9b1b2a17f201aa69d6e43c))
+* **metadata:** don't use tvdb id mapping for movies and only use cinemetaData.released when necessary ([86e65e7](https://github.com/Viren070/AIOStreams/commit/86e65e71ae5f1427a81d8d030440c22bf5ee0920))
+* **metadata:** parse and format release date from cinemetaData if available ([d8b6460](https://github.com/Viren070/AIOStreams/commit/d8b6460dccffa92d78174c1f4119c215193f7810))
+* only apply excludeSeasonPacks option to series type ([d9730a0](https://github.com/Viren070/AIOStreams/commit/d9730a0f330ffeab057d021cb430d3e04f86fb94))
+* replace certain characters with spaces ([533e477](https://github.com/Viren070/AIOStreams/commit/533e477da99113bf67b0c1777cb625e5fa8ba7e8))
+
 ## [2.16.0](https://github.com/Viren070/AIOStreams/compare/v2.15.4...v2.16.0) (2025-10-20)
 
 
