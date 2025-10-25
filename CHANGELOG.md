@@ -1,5 +1,17 @@
 # Changelog
 
+## [2.16.2](https://github.com/Viren070/AIOStreams/compare/v2.16.1...v2.16.2) (2025-10-25)
+
+
+### Bug Fixes
+
+* **frontend:** provide initialUuid, adjust start setup button text when logged in ([852ba9c](https://github.com/Viren070/AIOStreams/commit/852ba9c485e16091501bcccf93f8df6d2464eace))
+* improve patterns for detecting 2 titles ([5812346](https://github.com/Viren070/AIOStreams/commit/5812346da5a6e72fe4537db84bdd8448934a7973))
+* normalise redirect url when extracting infohash ([c8cce41](https://github.com/Viren070/AIOStreams/commit/c8cce4176a0eb09a44edc8dc1a6db84c5fff6c13))
+* parse size strings using bytes library for accurate size conversion ([108099b](https://github.com/Viren070/AIOStreams/commit/108099b30da62c01e90d985db870937471266337))
+* **presets/sootio:** update for http providers ([297c4c0](https://github.com/Viren070/AIOStreams/commit/297c4c068bd1ea79a1b877eea4d3f6774e0bfaf1))
+* update ip fields to accept any string ([4a25c1a](https://github.com/Viren070/AIOStreams/commit/4a25c1aee10477895486cfb55b06e211bc43a961)), closes [#453](https://github.com/Viren070/AIOStreams/issues/453)
+
 ## [2.16.1](https://github.com/Viren070/AIOStreams/compare/v2.16.0...v2.16.1) (2025-10-23)
 
 
