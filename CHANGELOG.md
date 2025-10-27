@@ -1,5 +1,21 @@
 # Changelog
 
+## [2.16.4](https://github.com/Viren070/AIOStreams/compare/v2.16.3...v2.16.4) (2025-10-27)
+
+
+### Features
+
+* add dynamic checkpoint extraction for exit conditions ([8ce12cd](https://github.com/Viren070/AIOStreams/commit/8ce12cd94cfd610c1758d878a26acdabfedbd082))
+
+
+### Bug Fixes
+
+* add parsedFile in search api result ([373286b](https://github.com/Viren070/AIOStreams/commit/373286be67a536304e76017f636e38998faf3a8c))
+* improve IP handling in user data via schema and middleware ([#461](https://github.com/Viren070/AIOStreams/issues/461)) ([deb6b58](https://github.com/Viren070/AIOStreams/commit/deb6b58a131d7a4203eeeecdb2d4ddf0474278f6))
+* invalidate stream cache entry if search only produces errors ([5083b06](https://github.com/Viren070/AIOStreams/commit/5083b0607dc352ce034fbde8b427dc7f5387f282))
+* **presets/streamasia:** default to 0 hidden kisskh catalogues & update version to 1.3.4 ([e9a9cc2](https://github.com/Viren070/AIOStreams/commit/e9a9cc275a226ac8a4c751d97c997819011f2878))
+* remove .iso from non video files list ([a2a1946](https://github.com/Viren070/AIOStreams/commit/a2a19463ed19b718329f21d4cb739908463b9feb))
+
 ## [2.16.3](https://github.com/Viren070/AIOStreams/compare/v2.16.2...v2.16.3) (2025-10-26)
 
 
