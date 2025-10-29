@@ -9,6 +9,8 @@ import {
 } from '@aiostreams/core';
 
 const logger = createLogger('server');
+const PORT = Number(process.env.PORT || Env.PORT || 3000);
+const HOST = '0.0.0.0';
 
 async function initialiseDatabase() {
   try {
@@ -22,9 +24,7 @@ async function initialiseDatabase() {
 
 async function startAutoPrune() {
   try {
-    if (Env.PRUNE_MAX_DAYS < 0) {
-      return;
-    }
+    if (Env.PRUNE_MAX_DAYS < 0) return;
     await UserRepository.pruneUsers(Env.PRUNE_MAX_DAYS);
   } catch {}
   setTimeout(startAutoPrune, Env.PRUNE_INTERVAL * 1000);
@@ -33,12 +33,16 @@ async function startAutoPrune() {
 async function start() {
   try {
     await initialiseDatabase();
+
     if (Env.PRUNE_MAX_DAYS >= 0) {
       startAutoPrune();
     }
+
     logStartupInfo();
-    app.listen(Env.PORT, () => {
-      logger.info(`Server running on port ${Env.PORT}`);
+
+    // Bind to 0.0.0.0 so Render detects the port
+    app.listen(PORT, HOST, () => {
+      logger.info(`Server running on http://${HOST}:${PORT}`);
     });
   } catch (error) {
     logger.error('Failed to start server:', error);
