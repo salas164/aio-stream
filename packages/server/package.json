@@ -6,9 +6,11 @@
     "test": "vitest run --passWithNoTests",
     "test:watch": "vitest watch",
     "build": "tsc",
-    "prepublish": "npm run build"
+    "prepublish": "npm run build",
+    "start": "node dist/server.js",
+    "dev": "ts-node src/server.ts"
   },
-  "description": "Combine all your streams into one addon and display them with consistent formatting, sorting, and filtering.",
+  "description": "Combine all your streams into one unified API service.",
   "dependencies": {
     "@aiostreams/core": "^0.0.0",
     "express": "^4.21.2",
