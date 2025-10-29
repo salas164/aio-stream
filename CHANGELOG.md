@@ -1,5 +1,12 @@
 # Changelog
 
+## [2.16.5](https://github.com/Viren070/AIOStreams/compare/v2.16.4...v2.16.5) (2025-10-29)
+
+
+### Bug Fixes
+
+* **presets/streamasia:** update version ([141771c](https://github.com/Viren070/AIOStreams/commit/141771c305dd348de546d6db1b5c4eef22b25520))
+
 ## [2.16.4](https://github.com/Viren070/AIOStreams/compare/v2.16.3...v2.16.4) (2025-10-27)
 
 
